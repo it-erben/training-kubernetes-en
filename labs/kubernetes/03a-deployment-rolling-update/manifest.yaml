@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-demo
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1 # Gibt an, wie viele Pods bei einem Rollout zusätzlich gestartet werden können
+      maxUnavailable: 0 # Gibt an, wie hoch die Anzahl der Replicas beim Rollout unter dem normalen Wert sein darf
+  selector:
+    matchLabels:
+      app: deployment-demo
+  template:
+    metadata:
+      labels:
+        app: deployment-demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine3.17
+          ports:
+            - containerPort: 80

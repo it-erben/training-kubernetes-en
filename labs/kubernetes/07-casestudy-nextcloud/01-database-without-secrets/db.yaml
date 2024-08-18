@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nextcloud-db
+  namespace: nextcloud
+spec:
+  serviceName: "nextcloud-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextcloud-db
+  template:
+    metadata:
+      labels:
+        app: nextcloud-db
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:latest
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "mysecretpassword"
+            - name: MYSQL_DATABASE
+              value: "nextcloud"
+            - name: MYSQL_USER
+              value: "nextcloud"
+            - name: MYSQL_PASSWORD
+              value: "nextcloudpassword"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-db
+  namespace: nextcloud
+spec:
+  clusterIP: None
+  selector:
+    app: nextcloud-db
+  ports:
+    - protocol: TCP
+      port: 3306

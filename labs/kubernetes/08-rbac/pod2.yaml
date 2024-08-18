@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kubectl-pod
+  namespace: default
+spec:
+  serviceAccountName: my-kubectl-sa
+  containers:
+  - name: kubectl-container
+    image: bitnami/kubectl:latest
+    command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+  restartPolicy: Always
+

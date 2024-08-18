@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-recreate-demo
+spec:
+  replicas: 10
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: deployment-recreate-demo
+  template:
+    metadata:
+      labels:
+        app: deployment-recreate-demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine3.17
+          ports:
+            - containerPort: 80
