@@ -29,7 +29,7 @@ spec:
     name: nginx-replicaset
   minReplicas: 1
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 50
+  targetCPUUtilizationPercentage: 30
 ```
 
 Wendet danach euer Manifest mit dem HPA mit `kubectl apply` an.
