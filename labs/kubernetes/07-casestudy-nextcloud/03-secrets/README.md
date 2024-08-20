@@ -2,9 +2,7 @@
 
 Euch ist vielleicht schon aufgefallen, dass wir Datenbanknutzer und Passwort im Manifest für PhpMyAdmin einfach kopiert haben aus dem Manifest für die Datenbank. Das ist unschön – und auch unsicher. Wir wollen nun die Zugangsdaten in ein Kubernetes-Secret auslagern.
 
-Dazu liefere ich euch diesmal kein fertiges Manifest. Aber hier ist eine Anleitung, wie ihr vorgehen müsst, am Beispiel des Datenbank-StatefulSet:
-
-Der Abschnitt mit den Umgebungsvariablen, den wir ersetzen wollen, sieht wie folgt aus:
+Die Abschnitte mit den Umgebungsvariablen, die wir ersetzen wollen, sehen wie folgt aus:
 
 ```yaml
 env:
@@ -18,23 +16,8 @@ env:
   value: "nextcloudpassword"
 ```
 
-Für diese Einträge brauchen wir im ersten Schritt ein Secret.
+Für diese Einträge brauchen wir im ersten Schritt ein Secret. Erstellt ein Manifest `secret.yaml`, welches obige Schlüssel und Werte enthält. 
 
-```yaml
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: nextcloud-db-secret
-  namespace: nextcloud
-type: Opaque
-stringData:
-  MYSQL_USER: "nextcloud"
-  MYSQL_ROOT_PASSWORD: "mysecretpassword"
-  MYSQL_PASSWORD: "nextcloudpassword"
-  MYSQL_DATABASE: "nextcloud"
-```
-Dieses Manifest legt ihr euch am besten in eine Datei `secret.yaml` an, die ihr später anwenden werdet.
 Das Secret müssen wir nun in das Manifest `db.yaml` sowie in `pma.yaml` referenzieren.
 Für das StatefulSet der Datenbank sieht dies wie Folgt aus:
 
@@ -82,7 +65,7 @@ env:
   value: "3306"
 ```
 
-Wenn ihr fertig seid, könnt ihr die beiden Dateien mit apply anwenden:
+Wenn ihr fertig seid, könnt ihr die Dateien mit apply anwenden:
 
 ```shell
 kubectl apply -f secret.yaml

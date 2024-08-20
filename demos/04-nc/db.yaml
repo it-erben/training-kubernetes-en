@@ -19,14 +19,26 @@ spec:
         - name: mariadb
           image: mariadb:latest
           env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: "mysecretpassword"
-            - name: MYSQL_DATABASE
-              value: "nextcloud"
-            - name: MYSQL_USER
-              value: "nextcloud"
-            - name: MYSQL_PASSWORD
-              value: "nextcloudpassword"
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-db-secret
+                key: MYSQL_ROOT_PASSWORD
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-db-secret
+                key: MYSQL_USER
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-db-secret
+                key: MYSQL_PASSWORD
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-db-secret
+                key: MYSQL_DATABASE
           ports:
             - containerPort: 3306
           volumeMounts:

@@ -2,7 +2,7 @@
 
 Die letzte und wichtigste Komponente, die noch fehlt, ist Nextcloud selbst.
 
-In [nextcloud.yaml](nextcloud.yaml) habe ich euch ein vorgefertigtes Deployment bereitgestellt.
+In [nextcloud.yaml](../../../../demos/04-nc/nextcloud.yaml) habe ich euch ein vorgefertigtes Deployment bereitgestellt.
 Aber da ihr jetzt schon etwas fortgeschritten seid, fehlt noch etwas! Das Deployment verwendet nämlich kein PersistentVolume. Nach einem Update wären alle Daten weg!
 
 Wir müssen uns also darum kümmern, ein PersistentVolume anzufragen und zu mounten.
