@@ -29,11 +29,10 @@ env:
       - CPU: `100m` (100 Millikernprozessoren)
       - Speicher: `100Mi` (100 Megabyte)
 
-## Service erstellen:**
+## Service erstellen
 - Definiere einen Service mit dem Namen `phpmyadmin` im Namespace `nextcloud`.
 - Setze den Port auf `80`, um den phpMyAdmin-Service auf diesem Port verfügbar zu machen.
 - Setze `targetPort` auf `80`, damit der Service den Container-Port korrekt weiterleitet.
-- Definiere `nodePort` auf `30000`, damit der Service von außerhalb des Clusters über diesen Port erreichbar ist.
 - Setze den Servicetyp auf `NodePort`, um den Zugriff auf phpMyAdmin von außerhalb des Kubernetes-Clusters zu ermöglichen.
 
 Wende das Manifest an.
