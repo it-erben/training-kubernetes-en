@@ -72,6 +72,24 @@ minikube service my-service
 
 Im Browser sollten nun die Webseite erscheinen, die wir oben angelegt haben.
 
+## Pod löschen und neu anlegen
+
+Lösche nun den Pod my-pod und wende das Manifest neu an, damit der Pod wieder angelegt wird. Starte nun wieder den Service-Tunnel und prüfe, ob die Webseite immer noch erscheint.
+
+```shell
+kubectl delete pod my-pod
+kubectl apply -f manifest.yaml
+minikube service my-service
+```
+
+Um zu verstehen, warum das so ist, kannst du dir die PersistentVolumes anschauen. Lösche noch einmal den Pod und lass' dir anzeigen, ob das PV noch existiert:
+
+```shell
+kubectl delete pod my-pod
+kubectl get pv
+```
+
+
 ## Aufräumen
 
 Um die erstellten Ressourcen vollständig zu entfernen, gehen wir diesmal den einfachen Weg:
