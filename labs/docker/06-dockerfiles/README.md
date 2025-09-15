@@ -11,7 +11,7 @@ docker build -t my_flask_app .
 
 Starte nun einen Container davon
 ```shell
-docker run --rm -d -p 8080:80 --name my_flask_container my_flask_app
+docker run -d -p 8080:80 --name my_flask_container my_flask_app
 ```
 
 Öffne nun einen Browser auf http://localhost:8080 und schau, ob die Anwendung läuft.
