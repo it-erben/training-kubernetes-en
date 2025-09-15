@@ -33,13 +33,17 @@ docker rm my-httpd
 ```
 
 ## Übung 2
+
 In dieser Übung üben wir nochmal, einen Container zu erzeugen und zu starten.
 Anschließend benutzen wird den `exec`-Befehl, um auf einem laufenden Container Änderungen vorzunehmen.
 Wir installieren dabei den Texteditor nano und führen ihn danach auf dem Container aus.
+
 --- 
+
 Erzeuge mit `docker create` und `start` einen nginx Container.
 
 ```shell
+docker pull nginx:latest
 docker create --name praxisaufgabe nginx
 docker start praxisaufgabe
 ```
