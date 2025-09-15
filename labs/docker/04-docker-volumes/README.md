@@ -3,9 +3,19 @@ In dieser kurzen Übung schauen wir uns an, wie Bind Mounts in Docker funktionie
 Dazu findest du in diesem Verzeichnis eine Datei [script.py](script.py), welche ein einfaches Python-Skript enthält.
 
 Starte einen Container vom `python:3`-Image. Gib' als Startprogramm `bash` an. Mounte das Verzeichnis, in dem das Python-Skript liegt, in das Containerverzeichnis `/tmp/scripts`:
+
+Unter Windows:
 ```shell
-docker run -it --rm -v .:/tmp/scripts python:3 bash
+docker run -it --rm --mount type=bind,source="${PWD}",target=/tmp/scripts python:3 bash
 ```
+
+Unter Linux und macOS:
+```shell
+docker run -it --rm -v "$(pwd):/tmp/scripts" python:3 bash
+```
+
+---
+
 Du befindest dich nun in einer Bash-Sitzung innerhalb des Containers. Führe das Skript aus:
 ```shell
 python /tmp/scripts/script.py
