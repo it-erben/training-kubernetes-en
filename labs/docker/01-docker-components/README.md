@@ -7,9 +7,9 @@ Lass' dir nun den heutigen Tag ausgeben.
 ```python
 from datetime import date
 str(date.today())
-# '2023-12-06'
+# '202X-12-06'
 ```
-Den Interpreter kannst du mit STRG+D verlassen – so wie auch den Container.
+Den Interpreter kannst du mit STRG+Z unter Windows oder STRG+D unter Linux und macOS verlassen – so wie auch den Container.
 
 # 2 Docker Client
 Manchmal verhält sich das Docker CLI nicht so, wie es soll. Es ist wichtig zu wissen, wie man sich Informationen über die lokale Docker-Installation beschaffen kann.
@@ -41,6 +41,6 @@ Gehe auf https://hub.docker.com/ und suche nach dem Image `node`.
 
 Ermittle folgende Informationen:
 - Wie viele bekannte Sicherheitslücken hat das Image mit dem Tag `latest`?
-- Welches Base-Image wurde für dieses Image benutzt? (Tipp: Auf den Hash des obersten Layers dieses Images klicken)
+- Welches Base-Image wurde für dieses Image benutzt? (Klicke dafür auf "buildpack-deps" in der Liste)
 - Würdest du insgesamt sagen, dass man dieses Image in Produktion einsetzen kann?
 - Egal ob du auf die letzte Frage mit "ja" oder "nein" geantwortet hast: Welchen Tag von "node" könnte man statt "latest" nehmen?
