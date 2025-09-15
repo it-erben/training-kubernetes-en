@@ -5,7 +5,7 @@
 In dieser Übung gehen wir das Erzeugen, Starten, Stoppen und Löschen von Containern durch.
 Mache dich mit den Befehlen vertraut und lass dir ruhig etwas Zeit, die jeweiligen Ausgaben der Befehle zu verstehen.
 
-Erzeuge einen Container vom `node:latest` Image und nenne es "my-httpd"
+Erzeuge einen Container vom `httpd:latest` Image und nenne es "my-httpd"
 
 ```shell
 docker pull httpd:latest
