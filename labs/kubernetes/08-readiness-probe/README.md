@@ -5,7 +5,7 @@ In dieser Übungsaufgabe zeige ich euch, wie ihr Readiness-Probes einsetzen kön
 ## Vorbereitung: Deployment aufsetzen
 
 In [manifest.yaml](./manifest.yaml) findet ihr ein Deployment mit NGINX-Containern. 
-Es enthält bewusst einen Fehler in der Readiness-Probe. Ihr dürft ihn finden und beheben.
+Es enthält bewusst einen Fehler in der Readiness-Probe.
 
 Wendet als Erstes das Manifest an:
 
