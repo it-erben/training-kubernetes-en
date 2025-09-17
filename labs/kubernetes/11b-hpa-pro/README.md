@@ -10,7 +10,7 @@ minikube addons enable metrics-server
 Lege danach folgende Ressourcen an:
 
 - Ein `ReplicaSet` mir 3 Replikas. Als Image verwendest du bitte `nginx:latest`. Beachte, dass die Port-Einstellung korrekt ist.
-- Einen dazu passenden `Service` vom Typ `ClusterIP`
+- Einen dazu passenden `Service` vom Typ `ClusterIP`, der `nginx-service` heißt.
 
 Füge danach in den nginx-Container im `ReplicaSet` folgenden Eintrag ein. Die Kommentare oben und unten dienen dir nur als Orientierung, wo dieses Schnippsel hingehört.
 
@@ -69,6 +69,7 @@ Wir wollen nun die Probe aufs Exempel machen und prüfen, ob das Autoscaling wir
 
 - In der ersten Sitzung führt ihr den Befehl `kubectl get hpa -w` aus. Dadurch könnt ihr kontinuierlich sehen, wie viele Pods laufen.
 - Im zweiten Fenster lassen wir einen Lasttest laufen: 
+
 
 ```shell
 kubectl run -i --tty loadtest --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.0001; do wget -q -O- http://nginx-service; done"
