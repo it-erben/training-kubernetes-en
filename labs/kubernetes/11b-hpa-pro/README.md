@@ -7,15 +7,26 @@ Autoscaling mit dem `HorizontalPodAutoscaler`, auch HPA genannt. Damit der HPA s
 minikube addons enable metrics-server
 ```
 
-Der HPA braucht die vom Metrics-Server bereitgestellten Metriken, um zu entscheiden, wann er skalieren muss.
+Lege danach folgende Ressourcen an:
 
-Danach könnt ihr das [Manifest](./manifest.yaml) anwenden, um ein NGINX-ReplicaSet inklusive Service anzulegen:
+- Ein `ReplicaSet` mir 3 Replikas. Als Image verwendest du bitte `nginx:latest`. Beachte, dass die Port-Einstellung korrekt ist.
+- Einen dazu passenden `Service` vom Typ `ClusterIP`
 
-```shell
-kubectl apply -f manifest.yaml
+Füge danach in den nginx-Container im `ReplicaSet` folgenden Eintrag ein. Die Kommentare oben und unten dienen dir nur als Orientierung, wo dieses Schnippsel hingehört.
+
+```yaml
+# image: nginx:latest
+  resources:
+    requests:
+      cpu: "100m"
+    limits:
+      cpu: "100m"
+# ports: ...
 ```
 
-Das allein reicht aber nicht für Autoscaling. Wir brauchen nun noch die HPA-Ressource. Legt dazu eine neue Datei an und fügt diese Ressource ein:
+Wendet danach euer Manifest mit dem HPA mit `kubectl apply` an.
+
+Für Autoscaling brauchen nun noch die HPA-Ressource. Legt dazu eine neue Datei an und fügt diese Ressource ein:
 
 ```yaml
 apiVersion: autoscaling/v1
@@ -26,11 +37,13 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: ReplicaSet
-    name: nginx-replicaset
+    name: # Hier den Namen eintragen
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 30
 ```
+
+Fügt den korrekten Namen eures `ReplicaSet` ein!
 
 Wendet danach euer Manifest mit dem HPA mit `kubectl apply` an.
 
