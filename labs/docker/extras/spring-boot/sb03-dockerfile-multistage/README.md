@@ -1,21 +1,25 @@
-# ---------- Stage 1: Builder ----------
-FROM maven:3-eclipse-temurin-17 AS builder
-WORKDIR /workspace
+# Multistage-Build
 
-# nur pom.xml für besseren Cache
-COPY pom.xml .
-RUN mvn -q -DskipTests dependency:go-offline
+Du wandelst nun die bestehende Single-Stage-Dockerfile in einen Multistage-Build um. Der Build-Stage erzeugt das Jar, der Runtime-Stage enthält nur das Nötigste zum Ausführen.
 
-# jetzt Quellcode und Build
-COPY src ./src
-RUN mvn -B -DskipTests package
+## Dockerfile in Multistage umbauen
 
-# ---------- Stage 2: Runtime ----------
-FROM eclipse-temurin:17-jre AS runtime
-WORKDIR /app
+### Stage 1 (Builder)
 
-# nur das fertige Jar übernehmen
-COPY --from=builder /workspace/target/*.jar /app/app.jar
+- Verwende das Base-Image `maven:3-eclipse-temurin-17`
+- Setze das Arbeitsverzeichnis auf `/workspace`
+- Kopiere die `pom.xml` und führe einen Dependency-Cache aus (`mvn -q -DskipTests dependency:go-offline`)
+- Kopiere das Verzeichnis `src/` und baue das Jar mit Maven
 
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+### Stage 2 (Runtime)
+
+- Kopiere **nur** das Jar aus Stage 1 nach `/app/app.jar`
+- Setze einen korrekten Entrypoint
+
+## Dockerignore anlegen
+
+Erzeuge eine Datei `.dockerignore` und füge die Verzeichnisse `target` und `.git` hinzu
+
+## Image bauen und testen
+
+Baue nun mit Docker das Image und teste es danach auf Funktionsfähigkeit.

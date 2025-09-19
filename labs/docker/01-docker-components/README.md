@@ -18,7 +18,6 @@ str(date.today())
 
 Schließe nun das Fenster.
 
-
 ## Übung 2: Docker Client
 
 Manchmal verhält sich das Docker CLI nicht so, wie es soll. Es ist wichtig zu wissen, wie man sich Informationen über die lokale Docker-Installation beschaffen kann.

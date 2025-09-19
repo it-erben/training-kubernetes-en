@@ -43,6 +43,6 @@ Setze das `nginx`-Image als Basis ein und erweitere es wie folgt:
 - Baue das Image und starte einen Container davon. Der laufende Container soll unter Port 9000 erreichbar sein und obige HTML-Seite anzeigen.
 - Prüfe, ob alles funktioniert, indem du http://localhost:9000 aufrufst.
 
->- Für diese Aufgabe reichen die Dockerfile-Direktiven `FROM` und `COPY`
->- Um einem Image direkt beim Build einen Namen zu geben, verwende das `-t` Flag. Beispiel: `docker build . -t my-nginx`.
->- NGINX lauscht innerhalb Container standardmäßig auf Port 80. Auf dem Host soll NGINX aber unter Port 9000 erreichbar sein. Dabei hilft dir das `-p` Argument. Beispiel: `docker run -p 9000:80 my-nginx`
+> - Für diese Aufgabe reichen die Dockerfile-Direktiven `FROM` und `COPY`
+> - Um einem Image direkt beim Build einen Namen zu geben, verwende das `-t` Flag. Beispiel: `docker build . -t my-nginx`.
+> - NGINX lauscht innerhalb Container standardmäßig auf Port 80. Auf dem Host soll NGINX aber unter Port 9000 erreichbar sein. Dabei hilft dir das `-p` Argument. Beispiel: `docker run -p 9000:80 my-nginx`
