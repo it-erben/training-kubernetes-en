@@ -104,7 +104,9 @@ Beispiel:
 ```Dockerfile
 VOLUME ["/data"]
 ```
-Best Practices
+
+### Best Practices
+
 - Verwende kleine Basis-Images, um die Größe des resultierenden Images zu reduzieren.
 - Fasse mehrere RUN-Anweisungen zusammen, um die Anzahl der erstellten Ebenen zu reduzieren.
 - Verwende `.dockerignore`, um unnötige Dateien aus dem Build-Kontext auszuschließen.
