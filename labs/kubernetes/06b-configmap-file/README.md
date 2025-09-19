@@ -27,11 +27,12 @@ data:
 
 Speichere sie in einer Datei ab und wende sie mit kubectl an.
 Erstelle nun eine YAML-Datei mit einem Pod, welche obige ConfigMap als Volume mountet und als Startseite von NGINX verfügbar macht. Nimm dazu diesen Mount als Vorlage:
+
 ```yaml
 volumeMounts:
-- name: nginx-index-volume
-  mountPath: /usr/share/nginx/html/index.html
-  subPath: index.html
+  - name: nginx-index-volume
+    mountPath: /usr/share/nginx/html/index.html
+    subPath: index.html
 ```
 
 Erstelle zuletzt einen NodePort-Service namens "nginx-service" der auf den Pod weiterleitet.
@@ -40,4 +41,3 @@ Verwende folgenden Befehl, um einen Tunnel zum Service zu öffnen und zu testen,
 ```yaml
 minikube service nginx-service
 ```
-

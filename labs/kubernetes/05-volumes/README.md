@@ -43,14 +43,17 @@ Du kannst auch die index.html-Datei verwenden, die in diesem Verzeichnis liegt.
 ```html
 <!DOCTYPE html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Meine persönliche Webseite</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Hallo, das ist meine persönliche Webseite!</h1>
-    <p>Willkommen auf meiner Webseite, die in einem Kubernetes-Pod mit einem Persistent Volume läuft.</p>
-</body>
+    <p>
+      Willkommen auf meiner Webseite, die in einem Kubernetes-Pod mit einem
+      Persistent Volume läuft.
+    </p>
+  </body>
 </html>
 ```
 
@@ -88,7 +91,6 @@ Um zu verstehen, warum das so ist, kannst du dir die PersistentVolumes anschauen
 kubectl delete pod my-pod
 kubectl get pv
 ```
-
 
 ## Aufräumen
 

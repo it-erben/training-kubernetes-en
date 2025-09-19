@@ -5,8 +5,7 @@ metadata:
   namespace: default
 spec:
   containers:
-  - name: kubectl-container
-    image: bitnami/kubectl:latest
-    command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+    - name: kubectl-container
+      image: bitnami/kubectl:latest
+      command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
   restartPolicy: Always
-

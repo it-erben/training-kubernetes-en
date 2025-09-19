@@ -4,6 +4,7 @@ In diesem Beispiel werden wir Prometheus in einen Minikube-Cluster installieren.
 Zuerst legen wir dafür einen eigenen Namespace für Prometheus an. In diesem werden alle Workloads für Prometheus installiert.
 
 ## Schritt 1: Prometheus einrichten
+
 Erstelle ein neues Namespace für Monitoring:
 
 ```shell
@@ -18,6 +19,7 @@ cd kube-prometheus/manifests
 ```
 
 Installiere die CRDs (Custom Resource Definitions) für Prometheus:
+
 ```shell
 kubectl apply --server-side -f setup/
 ```
@@ -27,6 +29,7 @@ Installiere die Prometheus-Operator-Ressourcen:
 ```shell
 kubectl apply -f .
 ```
+
 Hinweis: Das kann einige Minuten dauern. Du kannst den Status der Deployments überwachen:
 
 ```shell

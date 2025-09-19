@@ -16,11 +16,11 @@ Füge danach in den nginx-Container im `ReplicaSet` folgenden Eintrag ein. Die K
 
 ```yaml
 # image: nginx:latest
-  resources:
-    requests:
-      cpu: "100m"
-    limits:
-      cpu: "100m"
+resources:
+  requests:
+    cpu: "100m"
+  limits:
+    cpu: "100m"
 # ports: ...
 ```
 
@@ -53,14 +53,18 @@ Mit `targetCPUUtilizationPercentage` wird definiert, dass die CPU-Auslastung im 
 Es kann nun etwas dauern, bis der HPA korrekt seine Arbeit verrichtet – abhängig davon, wie lange der Metrics Server braucht, um CPU-Metriken zu sammeln.
 
 Um zu prüfen, ob der HPA bereit ist, führt den folgenden Befehl aus:
+
 ```shell
 kubectl get hpa
 ```
+
 Es ist wichtig, dass bei TARGETS nicht "unknown" steht, sondern zwei Prozentzahlen:
+
 ```shell
 NAME        REFERENCE                     TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
 nginx-hpa   ReplicaSet/nginx-replicaset   0%/30%    3         10        3          2m24s
 ```
+
 Wenn dies noch nicht der Fall ist, dann ist der Metrics-Server noch nicht bereit. Das kann tatsächlich mehrere Minuten dauern.
 
 ## Lasttest
@@ -68,8 +72,7 @@ Wenn dies noch nicht der Fall ist, dann ist der Metrics-Server noch nicht bereit
 Wir wollen nun die Probe aufs Exempel machen und prüfen, ob das Autoscaling wirklich funktioniert. Am besten macht ihr dafür nun zwei Powershell-Sitzungen auf:
 
 - In der ersten Sitzung führt ihr den Befehl `kubectl get hpa -w` aus. Dadurch könnt ihr kontinuierlich sehen, wie viele Pods laufen.
-- Im zweiten Fenster lassen wir einen Lasttest laufen: 
-
+- Im zweiten Fenster lassen wir einen Lasttest laufen:
 
 ```shell
 kubectl run -i --tty loadtest --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.0001; do wget -q -O- http://nginx-service; done"

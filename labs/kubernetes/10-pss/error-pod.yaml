@@ -8,4 +8,4 @@ spec:
     - name: privileged-container
       image: alpine:latest
       securityContext:
-        privileged: true  # Privilegierter Container
+        privileged: true # Privilegierter Container

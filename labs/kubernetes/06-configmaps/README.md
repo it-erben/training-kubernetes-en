@@ -11,6 +11,7 @@ Wir werden sowohl imperative als auch deklarative Methoden verwenden, um die Con
 #### Imperative Methode
 
 Der folgende Befehl legt eine ConfigMap mit Namen "my-config" an und enthält zwei Schlüssel-Wert-Kombinationen.
+
 ```bash
 kubectl create configmap my-config --from-literal=key1=value1 --from-literal=key2=value2
 ```
@@ -69,7 +70,7 @@ kubectl apply -f config-pod.yaml
 kubectl logs config-pod
 ```
 
-In den Logs seht ihr alle Umgebungsvariablen, die der Pod kennt. Unter anderem sollten auch `key1` und `key2` enthalten sein. 
+In den Logs seht ihr alle Umgebungsvariablen, die der Pod kennt. Unter anderem sollten auch `key1` und `key2` enthalten sein.
 
 Aufräumen:
 
@@ -90,8 +91,9 @@ kubectl apply -f volume-pod.yaml
 Wir prüfen nun, ob die Dateien erfolgreich in den Pod gemountet wurden:
 
 ```bash
-kubectl exec -it volume-pod -- ls /etc/config 
+kubectl exec -it volume-pod -- ls /etc/config
 ```
+
 ```bash
 kubectl exec -it volume-pod -- cat /etc/config/key1
 ```
@@ -101,6 +103,7 @@ Im ersten Fall seht ihr alle Dateien, die angelegt wurden im Rahmen des Mountens
 Haltet jetzt noch einmal einen moment inne und führt euch vor Augen, dass Kubernetes dem Pod für jede Schlüssel-Wert-Kombination in der ConfigMap eine Datei zur Verfügung stellt. Die Dateien enthalten jeweils die in der ConfigMap genannten Werte.
 
 Aufräumen:
+
 ```shell
 kubectl delete configmap/my-config
 kubectl delete pod/volume-pod

@@ -7,6 +7,7 @@ Aber da ihr jetzt schon etwas fortgeschritten seid, fehlt noch etwas! Das Deploy
 
 Wir müssen uns also darum kümmern, ein PersistentVolume anzufragen und zu mounten.
 Als Erstes braucht ihr einen PersistentVolumeClaim:
+
 ```yaml
 ---
 apiVersion: v1

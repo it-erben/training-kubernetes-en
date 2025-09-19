@@ -57,6 +57,7 @@ kubectl rollout history deployment/deployment-demo
 ```
 
 ## Aufräumen
+
 ```shell
 kubectl delete deployment.apps/deployment-demo
 ```

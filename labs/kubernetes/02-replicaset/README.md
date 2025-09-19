@@ -11,7 +11,7 @@ Erstelle das ReplicaSet mit dem Manifest:
 kubectl apply -f manifest.yaml
 ```
 
-Das Manifest enthält ein `ReplicaSet` von drei NGINX-Pods. 
+Das Manifest enthält ein `ReplicaSet` von drei NGINX-Pods.
 Stelle sicher, dass alle Pods korrekt erstellt wurden:
 
 ```sh
@@ -29,12 +29,13 @@ kubectl delete pod <POD_NAME>
 Prüfe die Podliste erneut.
 
 ```sh
-kubectl get pods --selector=app=replicaset-demo 
+kubectl get pods --selector=app=replicaset-demo
 ```
 
 Das ReplicaSet sollte nun wieder einen dritten Pod angelegt haben. Falls nicht, musst du vielleicht ein paar Sekunden warten.
 
 ## Aufräumen
+
 ```shell
 kubectl delete replicaset.apps/replicaset-demo
 ```

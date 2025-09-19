@@ -6,63 +6,65 @@ Die Abschnitte mit den Umgebungsvariablen, die wir ersetzen wollen, sehen wie fo
 
 ```yaml
 env:
-- name: MYSQL_ROOT_PASSWORD
-  value: "mysecretpassword"
-- name: MYSQL_DATABASE
-  value: "nextcloud"
-- name: MYSQL_USER
-  value: "nextcloud"
-- name: MYSQL_PASSWORD
-  value: "nextcloudpassword"
+  - name: MYSQL_ROOT_PASSWORD
+    value: "mysecretpassword"
+  - name: MYSQL_DATABASE
+    value: "nextcloud"
+  - name: MYSQL_USER
+    value: "nextcloud"
+  - name: MYSQL_PASSWORD
+    value: "nextcloudpassword"
 ```
 
-Für diese Einträge brauchen wir im ersten Schritt ein Secret. Erstellt ein Manifest `secret.yaml`, welches obige Schlüssel und Werte enthält. 
+Für diese Einträge brauchen wir im ersten Schritt ein Secret. Erstellt ein Manifest `secret.yaml`, welches obige Schlüssel und Werte enthält.
 
 Das Secret müssen wir nun in das Manifest `db.yaml` sowie in `pma.yaml` referenzieren.
 Für das StatefulSet der Datenbank sieht dies wie Folgt aus:
 
 ```yaml
 env:
-- name: MYSQL_ROOT_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: nextcloud-db-secret
-      key: MYSQL_ROOT_PASSWORD
-- name: MYSQL_USER
-  valueFrom:
-    secretKeyRef:
-      name: nextcloud-db-secret
-      key: MYSQL_USER
-- name: MYSQL_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: nextcloud-db-secret
-      key: MYSQL_PASSWORD
-- name: MYSQL_DATABASE
-  valueFrom:
-    secretKeyRef:
-      name: nextcloud-db-secret
-      key: MYSQL_DATABASE
+  - name: MYSQL_ROOT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: nextcloud-db-secret
+        key: MYSQL_ROOT_PASSWORD
+  - name: MYSQL_USER
+    valueFrom:
+      secretKeyRef:
+        name: nextcloud-db-secret
+        key: MYSQL_USER
+  - name: MYSQL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: nextcloud-db-secret
+        key: MYSQL_PASSWORD
+  - name: MYSQL_DATABASE
+    valueFrom:
+      secretKeyRef:
+        name: nextcloud-db-secret
+        key: MYSQL_DATABASE
 ```
+
 Das Muster ist immer das Gleiche. Der `name` der Umgebungsvariable bleibt so wie vorher, aber der Wert kommt jetzt aus dem Secret.
 
 Für PhpMyAdmin in der `pma.yaml` müssen wir es ein wenig anders machen, weil die Umgebungsvariablen anders heißen:
+
 ```yaml
 env:
-- name: PMA_USER
-  valueFrom:
-    secretKeyRef:
-      name: nextcloud-db-secret
-      key: MYSQL_USER
-- name: PMA_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: nextcloud-db-secret
-      key: MYSQL_PASSWORD
-- name: PMA_HOST
-  value: nextcloud-db
-- name: PMA_PORT
-  value: "3306"
+  - name: PMA_USER
+    valueFrom:
+      secretKeyRef:
+        name: nextcloud-db-secret
+        key: MYSQL_USER
+  - name: PMA_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: nextcloud-db-secret
+        key: MYSQL_PASSWORD
+  - name: PMA_HOST
+    value: nextcloud-db
+  - name: PMA_PORT
+    value: "3306"
 ```
 
 Wenn ihr fertig seid, könnt ihr die Dateien mit apply anwenden:

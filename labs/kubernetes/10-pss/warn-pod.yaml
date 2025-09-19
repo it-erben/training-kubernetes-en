@@ -8,5 +8,5 @@ spec:
     - name: nginx
       image: nginx:latest
       securityContext:
-        runAsUser: 0  # Als root-Benutzer laufen
+        runAsUser: 0 # Als root-Benutzer laufen
         allowPrivilegeEscalation: false

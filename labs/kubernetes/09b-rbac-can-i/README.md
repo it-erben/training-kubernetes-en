@@ -9,7 +9,7 @@ In dieser Übung wirst du zwei ServiceAccounts sowie entsprechende Rollen in Kub
 
 ## Erstelle Rollen
 
-- Erstelle eine Rolle namens `admin` im Default-Namespace. Diese Rolle soll Vollzugriff (* auf alle Verben) auf die Ressourcentypen `Pod`, `ReplicaSet` und `CronJob` haben.
+- Erstelle eine Rolle namens `admin` im Default-Namespace. Diese Rolle soll Vollzugriff (\* auf alle Verben) auf die Ressourcentypen `Pod`, `ReplicaSet` und `CronJob` haben.
 - Erstelle eine Rolle namens `developer` im Default-Namespace. Diese Rolle soll nur Lesezugriff (`get`, `list`, `watch`) auf die Ressourcentypen `Pod`, `ReplicaSet` und `CronJob` haben.
 
 ## Erstelle RoleBindings

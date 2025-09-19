@@ -28,15 +28,16 @@ Löse nun ein Update aus durch eine neue Imageversion, z.B. `nginx:alpine3.18`.
 kubectl set image deployment/deployment-recreate-demo nginx=nginx:alpine3.18
 ```
 
-Überwache das Rolling-Update. 
+Überwache das Rolling-Update.
 
 ```bash
 kubectl rollout status deployment/deployment-recreate-demo
 ```
 
-Es fällt sofort auf, dass das Rollout sehr viel schneller geht als beim Rolling Update. Das Deployment geht im Modus `Recreate` nämlich nicht Pod für Pod vor, sondern löscht alle auf einmal und legt sie neu an. 
+Es fällt sofort auf, dass das Rollout sehr viel schneller geht als beim Rolling Update. Das Deployment geht im Modus `Recreate` nämlich nicht Pod für Pod vor, sondern löscht alle auf einmal und legt sie neu an.
 
 ## Aufräumen
+
 ```shell
 kubectl delete deployment.apps/deployment-recreate-demo
 ```

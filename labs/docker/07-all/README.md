@@ -45,4 +45,4 @@ _Hinweis: Port-Mapping nicht vergessen._
 
 ---
 
-👉 Ziel dieser Übung: Du gehst einmal den gesamten Lebenszyklus durch – vom vorhandenen Programm über Image und Container bis hin zu Volumes und Netzwerken, und schließlich der Bereinigung.
+Ziel dieser Übung: Du gehst einmal den gesamten Lebenszyklus durch – vom vorhandenen Programm über Image und Container bis hin zu Volumes und Netzwerken, und schließlich der Bereinigung.
