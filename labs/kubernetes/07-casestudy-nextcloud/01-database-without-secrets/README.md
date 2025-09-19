@@ -17,6 +17,7 @@ Deine Aufgabe ist es nun, ein Kubernetes-Manifest zu erstellen, das eine MariaDB
 - Setze die Anzahl der Replikate (replicas) auf `1`, da wir nur eine Instanz der Datenbank benötigen.
 - Lege ein Container-Template für MariaDB an, das das neueste MariaDB-Image (`mariadb:latest`) verwendet.
 - Füge Umgebungsvariablen hinzu, um die Datenbank zu konfigurieren:
+
   ```yaml
   env:
     - name: MYSQL_ROOT_PASSWORD
@@ -31,6 +32,7 @@ Deine Aufgabe ist es nun, ein Kubernetes-Manifest zu erstellen, das eine MariaDB
 
   - Definiere einen Volume-Mount, der sicherstellt, dass die Datenbankdaten im Verzeichnis `/var/lib/mysql` gespeichert werden.
   - Erstelle ein VolumeClaimTemplate, das ein Persistent Volume mit einer Größe von `10Gi` anfordert und sicherstellt, dass es nur von einem Knoten gleichzeitig beschrieben werden kann (AccessMode: `ReadWriteOnce`).
+
   ```yaml
   volumeClaimTemplates:
     - metadata:
