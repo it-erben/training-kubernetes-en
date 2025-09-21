@@ -16,21 +16,15 @@ Starte nun einen Container davon
 docker run -d -p 8080:80 --name my_flask_container my_flask_app
 ```
 
-Öffne nun einen Browser auf http://localhost:8080 und schau, ob die Anwendung läuft.
+Öffne nun einen Browser auf [](http://localhost:8080) und schau, ob die Anwendung läuft.
 
-Schau dir die Logs an
+Schau dir nun die Logs an.
 
 ```shell
 docker logs my_flask_container
 ```
 
-Cleanup:
-
-```shell
-docker stop my_flask_container
-docker container rm my_flask_container
-docker image rm my_flask_app
-```
+Lösche nun Container und Image.
 
 ## Aufgabe 2
 

@@ -1,49 +1,73 @@
 # Docker Basics
 
-## Übung 1: Unser erster Docker-Container
+## Übung 1: Erster Container – Hello World
 
-Um uns langsam an Docker heranzutasten, starten wir einen Container vom Python 3-Image und testen, ob Python auch wirklich funktioniert
+Starte einen Container, um zu prüfen, ob Docker auf deinem Rechner funktioniert:
+
+```shell
+docker run hello-world
+```
+
+Du solltest eine Begrüßungsnachricht von Docker sehen.  
+Damit weißt du: Docker Engine und Docker Daemon laufen.
+
+---
+
+## Übung 2: Python im Container
+
+Starte einen interaktiven Container mit Python:
 
 ```shell
 docker run -it --rm python:3 python
 ```
 
-Lass' dir nun den heutigen Tag ausgeben.
+Prüfe im Python-Prompt das heutige Datum:
 
 ```python
 from datetime import date
-str(date.today())
-# '202X-12-06'
+print(date.today())
 ```
 
-Schließe nun das Fenster.
+Die Ausgabe sollte in etwa so aussehen (abhängig vom heutigen Datum):
 
-## Übung 2: Docker Client
+```
+2025-09-21
+```
 
-Manchmal verhält sich das Docker CLI nicht so, wie es soll. Es ist wichtig zu wissen, wie man sich Informationen über die lokale Docker-Installation beschaffen kann.
+Beende die Python-Sitzung mit `exit()` oder `CTRL+D`.
+
+---
+
+## Übung 3: Docker Client
+
+Manchmal verhält sich das Docker CLI nicht so, wie man es erwartet.  
+Es ist wichtig zu wissen, wie man sich Informationen zur Installation anzeigen lassen kann:
 
 ```shell
 docker version
-
 ```
 
-Ermittle mit docker version folgende Informationen:
+Ermittle und notiere:
+- Welche Version von **Docker Desktop** ist installiert?
+- Welche Version der **Docker Engine** ist installiert?
 
-- Welche Version von Docker Desktop ist installiert?
-- Welche Version der Docker Engine ist installiert?
+👉 Hinweis: Die Angaben findest du in den Abschnitten `Client` und `Server`.
 
-## Übung 3: Docker Daemon
+---
 
-Wir können uns auch Informationen über den Daemon ausgeben lassen. Der Docker Client wird dazu eine Verbindung zum Host aufbauen – der in unserem Fall auf der gleichen Maschine läuft.
+## Übung 4: Docker Daemon
+
+Mit dem folgenden Befehl bekommst du Informationen über den Docker-Daemon:
 
 ```shell
 docker info
 ```
 
-Ermittle die folgenden Informationen:
+Beantworte die folgenden Fragen:
+- Welche **Default Runtime** verwendet der Daemon?
+- Welche **Runtimes** sind insgesamt verfügbar?
+- Welches **Operating System** hat der Host?
+- Wie viele **CPUs** stehen zur Verfügung?
+- Wieviel **Memory** steht zur Verfügung?
 
-- Welche Runtime verwendet der Daemon zum Start der Container? (Hinweis: "Default Runtime")
-- Welche sind insgesamt verfügbar? (Hinweis: "Runtimes")
-- Welches OS hat der Host?
-- Wie viele CPUs stehen zur Verfügung?
-- Wieviel Memory steht zur Verfügung?
+> Tipp: Scrolle im Output und suche gezielt nach diesen Feldern.
