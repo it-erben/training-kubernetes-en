@@ -25,11 +25,10 @@ Wir üben den Umgang mit Tags und Aliassen.
 
 > Hinweis: Auch einen Alias setzt man mit dem `tag`-Befehl.
 
-* Überprüfe, welche Tags das Image bei dir lokal hat.
+* Überprüfe, welche Tags das Image bei dir lokal hat (siehe Feld `.RepoTags`)
 * Entferne zunächst den Alias-Tag `my-node:latest`.
 * Entferne danach auch den Tag `node:latest`.
 ´
-Beobachte genau die Ausgaben des CLI:
-*	Worin unterscheiden sich die Rückmeldungen beim Entfernen?
+Beobachte genau die Ausgaben des CLI: Worin unterscheiden sich die Rückmeldungen beim Entfernen?
 *	Was ist der Unterschied zwischen Tag löschen und Image löschen?
 
