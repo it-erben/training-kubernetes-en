@@ -10,6 +10,7 @@ Mounte dabei das Verzeichnis, in dem das Python-Skript liegt, in das Containerve
 > - Einen interaktiven Container startet man, indem man den `run`-Befehl mit den Argumenten `-it` benutzt.
 > - Das Startprogramm gibt man ganz am Ende des `run`-Befehls an.
 > - Verzeichnisse mountet man mit `-v <HOST_PFAD>:<CONTAINER_PFAD>`
+> - Wenn ihr das aktuelle Verzeichnis, in dem ihr euch auf dem Host befindet, mounten wollt, nutzt `-v "${CMD}:<CONTAINER_PFAD>"`
 
 ---
 
