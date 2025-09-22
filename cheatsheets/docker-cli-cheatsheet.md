@@ -28,7 +28,8 @@
 - `docker stop <name>` – Stoppt laufenden Container
 - `docker rm <name>` – Löscht gestoppten Container
 - `docker logs <name>` – Zeigt Container-Logs
-- `docker exec -it <name> <cmd>` – Führt Befehl im Container aus (z. B. `bash`)
+- `docker exec <name> <cmd>` – Führt einen Befehl im Container aus(z. B. `nano`)
+- `docker exec -it <name> <cmd>` – Öffnet eine interaktive Sitzung mit dem Container (z. B. `bash`)
 
 ---
 

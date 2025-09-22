@@ -22,6 +22,6 @@ Wir installieren dabei den Texteditor `nano` und führen ihn danach auf dem Cont
 
 > Die oben genannten Befehle enthalten Leerzeichen. Denk' also daran, sie in Anführungszeichen zu packen.
 
-- Verbinde dich mit dem Container durch eine Bash-Sitzung und starte `nano`. (Tipp: `docker exec <CONTAINER> bash`)
+- Verbinde dich mit dem Container durch eine Bash-Sitzung und starte `nano`. (Tipp: `docker exec -it <CONTAINER> bash`)
 
 > Dadurch hast du jetzt gelernt, wie du dich nachträglich mit einem Container verbindest. Du kannst jetzt gerne den Container löschen.
