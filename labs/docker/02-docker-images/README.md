@@ -20,7 +20,7 @@ Beantworte die folgenden Fragen (achte auf die JSON-Felder im Output):
 
 Wir üben den Umgang mit Tags und Aliassen.
 
-* Recherchiere das offizielle node-Image auf Docker Hub und lade es herunter.
+* Lade mit dem `pull`-Befehl das Image `node:latest` herunter
 * Vergib einen Alias mit dem Namen `my-node:latest`.
 
 > Hinweis: Auch einen Alias setzt man mit dem `tag`-Befehl.
