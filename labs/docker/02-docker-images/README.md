@@ -22,12 +22,13 @@ Wir üben den Umgang mit Tags und Aliassen.
 
 * Recherchiere das offizielle node-Image auf Docker Hub und lade es herunter.
 * Vergib einen Alias mit dem Namen `my-node:latest`.
-* Überprüfe, welche Tags das Image bei dir lokal hat.
-* Entferne zunächst den Alias-Tag `my-node:latest`.
-* Entferne danach auch den Tag `node:latest`.
 
 > Hinweis: Auch einen Alias setzt man mit dem `tag`-Befehl.
 
+* Überprüfe, welche Tags das Image bei dir lokal hat.
+* Entferne zunächst den Alias-Tag `my-node:latest`.
+* Entferne danach auch den Tag `node:latest`.
+´
 Beobachte genau die Ausgaben des CLI:
 *	Worin unterscheiden sich die Rückmeldungen beim Entfernen?
 *	Was ist der Unterschied zwischen Tag löschen und Image löschen?
