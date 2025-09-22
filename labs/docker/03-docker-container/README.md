@@ -6,9 +6,9 @@ In dieser Übung gehen wir das Erzeugen, Starten, Stoppen und Löschen von Conta
 Mache dich mit den Befehlen vertraut und lass dir ruhig etwas Zeit, die jeweiligen Ausgaben der Befehle zu verstehen.
 
 - Erzeuge mit dem `create`-Befehl einen Container vom `httpd:latest` Image und nenne den Container `my-httpd`
-- Lass' dir den Container mit dem `ls`-Befehl anzeigen (an das `-a` Flag denken, denn er ist noch nicht gestartet)
+- Lass' dir den Container mit dem `docker container ls`-Befehl anzeigen (an das `-a` Flag denken, denn er ist noch nicht gestartet)
 - Starte den Container mit dem `start`-Befehl
-- Lass dir den Zustand aller Container mit dem `ps`-Befehl anzeigen und suche den `my-httpd`-Container
+- Lass dir den Zustand aller Container mit dem `docker ps`-Befehl anzeigen und suche den `my-httpd`-Container
 - Stoppe und lösche anschließend den Container
 
 ## Übung 2: Befehle ausführen
