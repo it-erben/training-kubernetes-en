@@ -11,7 +11,7 @@
 
 - `docker images` – Listet vorhandene Images
 - `docker pull <image>:<tag>` – Image aus Registry laden (default: `latest`)
-- `docker rmi <image>:<tag>` – Entfernt ein Image
+- `docker image rm <image>:<tag>` – Entfernt ein Image
 - `docker inspect <image>` – Details (z. B. `.Os`, `.Created`, `.Config.Env`)
 - `docker tag <image>:<tag> <alias>:<tag>` – Alias/Umbenennung eines Images
 - `docker push <image>:<tag>` – Image in Registry hochladen
