@@ -23,7 +23,7 @@
 - `docker ps` – Laufende Container
 - `docker ps -a` – Alle Container (auch gestoppte)
 - `docker run -it --rm <image> <cmd>` – Startet Container interaktiv & löscht ihn beim Beenden
-- `docker create --name <name> <image>` – Startet einen neuen Container
+- `docker create --name <name> <image>` – Legt einen neuen Container an, der noch nicht gestartet ist
 - `docker start <name>` – Startet gestoppten Container
 - `docker stop <name>` – Stoppt laufenden Container
 - `docker rm <name>` – Löscht gestoppten Container
