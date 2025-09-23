@@ -26,12 +26,12 @@ RUN apt-get update && apt-get install -y curl
 
 ### CMD
 
-* `CMD ["executable", "param1", "param2"]`: Gibt den Standardbefehl an, der ausgeführt wird, wenn der Container gestartet wird. Es kann nur eine `CMD`-Anweisung im Dockerfile geben. Wenn mehrere angegeben sind, wird nur die letzte verwendet.
+* `CMD ["executable", "param1", "param2"]`: Gibt den Standardbefehl an, der ausgeführt wird, wenn der Container gestartet wird. Es sollte nur eine `CMD`-Anweisung im Dockerfile geben. Wenn mehrere angegeben sind, wird nur die letzte verwendet.
 
 Beispiel:
 
 ```Dockerfile
-CMD ["echo", "Hello, World!"]
+CMD ["java", "-jar", "app.jar"]
 ```
 
 ### ENTRYPOINT
@@ -42,7 +42,6 @@ Beispiel:
 
 ```Dockerfile
 ENTRYPOINT ["echo"]
-CMD ["Hello, World!"]
 ```
 
 ### COPY
