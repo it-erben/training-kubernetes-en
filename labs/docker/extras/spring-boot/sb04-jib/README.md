@@ -8,7 +8,7 @@ Ausgangspunkt ist ein Spring Boot-Service, den du zuvor mit dem [Spring Initiali
 ## Schritt 1 – Jib-Plugin einbinden
 
 - Öffne die `pom.xml` deines Projekts.
-- Füge das Jib-Plugin in den Abschnitt `<plugins>` ein.
+- Füge das Jib-Plugin in den Abschnitt `<plugins>` ein. Denk daran, mit `<from>...</from>` ein Baseimage wie z.b. Eclipse Temurin zu verwenden
 
 > Setup-Anweisungen für Maven findest du [hier](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#quickstart).
 
@@ -16,8 +16,8 @@ Ausgangspunkt ist ein Spring Boot-Service, den du zuvor mit dem [Spring Initiali
 
 ## Schritt 2 – Lokales Image bauen
 
-Baue dein Projekt und erzeuge dabei ein Docker-Image. Das passiert automatisch, wenn Jib im Build eingebunden ist. 
-
+Baue dein Projekt und erzeuge dabei ein Docker-Image. 
+`mvn compile jib:dockerBuild`
 
 > Du brauchst kein Dockerfile und keine Docker-Daemon-Verbindung
 
