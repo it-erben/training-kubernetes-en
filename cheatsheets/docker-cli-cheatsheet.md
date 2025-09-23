@@ -39,6 +39,9 @@
 - `docker run -v <vol>:/path <image>` – Container mit Volume starten
 - `docker run -v $(pwd):/tmp/scripts <image>` – Bind-Mount (Host → Container)
 
+> Für Windows funktioniert es etwas anders
+> `docker run -v ${pwd}:/tmp/scripts <image>` – Bind-Mount (Host → Container)
+
 ---
 
 ## Netzwerke
