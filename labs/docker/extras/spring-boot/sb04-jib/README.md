@@ -10,16 +10,16 @@ Ausgangspunkt ist ein Spring Boot-Service, den du zuvor mit dem [Spring Initiali
 - Öffne die `pom.xml` deines Projekts.
 - Füge das Jib-Plugin in den Abschnitt `<plugins>` ein.
 
-_Hinweis: Jib hat eine eigene Plugin-Gruppe `com.google.cloud.tools` und die aktuelle Version findest du in der Dokumentation._
+> Setup-Anweisungen für Maven findest du [hier](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#quickstart).
 
 ---
 
 ## Schritt 2 – Lokales Image bauen
 
-- Baue dein Projekt und erzeuge dabei ein Docker-Image.
-- Verwende dabei ein eigenes Tag, z. B. `my-spring-boot-jib:latest`.
+Baue dein Projekt und erzeuge dabei ein Docker-Image. Das passiert automatisch, wenn Jib im Build eingebunden ist. 
 
-_Hinweis: Mit einem einfachen Maven-Befehl wird der Build ausgeführt – du brauchst kein Dockerfile und keine Docker-Daemon-Verbindung._
+
+> Du brauchst kein Dockerfile und keine Docker-Daemon-Verbindung
 
 ---
 
@@ -27,8 +27,6 @@ _Hinweis: Mit einem einfachen Maven-Befehl wird der Build ausgeführt – du bra
 
 - Starte einen Container aus deinem mit Jib erstellten Image.
 - Teste, ob dein Spring Boot-Service über den Browser oder `curl` erreichbar ist.
-
-_Hinweis: Spring Boot lauscht standardmäßig auf Port 8080._
 
 ---
 
