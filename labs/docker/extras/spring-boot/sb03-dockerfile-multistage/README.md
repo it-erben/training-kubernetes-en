@@ -8,17 +8,17 @@ Du wandelst nun die bestehende Single-Stage-Dockerfile in einen Multistage-Build
 
 - Verwende das Base-Image `maven:3-eclipse-temurin-17`
 - Setze das Arbeitsverzeichnis auf `/workspace`
-- Kopiere die `pom.xml` und führe einen Dependency-Cache aus (`mvn -q -DskipTests dependency:go-offline`)
-- Kopiere das Verzeichnis `src/` und baue das Jar mit Maven
+- Kopiere das Verzeichnis `src/` in das Image 
+- Baue das Jar mit Maven
 
 ### Stage 2 (Runtime)
 
 - Kopiere **nur** das Jar aus Stage 1 nach `/app/app.jar`
-- Setze einen korrekten Entrypoint
+- Setze einen korrekten `CMD` oder Entrypoint
 
 ## Dockerignore anlegen
 
-Erzeuge eine Datei `.dockerignore` und füge die Verzeichnisse `target` und `.git` hinzu
+Erzeuge neben der `Dockerfile` eine Datei `.dockerignore` und füge die Verzeichnisse `target` und `.git` hinzu
 
 ## Image bauen und testen
 
