@@ -26,7 +26,7 @@ Lege eine Datei `Dockerfile` an mit folgenden Eigenschaften:
 
 - Basis-Image: `eclipse-temurin:17-jre`
 - Kopiere das Jar, was beim Maven-Build im `target`-Verzeichnis entsteht, nach `/app/app.jar` im Image
-- Konfiguriere den Entrypoint so, dass die Jar beim Start des Containers mit `java` ausgeführt wird.
+- Konfiguriere den Cmd bzw. Entrypoint so, dass die Jar beim Start des Containers mit `java` ausgeführt wird.
 
 ## Image bauen und testen
 
