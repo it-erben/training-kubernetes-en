@@ -21,6 +21,9 @@
         <version>${jib.version}</version>
         <configuration>
           <!-- Lokaler Image-Name/Tag -->
+          <from>
+            <image>eclipse-temurin:17-jre</image>
+          </from>
           <to>
             <image>my-spring-boot-jib:latest</image>
           </to>
