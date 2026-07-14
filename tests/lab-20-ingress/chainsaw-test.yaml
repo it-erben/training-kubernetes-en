@@ -1,0 +1,22 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-20-ingress
+  labels: { suite: labs }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-20-ingress/01-deployment.yaml }
+        - apply: { file: ../../labs/kubernetes/lab-20-ingress/02-service.yaml }
+        - apply: { file: ../../labs/kubernetes/lab-20-ingress/03-ingress.yaml }
+        - assert:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata: { name: nginx-ingress-demo }
+              status: { availableReplicas: 2 }
+        - assert:
+            resource:
+              apiVersion: networking.k8s.io/v1
+              kind: Ingress
+              metadata: { name: nginx-ingress }

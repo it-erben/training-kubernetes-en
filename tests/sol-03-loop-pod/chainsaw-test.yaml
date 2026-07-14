@@ -1,0 +1,15 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-03-loop-pod
+  labels: { suite: solutions }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../solutions/kubernetes/lab-03-pods-challenge/loop-pod.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: loop }
+              status: { phase: Running }

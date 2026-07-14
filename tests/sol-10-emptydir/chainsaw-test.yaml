@@ -1,0 +1,17 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-10-emptydir
+  labels: { suite: solutions }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../solutions/kubernetes/lab-10-volumes-challenge/emptydir-two-containers.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: emptydir-demo }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"

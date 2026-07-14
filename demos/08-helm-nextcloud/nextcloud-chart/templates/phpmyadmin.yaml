@@ -1,0 +1,62 @@
+# {{- if .Values.phpmyadmin.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-phpmyadmin"
+  labels:
+    app: "{{ .Release.Name }}-phpmyadmin"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-phpmyadmin"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}-phpmyadmin"
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: "{{ .Values.phpmyadmin.image }}"
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.global.secretName }}"
+                  key: MYSQL_USER
+            - name: PMA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.global.secretName }}"
+                  key: MYSQL_PASSWORD
+            - name: PMA_HOST
+              value: "{{ .Release.Name }}-db"
+            - name: PMA_PORT
+              value: "3306"
+          resources:
+            requests:
+              cpu: "{{ .Values.phpmyadmin.resources.requests.cpu }}"
+              memory: "{{ .Values.phpmyadmin.resources.requests.memory }}"
+            limits:
+              cpu: "{{ .Values.phpmyadmin.resources.limits.cpu }}"
+              memory: "{{ .Values.phpmyadmin.resources.limits.memory }}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-phpmyadmin"
+  labels:
+    app: "{{ .Release.Name }}-phpmyadmin"
+spec:
+  selector:
+    app: "{{ .Release.Name }}-phpmyadmin"
+  ports:
+    - port: 80
+      targetPort: 80
+      # {{- if eq .Values.phpmyadmin.service.type "NodePort" }}
+      nodePort: "{{ .Values.phpmyadmin.service.nodePort }}"
+      # {{- end }}
+  type: "{{ .Values.phpmyadmin.service.type }}"
+# {{- end -}}

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simple-server-app"
+version = "0.1.0"
+description = "Simple HTTP server packaged as a wheel"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+  {name = "GFU Challenges"}
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+simple-server = "simple_server.server:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

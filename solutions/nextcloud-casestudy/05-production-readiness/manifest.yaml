@@ -1,0 +1,434 @@
+# -------------------------------------------------------------------
+# Nextcloud + MariaDB (and optional phpMyAdmin)
+# -------------------------------------------------------------------
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nextcloud
+
+---
+# -----------------------------
+# Secrets (split app vs root)
+# -----------------------------
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nextcloud-db-app
+  namespace: nextcloud
+type: Opaque
+stringData:
+  MYSQL_DATABASE: nextcloud
+  MYSQL_USER: nextcloud
+  MYSQL_PASSWORD: nextcloudpassword
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nextcloud-db-root
+  namespace: nextcloud
+type: Opaque
+stringData:
+  MYSQL_ROOT_PASSWORD: mysecretpassword
+
+---
+# ---------------------------------------------------------
+# Persistent storage for Nextcloud: persist ONLY data/config
+# (Do not persist the entire /var/www/html application tree.)
+# ---------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-data-pvc
+  namespace: nextcloud
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 20Gi
+  # storageClassName: standard  # optional; Minikube typically defaults fine
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-config-pvc
+  namespace: nextcloud
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# ---------------------------------------------------------
+# MariaDB headless Service (needed for StatefulSet DNS)
+# and a normal ClusterIP Service for clients.
+# ---------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-db
+  namespace: nextcloud
+  labels:
+    app: nextcloud-db
+spec:
+  clusterIP: None
+  selector:
+    app: nextcloud-db
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-db-clusterip
+  namespace: nextcloud
+  labels:
+    app: nextcloud-db
+spec:
+  type: ClusterIP
+  selector:
+    app: nextcloud-db
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+
+---
+# -----------------------------
+# MariaDB StatefulSet
+# -----------------------------
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nextcloud-db
+  namespace: nextcloud
+spec:
+  serviceName: nextcloud-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextcloud-db
+  template:
+    metadata:
+      labels:
+        app: nextcloud-db
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: mariadb
+          image: mariadb:11.4.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-root
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-app
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-app
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-app
+                  key: MYSQL_PASSWORD
+          ports:
+            - name: mysql
+              containerPort: 3306
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "4Gi"
+            limits:
+              cpu: "1000m"
+              memory: "4Gi"
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 1
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nextcloud-db-pdb
+  namespace: nextcloud
+spec:
+  minAvailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector:
+    matchLabels:
+      app: nextcloud-db
+---
+# -----------------------------
+# Nextcloud Service (internal)
+# -----------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud
+  namespace: nextcloud
+  labels:
+    app: nextcloud
+spec:
+  type: ClusterIP
+  selector:
+    app: nextcloud
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+
+---
+# -----------------------------
+# Nextcloud Deployment
+# -----------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+  namespace: nextcloud
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      containers:
+        - name: nextcloud
+          image: nextcloud:27.1.4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            # Point Nextcloud at the DB. Use the ClusterIP service for clients.
+            - name: MYSQL_HOST
+              value: "nextcloud-db-clusterip"
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-app
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-app
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-app
+                  key: MYSQL_PASSWORD
+
+            # Minikube-friendly defaults; adjust when using Ingress:
+            - name: NEXTCLOUD_TRUSTED_DOMAINS
+              value: "nextcloud.local localhost 127.0.0.1"
+            # If using Ingress (recommended), set these and/or configure via config.php later:
+            # - name: TRUSTED_PROXIES
+            #   value: "10.0.0.0/8 192.168.0.0/16"
+
+          volumeMounts:
+            # Persist only data + config (NOT the app code)
+            - name: nextcloud-data
+              mountPath: /var/www/html/data
+            - name: nextcloud-config
+              mountPath: /var/www/html/config
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "2Gi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 10
+      volumes:
+        - name: nextcloud-data
+          persistentVolumeClaim:
+            claimName: nextcloud-data-pvc
+        - name: nextcloud-config
+          persistentVolumeClaim:
+            claimName: nextcloud-config-pvc
+---
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nextcloud-pdb
+  namespace: nextcloud
+spec:
+  minAvailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector:
+    matchLabels:
+      app: nextcloud
+
+---
+# ---------------------------------------------------------
+# Optional Ingress (recommended over NodePort).
+#
+# Enable in Minikube:
+#   minikube addons enable ingress
+#
+# Map host to minikube IP (on your laptop):
+#   echo "$(minikube ip) nextcloud.local" | sudo tee -a /etc/hosts
+#
+# Then visit:
+#   http://nextcloud.local/
+# ---------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextcloud
+  namespace: nextcloud
+  annotations:
+    # Reasonable defaults for typical Nextcloud use; students can tune:
+    nginx.ingress.kubernetes.io/proxy-body-size: "2g"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: nextcloud.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nextcloud
+                port:
+                  number: 80
+
+---
+# ---------------------------------------------------------
+# Optional phpMyAdmin (generally not “production-ready”).
+# Keep it internal and access via port-forward only.
+#
+# Usage:
+#   kubectl -n nextcloud port-forward svc/phpmyadmin 8081:80
+#   open http://localhost:8081
+# ---------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin
+  namespace: nextcloud
+  labels:
+    app: phpmyadmin
+spec:
+  type: ClusterIP
+  selector:
+    app: phpmyadmin
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+  namespace: nextcloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin:5.2.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: nextcloud-db-clusterip
+            - name: PMA_PORT
+              value: "3306"
+            - name: PMA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-app
+                  key: MYSQL_USER
+            - name: PMA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-db-app
+                  key: MYSQL_PASSWORD
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---

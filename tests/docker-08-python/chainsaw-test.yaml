@@ -1,0 +1,13 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: docker-08-python
+  labels: { suite: docker }
+spec:
+  steps:
+    - try:
+        - script:
+            content: |
+              docker buildx build --check -f ../../solutions/docker/lab-08-docker-python-challenge/Dockerfile ../../solutions/docker/lab-08-docker-python-challenge
+            check:
+              ($error == null): true

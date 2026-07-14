@@ -1,0 +1,17 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-11-configmap-volume
+  labels: { suite: labs }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-11-configmaps/volume-pod.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: volume-pod }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"

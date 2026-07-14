@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kubectl-pod
+  namespace: default
+spec:
+  containers:
+    - name: kubectl-container
+      image: bitnami/kubectl:latest
+      command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+      readinessProbe:
+        exec:
+          command: ["/bin/sh", "-c", "true"]
+        initialDelaySeconds: 1
+        periodSeconds: 10
+      livenessProbe:
+        exec:
+          command: ["/bin/sh", "-c", "true"]
+        initialDelaySeconds: 5
+        periodSeconds: 20
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+        limits:
+          cpu: "200m"
+          memory: "256Mi"
+  restartPolicy: Always

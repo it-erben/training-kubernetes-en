@@ -1,0 +1,18 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-13-readiness-broken
+  labels: { suite: labs }
+spec:
+  steps:
+    # This lab is broken by design: the readiness probe hits port 81, so the
+    # Deployment must NEVER reach 3 available replicas. `error` passes when the
+    # match is NOT observed within the error timeout.
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-13-readiness-probe/manifest.yaml }
+        - error:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata: { name: readiness-check-demo-deploy }
+              status: { availableReplicas: 3 }

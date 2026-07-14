@@ -1,0 +1,17 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-14-probe
+  labels: { suite: solutions }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../solutions/kubernetes/lab-14-probe-challenge/web-server.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: web-server }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"

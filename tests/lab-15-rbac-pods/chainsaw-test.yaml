@@ -1,0 +1,36 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-15-rbac-pods
+  labels: { suite: labs }
+spec:
+  steps:
+    - name: pod-without-sa
+      try:
+        - apply: { file: ../../labs/kubernetes/lab-15-rbac/pod1.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: kubectl-pod, namespace: default }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"
+        - delete:
+            ref: { apiVersion: v1, kind: Pod, name: kubectl-pod, namespace: default }
+    - name: pod-with-sa
+      try:
+        - apply: { file: ../../labs/kubernetes/lab-15-rbac/pod2.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: kubectl-pod, namespace: default }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"
+      finally:
+        - delete:
+            ref: { apiVersion: v1, kind: Pod, name: kubectl-pod, namespace: default }
+        - delete:
+            ref: { apiVersion: v1, kind: ServiceAccount, name: my-kubectl-sa, namespace: default }

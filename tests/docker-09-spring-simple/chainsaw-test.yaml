@@ -1,0 +1,13 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: docker-09-spring-simple
+  labels: { suite: docker }
+spec:
+  steps:
+    - try:
+        - script:
+            content: |
+              docker buildx build --check -f ../../solutions/docker/lab-09-spring-boot-dockerfile-simple/Dockerfile ../../solutions/docker/lab-09-spring-boot-dockerfile-simple
+            check:
+              ($error == null): true

@@ -1,0 +1,15 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-07-recreate
+  labels: { suite: labs }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-07-deployment-recreate/manifest.yaml }
+        - assert:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata: { name: deployment-recreate-demo }
+              status: { availableReplicas: 10 }

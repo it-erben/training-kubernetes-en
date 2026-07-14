@@ -1,0 +1,20 @@
+apiVersion: chainsaw.kyverno.io/v1alpha2
+kind: Configuration
+metadata:
+  name: gfu-labs
+spec:
+  # Image pulls on a fresh cluster are slow, so be generous on assert.
+  timeouts:
+    apply: 90s
+    assert: 180s
+    error: 45s
+    delete: 120s
+    cleanup: 120s
+    exec: 600s
+  execution:
+    # A few labs schedule ~10 replicas; keep cluster pressure sane.
+    parallel: 4
+    failFast: false
+  cleanup:
+    # Tear down each test's resources after it finishes.
+    skipDelete: false

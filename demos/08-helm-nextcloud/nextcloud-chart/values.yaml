@@ -1,0 +1,31 @@
+global:
+  secretName: nextcloud-db-secret
+
+database:
+  image: mariadb:latest
+  rootPassword: mysecretpassword
+  user: nextcloud
+  password: nextcloudpassword
+  dbName: nextcloud
+  storage: 10Gi
+
+phpmyadmin:
+  enabled: true
+  image: phpmyadmin:5.2.3
+  service:
+    type: NodePort
+    nodePort: 30000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+nextcloud:
+  image: nextcloud:32.0.5
+  storage: 10Gi
+  service:
+    type: NodePort
+    nodePort: 30001

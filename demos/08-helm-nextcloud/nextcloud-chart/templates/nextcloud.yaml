@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-nextcloud"
+  labels:
+    app: "{{ .Release.Name }}-nextcloud"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-nextcloud"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}-nextcloud"
+    spec:
+      volumes:
+        - name: nextcloud-data
+          persistentVolumeClaim:
+            claimName: "{{ .Release.Name }}-nextcloud-pvc"
+      containers:
+        - name: nextcloud
+          image: "{{ .Values.nextcloud.image }}"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nextcloud-data
+              mountPath: /var/www/html
+          env:
+            - name: MYSQL_HOST
+              value: "{{ .Release.Name }}-db"
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.global.secretName }}"
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.global.secretName }}"
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.global.secretName }}"
+                  key: MYSQL_PASSWORD
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ .Release.Name }}-nextcloud-pvc"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "{{ .Values.nextcloud.storage }}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-nextcloud"
+  labels:
+    app: "{{ .Release.Name }}-nextcloud"
+spec:
+  selector:
+    app: "{{ .Release.Name }}-nextcloud"
+  ports:
+    - port: 80
+      targetPort: 80
+      # {{- if eq .Values.nextcloud.service.type "NodePort" }}
+      nodePort: "{{ .Values.nextcloud.service.nodePort }}"
+      # {{- end }}
+  type: "{{ .Values.nextcloud.service.type }}"

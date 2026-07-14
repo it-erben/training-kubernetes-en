@@ -1,0 +1,15 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: nc-02-phpmyadmin
+  labels: { suite: nextcloud }
+spec:
+  steps:
+    - try:
+        - script:
+            # Server-side dry-run: full admission + schema + quantity validation
+            # without scheduling the (heavy) MariaDB/Nextcloud workloads.
+            content: |
+              kubectl apply --dry-run=server -f ../../solutions/nextcloud-casestudy/02-phpmyadmin/pma.yaml
+            check:
+              ($error == null): true

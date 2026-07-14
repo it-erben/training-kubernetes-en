@@ -1,0 +1,26 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-17-pss
+  labels: { suite: labs }
+spec:
+  steps:
+    - name: namespace
+      try:
+        - apply: { file: ../../labs/kubernetes/lab-17-pss/ns.yaml }
+    - name: warn-pod-is-admitted
+      # Passes the 'baseline' enforce level (only 'restricted' would warn).
+      try:
+        - apply: { file: ../../labs/kubernetes/lab-17-pss/warn-pod.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: warning-pod, namespace: my-secure-namespace }
+    - name: privileged-pod-is-rejected
+      try:
+        - apply:
+            file: ../../labs/kubernetes/lab-17-pss/error-pod.yaml
+            expect:
+              - check:
+                  ($error != null): true

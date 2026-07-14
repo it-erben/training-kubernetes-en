@@ -1,0 +1,25 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-02-pods-services
+  labels: { suite: labs }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-02-pods-services/manifest.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: nginx-pod-1 }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: nginx-pod-2 }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"

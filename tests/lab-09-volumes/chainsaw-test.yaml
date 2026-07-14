@@ -1,0 +1,17 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-09-volumes
+  labels: { suite: labs }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-09-volumes/manifest.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: my-pod }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"

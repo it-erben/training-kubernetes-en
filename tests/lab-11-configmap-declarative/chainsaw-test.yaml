@@ -1,0 +1,15 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-11-configmap-declarative
+  labels: { suite: labs }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-11-configmaps/declarative-config.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: ConfigMap
+              metadata: { name: my-config }
+              data: { key1: value1, key2: value2 }

@@ -1,0 +1,243 @@
+# -------------------------------------------------------------------
+# Workload Identity + Azure Key Vault Demo
+# -------------------------------------------------------------------
+# Prerequisites (Azure resources must be created beforehand):
+#   - Key Vault with secrets
+#   - User-Assigned Managed Identity
+#   - Federated Identity Credential
+#   - RBAC: Identity -> Key Vault Secrets User
+#
+# Usage:
+#   export NAMESPACE="workload-identity-demo"
+#   export SERVICE_ACCOUNT_NAME="workload-identity-sa"
+#   export IDENTITY_CLIENT_ID="<client-id-of-the-managed-identity>"
+#   export KEYVAULT_NAME="<name-of-the-key-vault>"
+#   export TENANT_ID="<azure-tenant-id>"
+#   envsubst < manifest.yaml | kubectl apply -f -
+# -------------------------------------------------------------------
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${NAMESPACE}
+
+---
+# -----------------------------
+# ServiceAccount with Workload Identity
+# -----------------------------
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${SERVICE_ACCOUNT_NAME}
+  namespace: ${NAMESPACE}
+  annotations:
+    # This annotation links the ServiceAccount to the Azure Managed Identity
+    azure.workload.identity/client-id: "${IDENTITY_CLIENT_ID}"
+  labels:
+    # This label enables Workload Identity for pods using this ServiceAccount
+    azure.workload.identity/use: "true"
+
+---
+# -----------------------------
+# SecretProviderClass
+# Defines which secrets are loaded from Key Vault
+# -----------------------------
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: azure-keyvault-secrets
+  namespace: ${NAMESPACE}
+spec:
+  provider: azure
+  parameters:
+    # Workload Identity configuration
+    usePodIdentity: "false"
+    useVMManagedIdentity: "false"
+    clientID: "${IDENTITY_CLIENT_ID}"
+
+    # Key Vault configuration
+    keyvaultName: "${KEYVAULT_NAME}"
+    tenantId: "${TENANT_ID}"
+
+    # Secrets to load
+    objects: |
+      array:
+        - |
+          objectName: demo-secret
+          objectType: secret
+        - |
+          objectName: db-password
+          objectType: secret
+
+  # Optional: sync the secrets as a Kubernetes Secret
+  # This allows them to be used as environment variables
+  secretObjects:
+    - secretName: synced-secrets
+      type: Opaque
+      data:
+        - objectName: demo-secret
+          key: DEMO_SECRET
+        - objectName: db-password
+          key: DB_PASSWORD
+
+---
+# -----------------------------
+# Demo Pod
+# Shows both access methods:
+# 1. Secrets mounted as files
+# 2. Secrets as environment variables
+# -----------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: keyvault-demo
+  namespace: ${NAMESPACE}
+  labels:
+    app: keyvault-demo
+    azure.workload.identity/use: "true"
+spec:
+  serviceAccountName: ${SERVICE_ACCOUNT_NAME}
+  containers:
+    - name: demo
+      image: busybox:1.36
+      command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          echo "=========================================="
+          echo "  Workload Identity + Key Vault Demo"
+          echo "=========================================="
+          echo ""
+          echo "=== Secrets from Key Vault (as files) ==="
+          echo "Path: /mnt/secrets-store/"
+          ls -la /mnt/secrets-store/
+          echo ""
+          echo "demo-secret: $(cat /mnt/secrets-store/demo-secret)"
+          echo "db-password: $(cat /mnt/secrets-store/db-password)"
+          echo ""
+          echo "=== Secrets from Kubernetes Secret (Env Vars) ==="
+          echo "DEMO_SECRET: $DEMO_SECRET"
+          echo "DB_PASSWORD: $DB_PASSWORD"
+          echo ""
+          echo "=========================================="
+          echo "  Success! Pod stays running..."
+          echo "=========================================="
+          sleep 3600
+      env:
+        - name: DEMO_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: synced-secrets
+              key: DEMO_SECRET
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: synced-secrets
+              key: DB_PASSWORD
+      volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "64Mi"
+        limits:
+          cpu: "100m"
+          memory: "128Mi"
+  volumes:
+    - name: secrets-store
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "azure-keyvault-secrets"
+
+---
+# -----------------------------
+# Realistic Deployment example
+# Web app that uses secrets
+# -----------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-with-secrets
+  namespace: ${NAMESPACE}
+  labels:
+    app: webapp-with-secrets
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp-with-secrets
+  template:
+    metadata:
+      labels:
+        app: webapp-with-secrets
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: ${SERVICE_ACCOUNT_NAME}
+      containers:
+        - name: webapp
+          image: nginx:1.27
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            # Secret as an environment variable
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: synced-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            # Secrets also available as files
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure-keyvault-secrets"
+
+---
+# -----------------------------
+# Service for the Deployment
+# -----------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-with-secrets
+  namespace: ${NAMESPACE}
+  labels:
+    app: webapp-with-secrets
+spec:
+  type: ClusterIP
+  selector:
+    app: webapp-with-secrets
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80

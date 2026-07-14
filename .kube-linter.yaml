@@ -1,0 +1,18 @@
+checks:
+  exclude:
+    - "no-anti-affinity"
+    - "run-as-non-root"
+    - "no-read-only-root-fs"
+    - "drop-net-raw-capability"
+    - "no-privileged-containers"
+    # lab-17-pss/error-pod.yaml is privileged on purpose (demonstrates a Pod
+    # Security Standards rejection). The real kube-linter check names are
+    # privileged-container and privilege-escalation-container (the existing
+    # "no-privileged-containers" entry above is not a real check, so it is a
+    # no-op kept for clarity); both must be excluded for it to pass.
+    - "privileged-container"
+    - "privilege-escalation-container"
+    - "readiness-port"
+    - "liveness-port"
+    - "latest-tag"
+    - "pdb-min-available"

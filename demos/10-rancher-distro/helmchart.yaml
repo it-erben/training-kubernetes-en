@@ -1,0 +1,12 @@
+# K3s/RKE2-specific: a Helm release as a Kubernetes object.
+# The built-in Helm controller installs the chart — without the `helm` CLI.
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: podinfo
+  namespace: kube-system
+spec:
+  repo: https://stefanprodan.github.io/podinfo
+  chart: podinfo
+  targetNamespace: demo
+  createNamespace: true

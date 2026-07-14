@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>k3s · RKE2 · Rancher Manager — in the it-erben style</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ie-blue: #1B4FD8;
+  --ie-blue-hover: #1741B8;
+  --ie-ink: #172033;
+  --ie-slate: #5B6675;
+  --ie-bg: #EEF1F8;
+  --ie-bg-tint: #E3E9F6;
+  --ie-white: #FFFFFF;
+  --ie-border: #D5DBEA;
+  --ie-radius: 20px;
+  --ie-radius-pill: 999px;
+  --ie-shadow: 0 12px 40px rgba(23,32,51,.12);
+  --ie-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: var(--ie-font); color: var(--ie-slate);
+  background: #c9d2e6; display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 24px;
+}
+
+.slide {
+  position: relative; width: 1280px; height: 760px;
+  background: linear-gradient(160deg, var(--ie-bg) 0%, var(--ie-bg-tint) 100%);
+  border-radius: 28px; box-shadow: 0 30px 80px rgba(23,32,51,.25);
+  overflow: hidden; padding: 44px 56px; display: flex; flex-direction: column;
+}
+
+/* halftone-dot logo mark */
+.brand { display: flex; align-items: center; gap: 12px; }
+.dotmark {
+  width: 28px; height: 28px;
+  background-image: radial-gradient(var(--ie-blue) 38%, transparent 40%);
+  background-size: 7px 7px; border-radius: 50%;
+  -webkit-mask: radial-gradient(circle at center, #000 60%, transparent 62%);
+          mask: radial-gradient(circle at center, #000 60%, transparent 62%);
+  opacity: .9;
+}
+.brand .name { color: var(--ie-ink); font-weight: 700; font-size: .92rem; letter-spacing: -0.01em; }
+.brand .name span { color: var(--ie-slate); font-weight: 500; }
+
+header { display: flex; justify-content: space-between; align-items: center; }
+.eyebrow { color: var(--ie-blue); text-transform: uppercase; font-weight: 600; letter-spacing: .14em; font-size: .78rem; }
+
+h1 { color: var(--ie-ink); font-weight: 800; line-height: 1.04; letter-spacing: -0.02em; font-size: 2.55rem; margin: 18px 0 6px; }
+.lede { font-size: 1rem; max-width: 880px; line-height: 1.5; }
+
+/* ---- diagram ---- */
+.diagram { flex: 1; display: flex; flex-direction: column; margin-top: 20px; }
+
+/* control-plane band = Rancher Manager */
+.control {
+  background: var(--ie-blue); color: #fff; border-radius: var(--ie-radius);
+  box-shadow: 0 16px 40px rgba(27,79,216,.28);
+  padding: 18px 26px; display: flex; align-items: center; gap: 22px;
+}
+.control .badge {
+  font-size: .66rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
+  background: rgba(255,255,255,.18); border-radius: var(--ie-radius-pill); padding: .4em 1em; white-space: nowrap;
+}
+.control .ctitle { font-weight: 800; font-size: 1.35rem; letter-spacing: -0.01em; }
+.control .cdesc { font-size: .92rem; opacity: .92; line-height: 1.4; }
+
+/* connectors */
+.connectors { height: 38px; display: grid; grid-template-columns: repeat(3, 1fr); }
+.connectors .leg { position: relative; }
+.connectors .leg::before {
+  content: ""; position: absolute; left: 50%; top: 0; bottom: 8px;
+  width: 2px; background: var(--ie-border); transform: translateX(-50%);
+}
+.connectors .leg::after {
+  content: ""; position: absolute; left: 50%; bottom: 0;
+  width: 9px; height: 9px; border-right: 2px solid var(--ie-border); border-bottom: 2px solid var(--ie-border);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* cluster cards */
+.clusters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; flex: 1; }
+.card {
+  background: var(--ie-white); border: 1px solid var(--ie-border); border-radius: var(--ie-radius);
+  box-shadow: var(--ie-shadow); padding: 20px 22px; display: flex; flex-direction: column;
+}
+.card .tag {
+  align-self: flex-start; font-size: .64rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--ie-blue); background: #E8EEFC; border-radius: var(--ie-radius-pill); padding: .35em .85em; margin-bottom: 12px;
+}
+.card h2 { color: var(--ie-ink); font-size: 1.35rem; font-weight: 800; letter-spacing: -0.01em; }
+.card .role { color: var(--ie-slate); font-size: .85rem; font-weight: 500; margin: 3px 0 14px; }
+.card ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.card li { position: relative; padding-left: 20px; font-size: .87rem; line-height: 1.34; color: var(--ie-ink); }
+.card li::before { content: ""; position: absolute; left: 0; top: .42em; width: 7px; height: 7px; border-radius: 50%; background: var(--ie-blue); }
+.card li b { font-weight: 700; }
+
+footer { margin-top: 18px; display: flex; justify-content: space-between; align-items: center; font-size: .82rem; color: var(--ie-slate); }
+.pill { border-radius: var(--ie-radius-pill); background: var(--ie-blue); color: #fff; padding: .55em 1.3em; font-weight: 600; font-size: .8rem; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <header>
+    <div class="brand">
+      <div class="dotmark"></div>
+      <div class="name">Alexander Erben <span>— IT Consulting</span></div>
+    </div>
+  </header>
+
+  <h1>k3s, RKE2, and Rancher Manager</h1>
+  <p class="lede">The three often get lumped together. In fact, k3s and RKE2 are two Kubernetes distributions, and Rancher Manager sits above them as a control plane. Here is how it fits together:</p>
+
+  <div class="diagram">
+
+    <div class="control">
+      <span class="badge">Control plane</span>
+      <div>
+        <div class="ctitle">Rancher Manager</div>
+        <div class="cdesc">Not a distribution, but an interface above the clusters. Rolls out k3s and RKE2 clusters, imports foreign k8s, and bundles access, permissions, monitoring, and GitOps (Fleet). Runs on a cluster itself.</div>
+      </div>
+    </div>
+
+    <div class="connectors">
+      <div class="leg"></div><div class="leg"></div><div class="leg"></div>
+    </div>
+
+    <div class="clusters">
+
+      <div class="card">
+        <span class="tag">Distribution</span>
+        <h2>k3s</h2>
+        <ul>
+          <li>A ~70 MB binary, runs as <b>one</b> systemd service</li>
+          <li>State in SQLite by default, etcd works too</li>
+          <li>Traefik, ServiceLB, and local-path are already included</li>
+          <li>Made for edge, IoT, CI, and laptops, also on ARM</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="tag">Distribution</span>
+        <h2>RKE2</h2>
+        <ul>
+          <li>Ships CIS-hardened and FIPS-compliant, no rework needed</li>
+          <li>Keeps its state in <b>etcd</b></li>
+          <li>Uses containerd and SELinux instead of Docker</li>
+          <li>For production, government, and air gap. Rancher's default</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="tag">Imported</span>
+        <h2>External clusters</h2>
+        <ul>
+          <li>EKS, AKS, GKE, and any other CNCF k8s</li>
+          <li>Imported via agent, not built by Rancher</li>
+          <li>Then in the same dashboard as k3s and RKE2</li>
+          <li>One place for all clusters, wherever they come from</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

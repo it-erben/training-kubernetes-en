@@ -1,0 +1,23 @@
+apiVersion: apps/v1                  # API group/version for workload objects such as Deployments
+kind: Deployment                     # Object type: a Deployment (manages ReplicaSets/pods)
+metadata:                            # Metadata block for this object
+  name: web                          # Name of the Deployment (unique within the namespace)
+spec:                                # Specification: desired target state
+  replicas: 1                        # Number of desired pod copies (here 1)
+  selector:                          # Defines which pods belong to this Deployment
+    matchLabels:                     # Selection by label equality
+      app: web                       # Pods with label app=web are managed
+  template:                          # Template (pod template) for newly created pods
+    metadata:                        # Metadata of the created pods
+      labels:                        # Labels assigned to every pod
+        app: web                     # must match the selector above (app=web)
+    spec:                            # Specification of the pod
+      containers:                    # List of containers in the pod
+        - name: web                  # Name of the container within the pod
+          image: nginx:alpine        # Container image (nginx, slim Alpine variant)
+          ports:                     # Ports exposed by the container (informational)
+            - containerPort: 80      # Container listens on port 80
+---                                  # Separator: start of a second YAML document
+apiVersion: v1                       # Core API version (for Service objects)
+kind: Service                        # Object type: a Service (stable network address)
+metadata:                            #

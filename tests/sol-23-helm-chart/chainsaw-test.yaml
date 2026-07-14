@@ -1,0 +1,15 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-23-helm-chart
+  labels: { suite: solutions }
+spec:
+  steps:
+    - try:
+        - script:
+            # Render the chart and validate the output against the k8s schemas.
+            content: |
+              helm template ../../solutions/kubernetes/lab-23-helm-create-challenge/my-nginx-chart \
+                | kubeconform -strict -summary -kubernetes-version 1.32.0
+            check:
+              ($error == null): true

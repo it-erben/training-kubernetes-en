@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "clusterName": {
+      "value": "aks-automatic-cluster"
+    },
+    "location": {
+      "value": "germanywestcentral"
+    },
+    "nodeVmSize": {
+      "value": "Standard_D8s_v3"
+    },
+    "kubernetesVersion": {
+      "value": ""
+    },
+    "tags": {
+      "value": {
+        "Environment": "Training",
+        "Project": "AKS-Training",
+        "ManagedBy": "ARM-Template",
+        "Owner": "your-name@example.com"
+      }
+    }
+  }
+}

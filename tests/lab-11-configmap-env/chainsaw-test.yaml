@@ -1,0 +1,16 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-11-configmap-env
+  labels: { suite: labs }
+spec:
+  steps:
+    # restartPolicy: Never -> the pod prints env once and reaches Succeeded.
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-11-configmaps/config-pod.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: config-pod }
+              status: { phase: Succeeded }

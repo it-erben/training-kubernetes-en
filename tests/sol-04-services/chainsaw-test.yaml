@@ -1,0 +1,17 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-04-services
+  labels: { suite: solutions }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../solutions/kubernetes/lab-04-services-challenge/deployment.yaml }
+        - apply: { file: ../../solutions/kubernetes/lab-04-services-challenge/service-clusterip.yaml }
+        - apply: { file: ../../solutions/kubernetes/lab-04-services-challenge/service-nodeport.yaml }
+        - assert:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata: { name: myapp-deployment }
+              status: { availableReplicas: 1 }

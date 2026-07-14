@@ -1,0 +1,7 @@
+# Parameter files (may contain secrets)
+azuredeploy.parameters.json
+*.parameters.json
+!*.parameters.example.json
+
+# macOS
+.DS_Store

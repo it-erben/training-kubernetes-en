@@ -1,0 +1,19 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-16-rbac-cani
+  labels: { suite: solutions }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../solutions/kubernetes/lab-16-rbac-can-i/rbac.yaml }
+        - assert:
+            resource:
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: RoleBinding
+              metadata: { name: admin-binding }
+        - assert:
+            resource:
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: RoleBinding
+              metadata: { name: developer-binding }

@@ -1,0 +1,17 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-10-logs-pv
+  labels: { suite: solutions }
+spec:
+  steps:
+    - try:
+        - apply: { file: ../../solutions/kubernetes/lab-10-volumes-challenge/logs-pv-pvc-pod.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata: { name: logs-nginx }
+              status:
+                phase: Running
+                (conditions[?type == 'Ready'] | [0].status): "True"

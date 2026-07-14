@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: date-writer
+  labels:
+    app: date-writer
+spec:
+  selector:
+    matchLabels:
+      name: date-writer
+  template:
+    metadata:
+      labels:
+        name: date-writer
+    spec:
+      containers:
+        - name: writer
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args:
+            - "date > /host/fun-with-daemonset.txt; sleep 3600"
+          volumeMounts:
+            - name: host-volume
+              mountPath: /host
+      volumes:
+        - name: host-volume
+          hostPath:
+            path: /var/tmp
+  updateStrategy:
+    type: RollingUpdate

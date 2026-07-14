@@ -1,0 +1,16 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-09-volumes-aks-lb
+  labels: { suite: labs }
+spec:
+  steps:
+    # No cloud load balancer on kind; just prove the manifest is accepted.
+    - try:
+        - apply: { file: ../../labs/kubernetes/lab-09-volumes/aks-lb.yaml }
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Service
+              metadata: { name: my-service }
+              spec: { type: LoadBalancer }

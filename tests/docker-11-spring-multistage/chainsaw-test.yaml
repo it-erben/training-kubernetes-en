@@ -1,0 +1,13 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: docker-11-spring-multistage
+  labels: { suite: docker }
+spec:
+  steps:
+    - try:
+        - script:
+            content: |
+              docker buildx build --check -f ../../solutions/docker/lab-11-spring-boot-dockerfile-multistage/Dockerfile ../../solutions/docker/lab-11-spring-boot-dockerfile-multistage
+            check:
+              ($error == null): true
