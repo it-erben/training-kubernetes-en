@@ -6,4 +6,5 @@ kubectl get pod nginx-custom
 minikube service nginx-service
 ```
 
-Expected result: the custom HTML page from the ConfigMap is served; it is reachable from outside via the NodePort.
+Expected result: nginx serves the custom HTML page from the ConfigMap, and the NodePort makes it reachable from
+outside the cluster.

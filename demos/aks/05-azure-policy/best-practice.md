@@ -6,7 +6,7 @@
 
 | # | Policy | Rationale |
 | --- | --- | --- |
-| 1 | **Kubernetes cluster containers should only use allowed images** | Protection against unauthorized images |
+| 1 | **Kubernetes cluster containers should only use allowed images** | Blocks unauthorized images |
 | 2 | **Kubernetes clusters should not allow privileged containers** | Root access to the host, high risk |
 | 3 | **Kubernetes cluster pods should only use approved host network and port range** | Prevents network sniffing |
 | 4 | **Kubernetes clusters should disable automounting API credentials** | No auto-mounting of SA tokens in pods |
@@ -20,7 +20,7 @@
 | --- | --- | --- |
 | 6 | **Kubernetes cluster containers should run with a read only root file system** | Prevents malware persistence |
 | 7 | **Kubernetes cluster pods should use specified labels** | Consistent labels for governance and monitoring |
-| 8 | **Kubernetes cluster containers should only use allowed capabilities** | Allow only the necessary Linux capabilities |
+| 8 | **Kubernetes cluster containers should only use allowed capabilities** | Only the Linux capabilities you need |
 | 9 | **Kubernetes clusters should not use the default namespace** | Better isolation and RBAC through namespaces |
 | 10 | **Kubernetes cluster containers CPU and memory resource limits should not exceed specified limits** | Anti-DoS |
 
@@ -31,8 +31,8 @@
 | # | Policy | Rationale |
 | --- | --- | --- |
 | 11 | **Kubernetes cluster services should only use allowed external IPs** | Controls exposed external IPs |
-| 12 | **Kubernetes cluster pods should only use allowed volume types** | E.g. no hostPath volumes |
-| 13 | **Kubernetes clusters should use internal load balancers** | Prevents public service exposure |
+| 12 | **Kubernetes cluster pods should only use allowed volume types** | For example, no hostPath volumes |
+| 13 | **Kubernetes clusters should use internal load balancers** | Keeps services off the public internet |
 | 14 | **Kubernetes cluster containers should only use allowed AppArmor profiles** | AppArmor profiles for isolation |
 | 15 | **Kubernetes cluster containers should only use allowed seccomp profiles** | Restricts the allowed syscalls |
 
@@ -60,7 +60,7 @@
 
 ---
 
-### Further resources
+### Further reading
 
 - [Azure Policy for Kubernetes – documentation](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes)
 - [AKS Security Best Practices](https://learn.microsoft.com/en-us/azure/aks/best-practices)

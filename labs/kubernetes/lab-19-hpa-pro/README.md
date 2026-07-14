@@ -1,7 +1,7 @@
 # Lab 19: Autoscaling with the HPA
 
-In this example we introduce a new concept and a new resource: autoscaling with the
-`HorizontalPodAutoscaler`, also known as HPA. For the HPA to do its job, we first need to enable
+This exercise introduces a new concept and a new resource: autoscaling with the
+`HorizontalPodAutoscaler`, or HPA for short. For the HPA to do its job, we first need to enable
 the metrics-server in Minikube:
 
 ```shell
@@ -14,8 +14,8 @@ Then create the following resources:
   is correct.
 - A matching `Service` of type `ClusterIP` named `nginx-service`.
 
-Then add the following entry to the nginx container in the `ReplicaSet`. The comments above and below only serve
-as orientation for where this snippet belongs.
+Then add the following entry to the nginx container in the `ReplicaSet`. The comments above and below
+just show where this snippet belongs.
 
 ```yaml
 # image: nginx:latest
@@ -27,7 +27,7 @@ resources:
 # ports: ...
 ```
 
-Then apply your manifest with the HPA using `kubectl apply`.
+Then apply your manifest using `kubectl apply`.
 
 For autoscaling, we still need the HPA resource. Create a new file and add this resource:
 
@@ -50,44 +50,41 @@ Enter the correct name of your `ReplicaSet`!
 
 Then apply your manifest with the HPA using `kubectl apply`.
 
-You can see that the HPA is bound directly to the ReplicaSet via `scaleTargetRef`. For once, no labels
-are used here. `targetCPUUtilizationPercentage` defines that the average CPU utilization should be
-at 30%.
+The HPA binds directly to the ReplicaSet via `scaleTargetRef` – for once, no labels involved.
+`targetCPUUtilizationPercentage` sets the target average CPU utilization to 30%.
 
-It may take a while until the HPA does its job correctly – depending on how long the metrics server
-needs to collect CPU metrics.
+It can take a while for the HPA to kick in, depending on how long the metrics-server needs to
+collect CPU metrics.
 
-To check whether the HPA is ready, run the following command:
+To check whether the HPA is ready, run:
 
 ```shell
 kubectl get hpa
 ```
 
-It is important that TARGETS does not show "unknown" but two percentages:
+TARGETS must show two percentages, not "unknown":
 
 ```shell
 NAME        REFERENCE                     TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
 nginx-hpa   ReplicaSet/nginx-replicaset   0%/30%    1         10        1          2m24s
 ```
 
-If that is not yet the case, the metrics-server is not ready yet. This can actually take several
-minutes.
+If it doesn't yet, the metrics-server isn't ready. That can genuinely take several minutes.
 
 ## Load Test
 
-Now let's put it to the test and check whether the autoscaling really works. It is best to open
-two PowerShell sessions for this:
+Now let's see whether the autoscaling actually works. Open two PowerShell sessions for this:
 
-- In the first session, run the command `kubectl get hpa -w`. This lets you continuously see how many
-  pods are running.
-- In the second window, we run a load test:
+- In the first session, run `kubectl get hpa -w`. This lets you watch live how many pods are
+  running.
+- In the second session, run a load test:
 
 ```shell
 kubectl run -i --tty loadtest --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.0001; do wget -q -O- http://nginx-service; done"
 ```
 
-Now watch the HPA statistics in the first window. Over time, the CPU utilization will rise, and eventually
-the replica count will rise as well.
+Watch the HPA stats in the first window: CPU utilization climbs over time, and eventually the
+replica count follows.
 
 ```shell
 ~ ❯❯❯ k get hpa -w

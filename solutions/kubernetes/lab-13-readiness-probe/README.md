@@ -1,6 +1,6 @@
 # Solution: Fixing the Readiness Probe
 
-In the exercise, the probe port is set incorrectly. Apply the corrected manifest:
+The probe in the exercise manifest points at the wrong port. Apply the corrected manifest:
 
 ```bash
 kubectl apply -f manifest-fixed.yaml

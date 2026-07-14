@@ -7,7 +7,7 @@ To start the application and the service, apply the following YAML files:
 - Deployment for the application: `kubectl apply -f deployment.yaml`
 - Service of type ClusterIP: `kubectl apply -f service-clusterip.yaml`
 
-The YAML definitions are as follows:
+The two files look like this:
 
 **`deployment.yaml`**
 
@@ -56,15 +56,16 @@ spec:
 
 - Determine the ClusterIP: `kubectl get svc myapp-clusterip -o wide`
 - Start busybox: `kubectl run -it curl --rm --restart=Never --image=busybox:1.37 -- wget -qO- http://<CLUSTER_IP>`
-- Alternatively via DNS: `wget -qO- http://myapp-clusterip`
+- Or via DNS: `wget -qO- http://myapp-clusterip`
 
 ## Changing the Service Type (NodePort Service)
 
-To change the service type to NodePort, apply the following YAML file. Note that this creates a new service.
+To change the service type to NodePort, apply the following YAML file. This creates a new service rather than
+modifying the existing one.
 
 - Service of type NodePort: `kubectl apply -f service-nodeport.yaml`
 
-The YAML definition is as follows:
+The file looks like this:
 
 **`service-nodeport.yaml`**
 

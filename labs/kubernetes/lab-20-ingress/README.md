@@ -87,8 +87,8 @@ spec:
           emptyDir: {}
 ```
 
-> **Note:** Each pod writes its own hostname into the `index.html` on startup. This way you can see
-> directly during testing which of the two pods answered your request – handy for observing load balancing.
+> **Note:** Each pod writes its own hostname into the `index.html` on startup, so when testing you can
+> see right away which of the two pods answered your request – handy for observing load balancing.
 
 **`02-service.yaml`:**
 
@@ -167,8 +167,8 @@ controller uses) get an IP, and it routes traffic.
 minikube tunnel
 ```
 
-Then add the entry to your `/etc/hosts` (sudo required) so that `nginx.example.com` points to `127.0.0.1`,
-OR test directly with curl:
+Then add an entry to your `/etc/hosts` (sudo required) so that `nginx.example.com` points to `127.0.0.1`,
+or test directly with curl:
 
 ```bash
 curl --resolve nginx.example.com:80:127.0.0.1 http://nginx.example.com
@@ -181,8 +181,8 @@ curl --resolve nginx.example.com:80:127.0.0.1 http://nginx.example.com
 > curl.exe --resolve nginx.example.com:80:127.0.0.1 http://nginx.example.com
 > ```
 
-Repeat the request several times: sometimes `nginx-ingress-demo-...-abcde` answers, sometimes another pod – that
-is the Service's load balancing.
+Repeat the request a few times: sometimes `nginx-ingress-demo-...-abcde` answers, sometimes another pod –
+that's the Service's load balancing at work.
 
 ### Method B: Minikube IP (Linux)
 
@@ -218,7 +218,7 @@ fanout pattern: `example.com/shop` goes to Service A, `example.com/blog` to Serv
 Your task:
 
 1. Create a **second** Deployment plus Service (e.g. `nginx-blog` / `nginx-blog-svc`). Use `nginx:1.29.4` again
-   and write a recognizable text into the `index.html` via `postStart` (e.g. `Hello from the BLOG`).
+   and write some recognizable text into the `index.html` via `postStart` (e.g. `Hello from the BLOG`).
 2. Extend `03-ingress.yaml` so that two paths exist under the same host `nginx.example.com`:
    - `/shop` → existing `nginx-ingress-svc`
    - `/blog` → new `nginx-blog-svc`
@@ -235,7 +235,7 @@ service – otherwise the NGINX in the container would receive the URL `/shop` a
 
 ### Solution Sketch for the Ingress
 
-Only look after trying it yourself:
+Don't look until you've tried it yourself:
 
 ```yaml
 spec:

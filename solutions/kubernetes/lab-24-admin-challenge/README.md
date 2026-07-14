@@ -51,7 +51,7 @@ cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep enable-admission-plugin
 --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota
 ```
 
-**Explanation of the most important ones:**
+**What the important ones do:**
 
 | Plugin | Function |
 | ------ | -------- |
@@ -65,14 +65,14 @@ cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep enable-admission-plugin
 
 #### Task 4: What happens when a manifest changes?
 
-**Answer:** The kubelet watches the directory `/etc/kubernetes/manifests/` via inotify. On changes:
+**Answer:** The kubelet watches `/etc/kubernetes/manifests/` via inotify. When a file changes:
 
-1. Kubelet detects the file change
-2. The pod is stopped
-3. A new pod with the changed config is started
-4. No API server interaction needed (static pods bypass the API)
+1. The kubelet detects the change
+2. It stops the pod
+3. It starts a new pod with the changed config
+4. The API server is never involved (static pods bypass the API)
 
-**Proof:**
+**See for yourself:**
 
 ```bash
 # Terminal 1: watch the logs
@@ -159,7 +159,7 @@ ls /var/lib/minikube/certs/ | grep ca
 openssl x509 -in /var/lib/minikube/certs/apiserver.crt -text -noout
 ```
 
-**Expected information:**
+**What you should see:**
 
 ```text
 Subject: CN = minikube
@@ -320,7 +320,7 @@ supersecret
 
 **⚠️ Security discussion:**
 
-- The secret is stored **unencrypted**!
+- The secret is stored **unencrypted**
 - Base64 in the API is just encoding, not encryption
 - **Solution:** configure etcd encryption at rest
 - Documentation: <https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/>
@@ -394,7 +394,7 @@ c3d4e5f6g7h8    8f7g99015cde    2 hours ago     Running  kube-scheduler         
 **Difference from `kubectl get pods`:**
 
 - `crictl` shows **containers**, not pods
-- One pod can have multiple containers (+ pause container)
+- One pod can have multiple containers (plus the pause container)
 - `crictl` also works when the API server is down
 
 ---
@@ -443,7 +443,7 @@ crictl inspect abc123def456
 }
 ```
 
-**How to determine them:**
+**How to extract them:**
 
 ```bash
 # Image with SHA
@@ -464,14 +464,14 @@ crictl inspect abc123 | jq '.info.config.mounts'
 crictl stop <container-id>
 ```
 
-**Observation (in a separate terminal):**
+**Watch from a separate terminal:**
 
 ```bash
 kubectl get pods -w
 # Pod status: Running → ContainerNotReady → Running (after ~10-30s)
 ```
 
-**Explanation:** The kubelet detects the missing container and restarts it (reconciliation loop).
+**Explanation:** The kubelet notices the missing container and restarts it (reconciliation loop).
 
 ---
 
@@ -516,7 +516,7 @@ search default.svc.cluster.local svc.cluster.local cluster.local
 options ndots:5
 ```
 
-**Comparison with the kubelet config:** `clusterDNS: 10.96.0.10` ✓
+**This matches the kubelet config:** `clusterDNS: 10.96.0.10` ✓
 
 ---
 
@@ -538,7 +538,7 @@ NAME       STATUS                     ROLES           AGE   VERSION
 minikube   Ready,SchedulingDisabled   control-plane   2d    v1.28.0
 ```
 
-**Existing pods:** Keep running! Cordon only prevents new scheduling.
+**Existing pods:** They keep running; cordon only prevents new pods from being scheduled.
 
 ---
 
@@ -553,7 +553,7 @@ kubectl drain minikube --ignore-daemonsets --delete-emptydir-data --force
 | Flag | Reason |
 | ---- | ----- |
 | `--ignore-daemonsets` | DaemonSet pods cannot be evacuated (they run on every node by definition) |
-| `--delete-emptydir-data` | Pods with emptyDir volumes lose their data – explicit confirmation |
+| `--delete-emptydir-data` | Pods with emptyDir volumes lose their data – this flag confirms you accept that |
 | `--force` | Pods without a controller (standalone) are deleted, not rescheduled |
 
 ---
@@ -571,7 +571,7 @@ kubectl drain minikube --ignore-daemonsets --delete-emptydir-data --force
 | **Controller manager** | ✅ Yes | ⚠️ Partially* | ✅ Yes |
 | **etcd** | ✅ Yes | ❌ No | ❌ No (API hangs) |
 
-*Controller manager: new pods are not created on ReplicaSet changes, but manual pod creation works.
+*Controller manager: ReplicaSet changes no longer produce new pods, but creating pods manually still works.
 
 ---
 
@@ -624,7 +624,7 @@ kubectl get nodes -w
 systemctl start kubelet
 ```
 
-**Observation:**
+**What you'll see:**
 
 - The node becomes `Ready` again within ~10s
 - Pods are reported as `Running` again (they never went away, they were just unreachable)
@@ -638,7 +638,7 @@ systemctl start kubelet
 cat /etc/kubernetes/manifests/kube-controller-manager.yaml | grep -E "(node-monitor|eviction)"
 ```
 
-**Or dynamically:**
+**Or via the API:**
 
 ```bash
 kubectl get pods -n kube-system kube-controller-manager-minikube -o yaml | grep -A1 command

@@ -19,4 +19,4 @@ kubectl delete pod my-pod
 kubectl get pv
 ```
 
-Expected result: the page remains available after the pod is recreated because the PVC keeps using the PV.
+Expected result: the page survives the pod being recreated because the PVC keeps using the same PV.

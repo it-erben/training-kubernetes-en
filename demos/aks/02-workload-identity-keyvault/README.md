@@ -1,13 +1,13 @@
 # Workload Identity with Azure Key Vault
 
-This demo shows how to use **Workload Identity** to securely load secrets from an **Azure Key Vault**
-into pods – entirely without passwords or service account keys.
+This demo shows how to use **Workload Identity** to pull secrets from an **Azure Key Vault**
+into pods securely – no passwords or service account keys needed.
 
 ## Prerequisites
 
 - AKS Automatic cluster (already has Workload Identity & Key Vault Secrets Provider enabled)
 - Azure CLI with the `aks-preview` extension
-- Existing variables from 01-setup:
+- Variables from 01-setup:
 
 ```bash
 export RESOURCE_GROUP="rg-aks-keyvault-demo"
@@ -19,7 +19,7 @@ export LOCATION="germanywestcentral"
 
 ## 1. What is Workload Identity?
 
-**Workload Identity** is the recommended way to give pods in AKS access to Azure resources:
+**Workload Identity** is the recommended way to give AKS pods access to Azure resources:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
@@ -125,9 +125,9 @@ az keyvault secret set \
 echo "Key Vault created: $KEYVAULT_NAME"
 ```
 
-> **Note:** With `--enable-rbac-authorization`, the creator of the Key Vault has
-> **no automatic permissions** on secrets. The RBAC role has to be assigned
-> explicitly. "Key Vault Secrets Officer" allows reading and writing secrets.
+> **Note:** With `--enable-rbac-authorization`, whoever creates the Key Vault gets
+> **no automatic permissions** on secrets – you have to assign an RBAC role
+> explicitly. "Key Vault Secrets Officer" lets you read and write secrets.
 
 ---
 
@@ -223,7 +223,7 @@ EOF
 
 ### 7.2 Create the SecretProviderClass
 
-The SecretProviderClass defines which secrets are loaded from the Key Vault:
+The SecretProviderClass defines which secrets get loaded from the Key Vault:
 
 ```bash
 # Fetch the tenant ID
@@ -393,15 +393,15 @@ kubectl delete pod keyvault-demo -n $NAMESPACE
 kubectl logs keyvault-demo -n $NAMESPACE
 ```
 
-> **Note:** The CSI-driver-based solution does **not** automatically refresh secrets
-> in a running pod. For automatic updates the pod has to be restarted,
-> or you use a rotation poll interval.
+> **Note:** The CSI driver does **not** refresh secrets in a running pod on its
+> own. To pick up a new value, restart the pod or configure a rotation poll
+> interval.
 
 ---
 
 ## 10. Deployment example (more realistic)
 
-For a more realistic use case:
+Here's a more realistic setup:
 
 ```bash
 kubectl apply -f - << EOF
@@ -473,7 +473,7 @@ kubectl get pods -n $NAMESPACE -l app=webapp-with-secrets
 
 ## 11. Troubleshooting
 
-### Pod does not start / SecretProviderClass errors
+### Pod doesn't start / SecretProviderClass errors
 
 ```bash
 # Check the events
@@ -535,8 +535,8 @@ echo "Cleanup complete!"
 
 **Best Practices:**
 
-1. **One ServiceAccount per workload** - Do not share between different apps
+1. **One ServiceAccount per workload** - Don't share it between apps
 2. **Least privilege** - Only "Key Vault Secrets User", not "Key Vault Administrator"
-3. **Separate namespaces** - Different environments in different namespaces
+3. **Separate namespaces** - Put each environment in its own namespace
 4. **Secret rotation** - Rotate secrets regularly, redeploy pods
 5. **Audit logging** - Enable Key Vault diagnostic logs

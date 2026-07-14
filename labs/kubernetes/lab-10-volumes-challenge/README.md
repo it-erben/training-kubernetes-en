@@ -3,16 +3,16 @@
 ## Task 1: Ephemeral volumes
 
 - Create a pod YAML manifest with two containers, both using the image `alpine:3.20`.
-- Define a command for both containers that ensures they stay in the Running state permanently.
+- Define a command for both containers that keeps them in the Running state indefinitely.
   > This can be done with the command `sleep infinity`.
 - Create an `emptyDir` volume in the pod.
   - Container 1 must mount this volume at `/etc/a`.
   - Container 2 must mount this volume at `/etc/b`.
   > [Documentation on `emptyDir` volumes](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)
-- Open container 1 via an interactive shell and create a directory named `data` in its mount path.
+- Open an interactive shell into container 1 and create a directory named `data` in its mount path.
 - Change into the new directory and create a file named `hello.txt` with the content `Hello World.`
 - Exit the container shell.
-- Open container 2 via an interactive shell and navigate to `/etc/b/data`.
+- Open an interactive shell into container 2 and navigate to `/etc/b/data`.
 - Check the contents of the file `hello.txt`.
 - Exit the container shell.
 

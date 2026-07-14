@@ -1,4 +1,4 @@
-# Lab 07: Final exercise: Putting it all together
+# Lab 07: Final exercise – putting it all together
 
 Goal: Containerize an existing Node.js program, inject content via a bind mount, make it reachable in its own
 network and clean up properly at the end.
@@ -28,19 +28,19 @@ server.listen(PORT, () => {
 - Create a Dockerfile with:
   - a pinned base image (e.g. `node:20-alpine`)
   - a sensible `WORKDIR`
-  - copying of the required files
+  - the required files copied in
   - startup via `CMD`
   - optionally `EXPOSE 3000`
 - Build an image with a unique name (e.g. prefixed with the exercise name).
 
-**Success criterion:** Image built; a container can be started from it.
+**Success criterion:** The image builds, and you can start a container from it.
 
 ---
 
 ## Step 2 – Start a container
 
 - Start a container from your image and make the service reachable locally.
-- Check reachability via a browser or HTTP client.
+- Check that it responds in a browser or via an HTTP client.
 
 **Success criterion:** HTTP response (status 200) with the expected answer from the app.
 
@@ -54,9 +54,9 @@ server.listen(PORT, () => {
 - Create a `file.txt` in the **host directory** and change its content.
 - Call the endpoint again and observe the change.
 
-**Note:** Make sure no already running container is blocking the port mapping.
+**Note:** Make sure no leftover container is still blocking the port mapping.
 
-**Success criterion:** The response contains the current content of the host `file.txt` at any given time.
+**Success criterion:** The response always reflects the current content of the host `file.txt`.
 
 ---
 
@@ -78,7 +78,7 @@ expected response.
 
 - Stop all containers from this exercise.
 - Remove **only** the containers, images, bind mount contents and the network created in this exercise.
-  - Use consistent names or a label that you set on all resources for this.
+  - Use consistent names or a shared label on all resources to make this easier.
 
 **Success criterion:** `docker ps`, `docker images` and the network/volume overviews show no resources with the
 exercise prefix/label.

@@ -1,16 +1,15 @@
 # Lab 05: Network policies with Cilium in AKS
 
-For this exercise, create a cluster as in exercise 1 and set the
-environment variables as described there.
+For this lab, create a cluster as in Lab 01 and set the environment variables described there.
 
 ## Part 1: Set up the test environment
 
 ### Create namespaces
 
-For our test scenario, we use three separate namespaces for different
-teams. In reality, the question always arises whether to use namespaces
-per team or per application. There is no universal answer to that. Here, we
-use the team-based model.
+For our test scenario, we use three separate namespaces for different teams.
+In real projects, the question always comes up whether to slice namespaces per
+team or per application – there's no universal answer. Here, we go with the
+team-based model.
 
 ```bash
 # Three namespaces for different teams/applications
@@ -54,8 +53,8 @@ kubectl expose pod database --namespace=team-database --port=80
 
 ### Test baseline connectivity
 
-In the current state, all pods should be able to reach each other.
-Let's test this by issuing a few `curl` commands with `exec`:
+Right now, all pods should be able to reach each other.
+Let's verify that with a few `curl` commands via `exec`:
 
 ```bash
 # From the backend to the frontend (should work)
@@ -77,7 +76,7 @@ kubectl exec -n team-frontend frontend -- \
 
 ### Default deny for a namespace
 
-Let's now create a policy that blocks all incoming traffic
+Now let's create a policy that blocks all incoming traffic
 to the database namespace:
 
 ```yaml
@@ -99,8 +98,8 @@ kubectl apply -f 01-default-deny-database.yaml
 
 ### Test connectivity again
 
-Now, no access from the other namespaces to pods in the database
-namespace should be allowed anymore.
+Pods in the database namespace should no longer be reachable
+from the other namespaces.
 
 ```bash
 # From the backend to the database (should NOT work anymore)
@@ -112,7 +111,7 @@ kubectl exec -n team-backend backend -- \
 
 ### Allow selective access
 
-Let's now allow the backend namespace access to the database:
+Now let's allow the backend namespace to talk to the database:
 
 ```yaml
 # File: 02-allow-backend-to-database.yaml
@@ -143,8 +142,8 @@ kubectl apply -f 02-allow-backend-to-database.yaml
 
 ### Validation
 
-Now the backend pod should be able to reach the simulated database,
-but the frontend should not anymore.
+The backend pod should now reach the simulated database,
+while the frontend no longer can.
 
 ```bash
 # Backend → Database (should work)
@@ -156,19 +155,18 @@ kubectl exec -n team-frontend frontend -- \
   curl -s --max-time 3 database.team-database.svc.cluster.local
 ```
 
-For the next task, we clean up the deny rule again:
+Before the next task, clean up the deny rule:
 
 ```bash
 kubectl delete netpol default-deny-ingress  -n team-database
 ```
 
-## 3 Global network policies with Cilium
+## Part 3: Global network policies with Cilium
 
-Cilium supports not only network policies scoped to namespaces, but
-can also define global network policies. We will shortly roll out a network
-policy that blocks all incoming ingress traffic on the cluster.
-First, we create a deployment with a LoadBalancer and test its
-external IP:
+Cilium doesn't stop at namespace-scoped network policies – it can also define
+global ones. In a moment, we'll roll out a network policy that blocks all
+incoming ingress traffic on the cluster. First, we create a deployment with a
+LoadBalancer and test its external IP:
 
 ```bash
 # Create a LoadBalancer service for the frontend
@@ -216,10 +214,10 @@ external IP:
 curl -s --max-time 5 http://$FRONTEND_IP
 ```
 
-If you delete the policy again, the IP will become reachable again
-after a short time.
+Once you delete the policy, the IP becomes reachable again
+after a short while.
 
-**IMPORTANT**: Now delete the `CiliumClusterwideNetworkPolicy` again:
+**IMPORTANT**: Don't forget to delete the `CiliumClusterwideNetworkPolicy` now:
 
 ```bash
 kubectl delete ccnp ccnp-default-deny-ingress

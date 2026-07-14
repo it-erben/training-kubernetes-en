@@ -1,7 +1,6 @@
 # Lab 02: Persistent Storage in AKS
 
-For this exercise, create a cluster as in exercise 1 and set the
-environment variables as described there.
+For this lab, create a cluster as in Lab 01 and set the environment variables described there.
 
 ## Part 1: Explore the existing StorageClasses
 
@@ -18,10 +17,10 @@ kubectl describe storageclass managed-csi
 kubectl describe storageclass azurefile-csi
 ```
 
-Particularly relevant for `StorageClasses` are the `VolumeBindingMode` and the
-`ReclaimPolicy`. The former determines whether a `PersistentVolume` is created
-for a `PersistentVolumeClaim` even when nobody is using it. The latter
-controls when the PV is deleted again.
+The fields worth a closer look on `StorageClasses` are the `VolumeBindingMode` and the
+`ReclaimPolicy`. The first determines whether a `PersistentVolume` is created for a
+`PersistentVolumeClaim` even while nobody is using it. The second controls when the PV
+is deleted.
 
 To illustrate this, create a file `pvc-disk.yaml`:
 
@@ -46,15 +45,14 @@ kubectl apply -f pvc-disk.yaml
 kubectl get pvc pvc-azure-disk -w
 ```
 
-**Question:** Why does the PVC remain in status "Pending"? (Hint: `VolumeBindingMode`)
+**Question:** Why is the PVC stuck in "Pending"? (Hint: `VolumeBindingMode`)
 
 ---
 
 ## Part 2: StatefulSet with an Azure Disk volume
 
-In this task, we will create a `StatefulSet` that exposes an NGINX via a
-`LoadBalancer`. The web server's files are stored on an
-Azure Disk.
+In this task, we'll create a `StatefulSet` that exposes an NGINX web server via a
+`LoadBalancer`. The web server's files are stored on an Azure Disk.
 
 ```yaml
 apiVersion: v1
@@ -148,7 +146,7 @@ Now copy the `index.html` in this directory into the pod:
 kubectl cp index.html my-statefulset-0:/usr/share/nginx/html/index.html -c my-container
 ```
 
-Now determine the external IP of the LoadBalancer via `kubectl` and open it.
+Now look up the LoadBalancer's external IP with `kubectl` and open it.
 You should see the HTML page above.
 
 But what happens when we delete the pod?
@@ -157,11 +155,10 @@ But what happens when we delete the pod?
 kubectl delete pod my-statefulset-0
 ```
 
-For a short time, our application will not be reachable. But what
-about when the pod is recreated? Is the HTML page the same?
+Our application will be unreachable for a moment. But what happens once the pod is
+recreated? Is the HTML page still the same?
 
-_Spoiler:_ It is still the same. That is because the
-`StatefulSet` automatically redeploys the pod and re-establishes the connection to the
+_Spoiler:_ It is. The `StatefulSet` automatically recreates the pod and reattaches the
 `PersistentVolumeClaim`.
 
 ---
@@ -249,7 +246,7 @@ spec:
 
 ```
 
-Apply the manifests and determine any pod name of the `Deployment`
+Apply the manifests and grab the name of any pod in the `Deployment`:
 
 ```yaml
 kubectl apply -f pvc-files.yaml
@@ -263,12 +260,10 @@ Now copy the HTML file into the volume again:
 kubectl cp index.html REPLACE_WITH_POD_NAME:/usr/share/nginx/html/index.html -c my-container
 ```
 
-Deploy and test the shared access. No matter how often you delete pods and
-thereby have them recreated: access to the Azure Files volume should
-keep working.
+Deploy and test the shared access. No matter how often you delete pods and have them
+recreated, access to the Azure Files volume should keep working.
 
 ## Bonus
 
-Try to find the created file share in the Azure Portal and display your
-file in the portal. Once you have found it, you can edit it
-and watch live how your NGINX returns a different response.
+Try to find the newly created file share in the Azure Portal and open your file there.
+Once you've found it, edit it and watch live as your NGINX serves a different response.

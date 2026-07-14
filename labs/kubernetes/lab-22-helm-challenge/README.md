@@ -6,7 +6,7 @@ solution **Prometheus** via the `kube-prometheus-stack` chart.
 ## Setup and Repository Management
 
 1. **Add the repository:** Search [Artifact Hub](https://artifacthub.io/) for the
-   `kube-prometheus-stack` chart. There you will find a one-line installation guide.
-2. At the end of the installation you will be told how to retrieve the default Grafana password.
-   You have to run these commands in a Bash shell (on Windows e.g. Git Bash)
+   `kube-prometheus-stack` chart. It comes with a one-line installation guide.
+2. At the end of the installation, the output tells you how to retrieve the default Grafana password.
+   Run those commands in a Bash shell (on Windows e.g. Git Bash).
 3. Access Grafana via `minikube service kube-prometheus-stack-grafana`

@@ -15,4 +15,4 @@ kubectl delete service/nginx-pod-demo-svc
 kubectl delete pod/nginx-pod-1 pod/nginx-pod-2
 ```
 
-Expected result: `nslookup` returns the ClusterIP of the service, `wget` returns the NGINX welcome page.
+Expected result: `nslookup` returns the service's ClusterIP, and `wget` returns the NGINX welcome page.

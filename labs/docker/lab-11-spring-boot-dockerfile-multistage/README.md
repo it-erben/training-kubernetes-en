@@ -33,4 +33,4 @@ Create a file `.dockerignore` next to the `Dockerfile` and add the directories `
 
 ## Build and test the image
 
-Now build the image with Docker and then test that it works.
+Build the image with Docker and test that it works.

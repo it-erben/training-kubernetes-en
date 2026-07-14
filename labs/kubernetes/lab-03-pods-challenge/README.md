@@ -8,8 +8,8 @@
    **80**.
 3. Then retrieve the details (`describe`) of the pod, including its IP address.
 4. Create a temporary pod with the image `busybox:1.37` to run a `wget` command inside it. This
-   `wget` call should target the endpoint of the `nginx` container. Confirm success by seeing the HTML response body
-   appear in the terminal.
+   `wget` call should target the endpoint of the `nginx` container. You'll know it worked when the HTML response
+   body shows up in the terminal.
 5. Display the logs of the `nginx` container.
 6. Delete the pod. Create a new pod and use the following environment variables for your container:
    - `DB_URL=postgresql://mydb:5432`
@@ -27,8 +27,8 @@
    > `kubectl run nginx --image=busybox:1.37 --dry-run=client -o yaml`.
 2. Create the pod using this YAML manifest.
 3. Determine the current status of the `loop` pod.
-4. Delete the `loop` pod and recreate it in a modified form by changing its command in the YAML. The new command should
-   be an endless loop that prints the current date on each iteration.
-   > In the shell you can run the `date` command to get the current date. You can create an endless loop
+4. Delete the `loop` pod, change its command in the YAML, and recreate it. The new command should
+   be an infinite loop that prints the current date on each iteration.
+   > In the shell you can run the `date` command to get the current date. You can build an infinite loop
    > with `while true; do date; sleep 1; done`.
 5. Inspect the events and the status of the `loop` pod.

@@ -1,16 +1,16 @@
 # Demo: Complex Nextcloud stack as a Helm chart
 
-This demo shows how to bundle a more complex application consisting of multiple microservices (Nextcloud, database,
-admin tool) into a single Helm chart.
+This demo shows how to bundle an application made up of several services (Nextcloud, a database, an admin
+tool) into a single Helm chart.
 
-It is based on the result of the exercise `assignments/kubernetes/lab-13-casestudy-nextcloud`.
+It builds on the result of the exercise `assignments/kubernetes/lab-13-casestudy-nextcloud`.
 
 ## Chart structure
 
 The chart `nextcloud-chart` contains templates for:
 
 1. **Database (MariaDB):** A StatefulSet for database persistence.
-2. **Nextcloud:** The actual application as a Deployment.
+2. **Nextcloud:** The application itself, as a Deployment.
 3. **PhpMyAdmin:** An optional admin interface (can be enabled via `values.yaml`).
 4. **Secrets:** Central management of credentials.
 5. **Services:** Networking between the components.
@@ -20,7 +20,7 @@ Highlights:
 - **Release names:** All resources use `{{ .Release.Name }}` as a prefix to avoid naming conflicts when the chart is
   installed multiple times.
 - **Conditional installation:** PhpMyAdmin can be switched on or off via `phpmyadmin.enabled`.
-- **Central configuration:** Passwords and images are maintained centrally in `values.yaml`.
+- **Central configuration:** Passwords and image references all live in `values.yaml`.
 
 ## Usage
 

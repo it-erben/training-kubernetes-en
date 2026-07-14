@@ -1,14 +1,14 @@
 # Making MariaDB and Nextcloud production-ready
 
-For production operation of MariaDB and Nextcloud, a few elements are still
-missing, which we want to implement to wrap up this case study.
+A few pieces are still missing before MariaDB and Nextcloud are fit for production.
+Let's add them to wrap up this case study.
 
 ## Requests and limits
 
 > **Docs:** [Resource Requests & Limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
 
 Every pod in a Kubernetes cluster should define resource requests and limits.
-Therefore, set the following requests and limits for MariaDB:
+Set the following for MariaDB:
 
 ```yaml
 resources:
@@ -39,8 +39,8 @@ resources:
 > - [Liveness, Readiness & Startup Probes](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/)
 > - [Configuring probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 
-For pod self-healing, a readiness probe should be defined. For MariaDB, the simplest readiness
-probe is the following:
+Pods should define a readiness probe for self-healing. For MariaDB, the simplest readiness
+probe looks like this:
 
 ```yaml
 readinessProbe:
@@ -71,7 +71,7 @@ readinessProbe:
 > - [Ingress controllers](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
 
 In production, a service usually also needs an Ingress or
-a Gateway. This is only necessary for Nextcloud.
+a Gateway. Here, only Nextcloud needs one.
 
 > Note (Minikube): Before applying, enable the NGINX ingress controller addon:
 >
@@ -112,9 +112,8 @@ spec:
 > - [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/)
 > - [Configuring a PDB](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 
-During Deployment rollouts as well as node draining, neither Nextcloud nor
-MariaDB should drop more than one pod at a time below
-their minimum provisioning.
+During Deployment rollouts and node drains alike, neither Nextcloud nor
+MariaDB should drop below their minimum number of available pods.
 
 ```yaml
 apiVersion: policy/v1

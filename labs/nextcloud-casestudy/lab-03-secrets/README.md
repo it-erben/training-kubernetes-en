@@ -1,8 +1,8 @@
 # Secrets for the database
 
-You may have already noticed that we simply copied the database user and password in the PhpMyAdmin
-manifest from the database manifest. That is ugly – and also insecure. We now want to move the
-credentials into a Kubernetes Secret.
+You may have noticed that the phpMyAdmin manifest simply copies the database user and password
+from the database manifest. That's ugly – and insecure on top. Let's move the credentials into
+a Kubernetes Secret.
 
 > **Docs:**
 >
@@ -23,11 +23,11 @@ env:
     value: "nextcloudpassword"
 ```
 
-As a first step, we need a Secret for these entries. Create a manifest `secret.yaml` that contains the
+First, we need a Secret for these entries. Create a manifest `secret.yaml` that contains the
 keys and values above.
 
-We now need to reference the Secret in the `db.yaml` manifest as well as in `pma.yaml`. For the database
-StatefulSet, this looks as follows:
+Next, reference the Secret in `db.yaml` and in `pma.yaml`. For the database StatefulSet, it
+looks like this:
 
 ```yaml
 env:
@@ -56,7 +56,8 @@ env:
 The pattern is always the same. The `name` of the environment variable stays as before, but the value
 now comes from the Secret.
 
-For PhpMyAdmin in `pma.yaml`, we have to do it slightly differently, because the environment variables have different names:
+For phpMyAdmin in `pma.yaml`, things look slightly different because the environment variables
+have different names:
 
 ```yaml
 env:
@@ -84,7 +85,7 @@ kubectl apply -f pma.yaml
 kubectl apply -f db.yaml
 ```
 
-Finally, set up the tunnel to phpmyadmin again and check whether everything still works:
+Finally, open the tunnel to phpMyAdmin again and check that everything still works:
 
 ```shell
 minikube service phpmyadmin -n nextcloud

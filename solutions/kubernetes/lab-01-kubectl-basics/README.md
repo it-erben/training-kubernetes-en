@@ -50,7 +50,7 @@ minikube   Ready    control-plane   5d    v1.28.3
 kubectl describe node minikube
 ```
 
-**Answers to the tasks:**
+**Answers:**
 
 1. **CPUs:** Found under `Capacity` → `cpu: 2` (or 4, depending on your configuration)
 2. **OS/version:** Under `System Info` → `OS Image: Buildroot 2023.02.1` or similar
@@ -63,9 +63,9 @@ kubectl describe node minikube
    memory             170Mi (2%)  350Mi (4%)
    ```
 
-   **Interpretation:** On a fresh Minikube cluster, typically 2-5% of the RAM is allocated.
+   **What this means:** On a fresh Minikube cluster, typically 2-5% of the RAM is allocated.
 
-5. **System pods:** Under `Non-terminated Pods` you will find pods such as:
+5. **System pods:** Under `Non-terminated Pods` you'll find pods such as:
    - `kube-apiserver-minikube`
    - `kube-controller-manager-minikube`
    - `kube-scheduler-minikube`
@@ -178,7 +178,7 @@ kube-system   etcd-minikube                      1/1     Running   0          5d
 kube-system   kube-apiserver-minikube            1/1     Running   0          5d    192.168.49.2   minikube
 ```
 
-**Additional information:**
+**The extra columns show:**
 
 - Pod IP addresses (e.g. `10.244.0.3`)
 - Which node the pod is running on (with Minikube, always `minikube`)
@@ -241,7 +241,7 @@ kubectl get pods -A --watch
 kubectl run nginx-test --image=nginx
 ```
 
-**Observation in terminal 1:**
+**What you'll see in terminal 1:**
 
 ```text
 NAMESPACE   NAME         READY   STATUS              RESTARTS   AGE
@@ -253,7 +253,7 @@ default     nginx-test   1/1     Running             0          2s
 
 **Lifecycle phases:**
 
-1. `Pending` – the pod has been accepted, but the container has not started yet
+1. `Pending` – the pod has been accepted, but the container hasn't started yet
 2. `ContainerCreating` – the container image is being pulled and the container is being created
 3. `Running` – the container is running
 
@@ -263,7 +263,7 @@ default     nginx-test   1/1     Running             0          2s
 kubectl delete pod nginx-test
 ```
 
-**Observation while deleting:**
+**What you'll see during deletion:**
 
 ```text
 default     nginx-test   1/1     Terminating   0          30s
@@ -294,7 +294,7 @@ kubectl explain pod.spec.containers
 
 **Output:** A description of the container configuration.
 
-**Task: fields of `pod.spec.containers.resources`:**
+**Task: the fields of `pod.spec.containers.resources`:**
 
 ```bash
 kubectl explain pod.spec.containers.resources
@@ -350,9 +350,9 @@ kube-system   etcd-minikube                      25m          50Mi
 kube-system   kube-apiserver-minikube            60m          250Mi
 ```
 
-**Interpretation:**
+**How to read this:**
 
-- **Nodes:** shows CPU and RAM of the entire node
-- **Pods:** shows the resource consumption of each individual pod
+- **Nodes:** shows CPU and RAM usage for the whole node
+- **Pods:** shows the resource consumption of each pod
 - `m` = millicores (1000m = 1 CPU core)
 - `Mi` = mebibytes (RAM)

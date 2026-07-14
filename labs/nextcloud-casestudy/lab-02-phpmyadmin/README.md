@@ -1,12 +1,13 @@
-# Nextcloud Stage 2: PhpMyAdmin
+# Nextcloud Stage 2: phpMyAdmin
 
-Currently, the database is only reachable inside the cluster via a headless service. In production, this
-is actually _best practice_. But since we want to test whether the database works, we deploy PhpMyAdmin.
+Right now, the database is only reachable inside the cluster through a headless service. In
+production, that's actually _best practice_. But we'd like to check that the database works,
+so we'll deploy phpMyAdmin.
 
-Your task is to create a Kubernetes manifest that provides an instance of phpMyAdmin. phpMyAdmin
-is used to manage the MariaDB database for a Nextcloud instance. The manifest should consist of two
-parts: a Deployment that configures and provides the phpMyAdmin application, and a Service that
-enables access to phpMyAdmin on a specific port.
+Your task is to write a Kubernetes manifest that runs an instance of phpMyAdmin, which we'll
+use to manage the MariaDB database behind our Nextcloud. The manifest has two parts: a
+Deployment that configures and runs phpMyAdmin, and a Service that makes it reachable on a
+specific port.
 
 ## Create the Deployment
 
@@ -49,16 +50,16 @@ env:
 > - [Service type NodePort](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport)
 
 - Define a Service with the name `phpmyadmin` in the namespace `nextcloud`.
-- Set the port to `80` to make the phpMyAdmin service available on this port.
-- Set `targetPort` to `80` so that the service forwards to the container port correctly.
-- Set the service type to `NodePort` to allow access to phpMyAdmin from outside the Kubernetes
+- Set the port to `80` so the phpMyAdmin service is available there.
+- Set `targetPort` to `80` so the service forwards traffic to the right container port.
+- Set the service type to `NodePort` so phpMyAdmin can be reached from outside the Kubernetes
   cluster.
 
-Apply the manifest. Now check with kubectl whether the Deployment and Service were created successfully. Then tunnel to
-PhpMyAdmin by running
+Apply the manifest and check with kubectl that the Deployment and Service were created. Then
+tunnel to phpMyAdmin by running
 
 ```shell
 minikube service phpmyadmin -n nextcloud
 ```
 
-In your browser, you should now see PhpMyAdmin connected to the database.
+Your browser should now show phpMyAdmin, connected to the database.

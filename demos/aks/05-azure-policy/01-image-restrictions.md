@@ -1,6 +1,6 @@
 # Demo 1: Container Image Restrictions
 
-This demo shows how to use Azure Policy to restrict which container images may be used in the cluster.
+This demo shows how to use Azure Policy to control which container images are allowed in the cluster.
 
 ## Use case
 
@@ -48,7 +48,7 @@ az policy definition show --name $POLICY_ID --query "{Name:displayName, Descript
 
 ## 3. Assign the policy (audit mode)
 
-First test in audit mode to see which workloads would be affected:
+Start in audit mode to see which workloads would be affected:
 
 ```bash
 # Prepare the regex pattern (shell variable for better readability)
@@ -70,7 +70,7 @@ az policy assignment create \
 echo "Policy assigned. Waiting for synchronization (2-3 minutes)..."
 ```
 
-**Regex explanation:**
+**What the regex allows:**
 
 - `mcr\.microsoft\.com` - Microsoft Container Registry (for system images)
 - `$ACR_NAME\.azurecr\.io` - Your own ACR
@@ -190,7 +190,7 @@ kubectl get constraint -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{rang
 
 ## 8. Switch the policy to Deny
 
-Once audit mode shows that everything is fine, switch to Deny:
+Once the audit results look clean, switch to Deny:
 
 ```bash
 # Regex pattern (in case it is no longer set)
@@ -244,7 +244,7 @@ EOF
 
 ---
 
-## 10. More complex regex examples
+## 10. More regex examples
 
 ```bash
 # Allow only your own ACR + MCR (strict)
@@ -290,11 +290,11 @@ az policy assignment delete \
 
 ## Best Practices
 
-1. **Always start with Audit** - First check what would be affected
-2. **Excluded namespaces** - Exclude system namespaces
-3. **Always allow MCR** - Microsoft Container Registry for AKS components
+1. **Start with Audit** - See what would be affected before you block anything
+2. **Exclude system namespaces** - kube-system and friends need to keep running
+3. **Always allow MCR** - AKS components come from the Microsoft Container Registry
 4. **Roll out gradually** - Test clusters first, then production
-5. **Documentation** - Document the regex pattern for the team
+5. **Document the regex** - The team needs to know what's allowed and why
 
 ## Summary
 

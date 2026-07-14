@@ -1,7 +1,6 @@
 # Lab 03: Horizontal Pod Autoscaling with HPA and KEDA on AKS
 
-For this exercise, create a cluster as in exercise 1 and set the
-environment variables as described there.
+For this lab, create a cluster as in Lab 01 and set the environment variables described there.
 
 ## Part 1: Horizontal Pod Autoscaler (HPA) – basics
 
@@ -108,9 +107,8 @@ kubectl apply -f hpa-cpu.yaml
 
 ### Task 1.3: Observe and test the HPA
 
-Observe the behavior of the HPA. It can take about a minute until it starts
-doing its work – until then, the last measured CPU utilization is still
-`<unknown>`.
+Watch what the HPA does. It can take about a minute before it kicks in – until
+then, the last measured CPU utilization stays at `<unknown>`.
 
 ```bash
 # Continuously observe HPA status
@@ -120,24 +118,24 @@ kubectl get hpa cpu-stress-hpa --watch
 kubectl describe hpa cpu-stress-hpa
 ```
 
-**Questions for reflection:**
+**Things to think about:**
 
-1. Which metrics are currently collected by the HPA?
+1. Which metrics is the HPA currently collecting?
 2. What do the values in the TARGETS column mean?
 3. How long does it typically take for the HPA to react to load
    changes?
 
-By the way, you can now also test cluster autoscaling if it is enabled in the
-cluster. If you set the `maxReplicas` field in the YAML to a very high value,
-e.g. `100`, AKS will soon have to start new nodes. But please remember
-to delete the deployment afterwards to relieve the cluster again.
+By the way, if cluster autoscaling is enabled, you can now test that too. Set the
+`maxReplicas` field in the YAML to a very high value, say `100`, and AKS will soon
+have to spin up new nodes. Just remember to delete the deployment afterwards to
+take the load off the cluster.
 
 ## Part 2: Enable KEDA on AKS
 
 ### Task 2.1: Enable the KEDA add-on
 
-KEDA is available as a native AKS add-on and is managed by Microsoft. This
-is the recommended method for AKS.
+KEDA is available as a native AKS add-on managed by Microsoft – the recommended
+way to run it on AKS.
 
 **Enable it on an existing cluster:**
 
@@ -152,12 +150,12 @@ az aks update \
 kubectl get pods -n kube-system -l app=keda-operator
 ```
 
-**Note:** When creating a cluster, KEDA can be enabled directly with `--enable-keda`
+**Note:** On a new cluster, you can enable KEDA right away with `--enable-keda`
 (see prerequisites).
 
 ### Task 2.2: Check the KEDA add-on status
 
-As a final test, we now check whether KEDA is really enabled:
+To wrap up, let's make sure KEDA is actually enabled:
 
 ```bash
 # Show the add-on status in the cluster
@@ -176,10 +174,9 @@ az aks show \
 This scenario shows how KEDA scales based on the message count of an Azure
 Service Bus queue.
 
-Azure Service Bus is an Azure service that transports messages between
-applications. This decouples systems from each other, so they can work
-independently and no messages are lost, even if a system
-is briefly offline.
+Azure Service Bus is an Azure service that carries messages between applications.
+It decouples systems from each other: they can work independently, and no messages
+get lost even if one of them goes offline for a bit.
 
 #### Task 3.1: Set up Azure Service Bus
 
@@ -268,7 +265,7 @@ spec:
               memory: "128Mi"
 ```
 
-Note for practice: a real Service Bus consumer would look like this, for example:
+In the real world, a Service Bus consumer might use:
 
 - .NET: `Azure.Messaging.ServiceBus` SDK with `ServiceBusProcessor`
 - Java: `azure-messaging-servicebus` with `ServiceBusProcessorClient`
@@ -283,9 +280,8 @@ kubectl get pods -l app=order-processor
 
 #### Task 3.3: KEDA TriggerAuthentication and ScaledObject
 
-KEDA needs to connect to Azure Service Bus to check whether there are messages in
-the queue. For this, we need to store the connection string as a
-Kubernetes Secret:
+KEDA needs to connect to Azure Service Bus to check whether the queue has messages.
+So we store the connection string in a Kubernetes Secret:
 
 ```bash
 # Create the secret with the real connection string
@@ -293,9 +289,8 @@ kubectl create secret generic servicebus-secret \
   --from-literal=connectionString="$SB_CONNECTION"
 ```
 
-We also need a so-called `TriggerAuthentication`:
-it tells KEDA how to connect to the trigger source. In this
-case, this works via the secret we just created.
+We also need a `TriggerAuthentication`: it tells KEDA how to connect to the trigger
+source – in this case, through the secret we just created.
 
 **File: `keda-servicebus-auth.yaml`**
 
@@ -311,10 +306,9 @@ spec:
       key: connectionString
 ```
 
-Furthermore, we have to configure KEDA so that it scales our order processor,
-which we created earlier. This is done via a so-called
-`ScaledObject`. It will create a `HorizontalPodAutoscaler` for us and
-adjust it according to the throughput of the message queue.
+We also have to tell KEDA to scale the order processor we created earlier. That's
+what a `ScaledObject` is for: it creates a `HorizontalPodAutoscaler` for us and
+keeps adjusting it to the throughput of the message queue.
 
 **File: `keda-servicebus-scaledobject.yaml`**
 
@@ -349,7 +343,7 @@ spec:
         name: azure-servicebus-auth
 ```
 
-Of course, we still need to apply the files:
+Apply both files:
 
 ```bash
 
@@ -359,8 +353,8 @@ kubectl apply -f keda-servicebus-scaledobject.yaml
 
 #### Task 3.4: Test the scaling
 
-The Azure CLI does not support sending Service Bus messages directly (only
-management operations). We will therefore simulate the load via the Azure portal.
+The Azure CLI can't send Service Bus messages directly (management operations only),
+so we'll generate the load through the Azure portal instead.
 
 - Open the Service Bus namespace in the Azure portal
 - Under "Entities", select the queue `orders-queue`
@@ -369,7 +363,7 @@ management operations). We will therefore simulate the load via the Azure portal
 - Enter a message and click "Send"
 - Repeat this several times or use "Repeat send"
 
-Meanwhile, observe the behavior of the deployment and the HPA.
+While you do that, keep an eye on the deployment and the HPA.
 
 ```bash
 kubectl get pods -l app=order-processor --watch
@@ -377,8 +371,8 @@ kubectl get scaledobject order-processor-scaler -o yaml
 kubectl get hpa
 ```
 
-**Look at:**
+**Watch for:**
 
-- How many seconds after sending the messages does the scaling begin?
-- To how many pods is it scaled?
-- How does the scale-down behave after all messages have been processed?
+- How many seconds after the messages are sent does scaling kick in?
+- How many pods does it scale up to?
+- What does the scale-down look like once all messages are processed?

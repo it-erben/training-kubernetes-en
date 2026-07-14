@@ -1,6 +1,6 @@
 # Demo 2: Enforcing Resource Limits
 
-This demo shows how to use Azure Policy to ensure that all containers have CPU and memory limits defined.
+This demo shows how to use Azure Policy to make sure every container defines CPU and memory limits.
 
 ## Use case
 
@@ -68,12 +68,12 @@ echo "Policy assigned. Waiting for synchronization (2-3 minutes)..."
 sleep 120
 ```
 
-**Parameter explanation:**
+**What the parameters mean:**
 
 - `cpuLimit`: Maximum CPU per container (here: 2 cores)
 - `memoryLimit`: Maximum memory per container (here: 4Gi)
 - Pods without limits are blocked
-- Pods with limits above the maximum are blocked as well
+- Pods with limits above the maximum are blocked too
 
 ---
 
@@ -263,7 +263,7 @@ export REQUESTS_POLICY_ID=$(az policy definition list \
 
 ## 10. LimitRange as a Kubernetes alternative
 
-In addition to Azure Policy, you can use LimitRanges for default values:
+On top of Azure Policy, you can use a LimitRange to set default values:
 
 ```bash
 # Create a LimitRange (sets defaults when no limits are specified)
@@ -294,9 +294,9 @@ EOF
 # are only applied AFTER the admission check!
 ```
 
-> **Important:** LimitRange defaults are applied after the admission webhook.
-> Therefore Azure Policy with `deny` can still block pods without explicit limits.
-> Recommendation: Combine both, but use LimitRange only as a safety net.
+> **Important:** LimitRange defaults are applied after the admission webhook,
+> so an Azure Policy set to `deny` can still block pods without explicit limits.
+> Combine both, but treat the LimitRange as a safety net only.
 
 ---
 
@@ -369,10 +369,10 @@ echo "Cleanup complete!"
 ## Best Practices
 
 1. **Requests = guaranteed resources** - Set them realistically
-2. **Limits = maximum** - Not too high, to preserve cluster stability
+2. **Limits = maximum** - Don't set them too high, or cluster stability suffers
 3. **Watch the ratio** - The limit should be at most 2-3x the request
-4. **Monitoring** - Observe actual usage and adjust
-5. **Use VPA** - Vertical Pod Autoscaler for automatic recommendations
+4. **Monitor** - Watch actual usage and adjust
+5. **Use VPA** - The Vertical Pod Autoscaler gives you automatic recommendations
 
 ## Summary
 

@@ -1,7 +1,7 @@
-# Lab 09: Turning a Spring Boot application into an image the simple way with Dockerfiles
+# Lab 09: A simple Dockerfile for a Spring Boot application
 
-In this task you create a Docker image from a simple Spring Boot service. We choose a
-simple approach without special plugins or multi-stage builds.
+In this task you create a Docker image from a small Spring Boot service, deliberately without
+special plugins or multi-stage builds.
 
 ## Generate the project
 
@@ -24,11 +24,11 @@ a Maven install once to verify that everything works.
 
 ## Create the Dockerfile
 
-Create a file `Dockerfile` with the following properties:
+Create a file `Dockerfile`:
 
 - Base image: `eclipse-temurin:17-jre`
 - Copy the jar produced by the Maven build in the `target` directory to `/app/app.jar` in the image
-- Configure the `CMD` or entrypoint so that the jar is executed with `java` when the container starts.
+- Configure the `CMD` or entrypoint so that the container runs the jar with `java` on start.
 
 ## Build and test the image
 
@@ -38,4 +38,4 @@ Create a file `Dockerfile` with the following properties:
 
 ## Clean up
 
-- Stop the container and delete the container and the image
+- Stop the container, then delete it together with the image

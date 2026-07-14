@@ -1,8 +1,8 @@
 # Lab 07: Deployments with Recreate Rollout
 
-The [manifest](manifest.yaml) contains a deployment very similar to the one from the previous exercise. However,
-it is now configured so that the deployment is not rolled out in `RollingUpdate` mode but in
-`Recreate` mode. Let's take a look at what that means.
+The [manifest](manifest.yaml) contains a deployment very similar to the one from the previous exercise.
+This time, though, it's configured to roll out in `Recreate` mode instead of `RollingUpdate`.
+Let's see what that means in practice.
 
 **`manifest.yaml`:**
 
@@ -70,8 +70,8 @@ Check the status of the deployment:
 kubectl rollout status deployment/deployment-recreate-demo
 ```
 
-The rollout should succeed shortly. Afterwards, you can list all pods with the label specified in the
-deployment's pod template spec:
+The rollout should finish quickly. Once it's done, you can list all pods carrying the label from the
+deployment's pod template:
 
 ```shell
 kubectl get pod --selector=app=deployment-recreate-demo
@@ -89,8 +89,8 @@ Monitor the rollout.
 kubectl rollout status deployment/deployment-recreate-demo
 ```
 
-You will immediately notice that the rollout is much faster than with a rolling update. In `Recreate`
-mode, the deployment does not proceed pod by pod but deletes all pods at once and recreates them.
+You'll notice right away that the rollout is much faster than a rolling update. In `Recreate`
+mode, the deployment doesn't go pod by pod – it deletes all pods at once and creates new ones.
 
 ## Cleaning up
 

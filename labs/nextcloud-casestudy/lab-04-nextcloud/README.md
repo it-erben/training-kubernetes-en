@@ -1,10 +1,10 @@
 # Nextcloud
 
-The last and most important component still missing is Nextcloud itself.
+The last missing piece – and the most important one – is Nextcloud itself.
 
-In [nextcloud.yaml](nextcloud.yaml), I have provided a ready-made Deployment for you. But since you are
-a bit more advanced by now, something is still missing! The Deployment does not use a PersistentVolume. After an update,
-all data would be gone!
+In [nextcloud.yaml](nextcloud.yaml), I've provided a ready-made Deployment for you. But you're a
+bit more advanced by now, so there's a catch: the Deployment doesn't use a PersistentVolume.
+After an update, all your data would be gone!
 
 > **Docs:**
 >
@@ -75,7 +75,7 @@ spec:
               memory: "512Mi"
 ```
 
-So we need to take care of requesting and mounting a PersistentVolume. First, you need a
+So we need to request and mount a PersistentVolume ourselves. First, you need a
 PersistentVolumeClaim:
 
 ```yaml
@@ -102,7 +102,7 @@ volumes:
       claimName: nextcloud-pvc
 ```
 
-Finally, you still need to mount the resulting volume:
+Finally, mount the resulting volume:
 
 ```yaml
 volumeMounts:
@@ -110,13 +110,14 @@ volumeMounts:
     mountPath: /var/www/html
 ```
 
-Where exactly these snippets need to go is for you to figure out. The documentation can help you
-with that – or yesterday's exercise on volumes.
+Where exactly these snippets go is for you to figure out. The documentation can help – or
+yesterday's exercise on volumes.
 
-Once you are done, a Service is still missing to expose Nextcloud to the outside. Use the
-"PhpMyAdmin" service as a template and adjust the names and labels so that they match the Nextcloud Deployment.
+Once that's done, you still need a Service to expose Nextcloud to the outside world. Use the
+phpMyAdmin Service as a template and adjust the names and labels to match the Nextcloud
+Deployment.
 
-When everything is ready, you can apply the file with kubectl and then use minikube to open a tunnel to your
-service to test Nextcloud.
+When everything is in place, apply the file with kubectl, open a minikube tunnel to your
+service, and give Nextcloud a try.
 
 Good luck!

@@ -3,16 +3,16 @@
 First, we set up the database that Nextcloud needs to run. Step 0 is to create a namespace
 called "nextcloud". Use `kubectl` for this.
 
-So that we don't have to pass the namespace we are working in with every command from now on, we can tell kubectl
-the new default namespace:
+To avoid passing the namespace with every command from now on, tell kubectl to use the new
+namespace as the default:
 
 ```shell
 kubectl config set-context --current --namespace=nextcloud
 ```
 
-Your task now is to create a Kubernetes manifest that provides a MariaDB database. The manifest
-should consist of two parts: a StatefulSet that configures and provides the MariaDB database, and a
-Service that enables access to the database.
+Your task is to write a Kubernetes manifest that sets up a MariaDB database. The manifest
+has two parts: a StatefulSet that configures and runs MariaDB, and a Service that makes the
+database reachable.
 
 ## Create the StatefulSet
 
@@ -38,9 +38,9 @@ Service that enables access to the database.
       value: "nextcloudpassword"
   ```
 
-  - Define a volume mount that ensures the database data is stored in the directory `/var/lib/mysql`.
-  - Create a VolumeClaimTemplate that requests a persistent volume with a size of `10Gi` and ensures
-    that it can only be written by one node at a time (AccessMode: `ReadWriteOnce`).
+  - Define a volume mount so the database data is stored in `/var/lib/mysql`.
+  - Create a VolumeClaimTemplate that requests a `10Gi` persistent volume that only one node
+    can write to at a time (AccessMode: `ReadWriteOnce`).
 
   ```yaml
   volumeClaimTemplates:
@@ -62,18 +62,18 @@ Service that enables access to the database.
 
 - Define a Service with the name `nextcloud-db` in the namespace `nextcloud`.
 - Set the `clusterIP` to `None` so that each pod in the StatefulSet gets its own DNS name.
-- Define a port through which the database service can be reached (port `3306`).
+- Define the port the database service is reachable on (port `3306`).
 
 ## Finish the manifest
 
 Make sure the manifest is syntactically correct and meets the requirements listed above.
 
-The result should be a YAML document describing the configuration of a StatefulSet and its accompanying
-Service. Apply the manifest and then check whether the StatefulSet is running as expected.
+You should end up with a single YAML document containing the StatefulSet and its accompanying
+Service. Apply the manifest and check that the StatefulSet is running as expected.
 
 ## Verify the result
 
-Start a debug pod and check whether the service is reachable and returns an IP for the pod.
+Start a debug pod and check that the service is reachable and resolves to the pod's IP.
 
 ```yaml
 kubectl run -i --tty busybox --image=busybox --restart=Never -- sh

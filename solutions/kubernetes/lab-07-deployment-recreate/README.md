@@ -12,5 +12,5 @@ kubectl rollout status deployment/deployment-recreate-demo   # all old pods are 
 kubectl delete deployment.apps/deployment-recreate-demo
 ```
 
-Expected result: during the update all pods are deleted and then recreated (downtime possible), which makes the
-rollout faster.
+Expected result: the update deletes all pods first and then recreates them, which makes the rollout faster but can
+cause downtime.

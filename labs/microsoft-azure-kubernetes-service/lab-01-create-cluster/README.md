@@ -63,7 +63,7 @@ az aks get-credentials \
 kubectl get nodes
 ```
 
-You should now see one node with status `Ready`.
+You should now see one node in the `Ready` state.
 
 ---
 
@@ -88,11 +88,11 @@ kubectl get nodes
 
 - Which Kubernetes version is running on your cluster?
 - How many nodes does your cluster have?
-- Is the node in status `Ready`?
+- Is the node in the `Ready` state?
 
 ### Examine node details
 
-With `describe`, we get detailed information about a resource.
+`describe` gives you detailed information about a resource.
 Replace `<NODENAME>` with a real node name:
 
 ```bash
@@ -111,7 +111,7 @@ kubectl describe node <NODENAME>
 
 ### Explore resources in the cluster
 
-Pods are the smallest deployable unit in Kubernetes. Let's look at what is already running:
+Pods are the smallest deployable unit in Kubernetes. Let's see what's already running:
 
 ```bash
 # All pods in the current namespace (default)
@@ -130,9 +130,9 @@ kubectl get pods -A
 - System components run in `kube-system` (CoreDNS, kube-proxy, etc.)
 - Every pod has a status (Running, Pending, etc.)
 
-### Which resources exist in the first place?
+### Which resource types are there, anyway?
 
-Kubernetes knows many different resource types. Display all of them:
+Kubernetes has a lot of different resource types. List them all:
 
 ```bash
 kubectl api-resources
@@ -151,7 +151,7 @@ kubectl api-resources
    kubectl get ns           # instead of namespaces
    ```
 
-**Tip:** The short forms save typing. It's worth memorizing them.
+**Tip:** The short forms save a lot of typing – worth memorizing.
 
 ### Understand the namespace system
 
@@ -171,7 +171,7 @@ kubectl get pods
 
 **Task:** How many pods are running in the namespace `kube-system`?
 
-### Output format _wide_
+### The _wide_ output format
 
 By default, `kubectl get` only shows the most important columns. With `-o wide` you get more details:
 
@@ -179,7 +179,7 @@ By default, `kubectl get` only shows the most important columns. With `-o wide` 
 kubectl get pods -A -o wide
 ```
 
-**What do you see now, in addition?**
+**What extra information do you get now?**
 
 - IP addresses of the pods
 - Which node the pod is running on
@@ -200,7 +200,7 @@ kubectl get pod <POD-NAME> -n kube-system -o yaml
 kubectl get pod <POD-NAME> -n kube-system -o json
 ```
 
-**Replace `<POD-NAME>`** with a real pod name
+**Replace `<POD-NAME>`** with a real pod name.
 
 **Tasks:**
 
@@ -220,7 +220,7 @@ You can also build your own tables:
 kubectl get pods -A -o custom-columns=NAME:.metadata.name,STATUS:.status.phase,IP:.status.podIP
 ```
 
-**Explain in words:** What does this command display?
+**In your own words:** what does this command display?
 
 ## Kubectl help
 
@@ -243,9 +243,9 @@ kubectl explain pod.spec.containers
 
 **Task:** Create a separate user node pool for workloads.
 
-**Background:** It is best practice to separate system workloads (CoreDNS, etc.) from
-application workloads. For this, you use separate node pools with
-different `mode` settings.
+**Background:** It's best practice to separate system workloads (CoreDNS, etc.) from
+application workloads. That's what separate node pools with different `mode` settings
+are for.
 
 ```bash
 az aks nodepool add \

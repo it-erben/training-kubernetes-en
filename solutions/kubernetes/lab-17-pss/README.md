@@ -14,5 +14,5 @@ kubectl delete all --all -n my-secure-namespace
 kubectl delete ns my-secure-namespace
 ```
 
-The namespace enforces `baseline`; pods with `privileged=true` are rejected, less restrictive fields produce
-warnings.
+The namespace enforces `baseline`; pods with `privileged=true` are rejected, while less severe violations only
+produce warnings.

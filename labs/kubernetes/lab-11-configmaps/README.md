@@ -1,18 +1,18 @@
 # Lab 11: Working with ConfigMaps
 
-In this series of tasks we will learn how to work with ConfigMaps. Almost all ConfigMap concepts can later
-be transferred to Secrets.
+In this series of tasks we'll learn how to work with ConfigMaps. Almost everything about ConfigMaps
+carries over to Secrets later.
 
 ## Exercise 1: Creating a ConfigMap
 
-We create a ConfigMap named my-config containing two key-value pairs: `key1: value1` and
+We'll create a ConfigMap named my-config with two key-value pairs: `key1: value1` and
 `key2: value2`.
 
-We will use both imperative and declarative methods to create the ConfigMap.
+We'll create it both ways: imperatively and declaratively.
 
 ### Imperative method
 
-The following command creates a ConfigMap named "my-config" containing two key-value combinations.
+The following command creates a ConfigMap named "my-config" with two key-value pairs.
 
 ```bash
 kubectl create configmap my-config --from-literal=key1=value1 --from-literal=key2=value2
@@ -24,14 +24,14 @@ Now display the contents of the new ConfigMap:
 kubectl get configmap my-config -o "jsonpath= {.data.key1}"
 ```
 
-`jsonpath` is used here to pick out and print the value of the key `key1` directly. To understand more
-precisely why `.data.key` is passed, you can display the contents without `jsonpath`:
+Here, `jsonpath` picks out the value of the key `key1` and prints it directly. To see why
+`.data.key` is passed, print the contents without `jsonpath`:
 
 ```shell
 kubectl get configmap my-config -o json
 ```
 
-You will see that the key-value combinations are contained in the `data` subfield.
+You'll see that the key-value pairs live in the `data` field.
 
 To delete the ConfigMap afterwards:
 
@@ -60,7 +60,7 @@ data:
 kubectl apply -f declarative-config.yaml
 ```
 
-Now display the contents of the new ConfigMap to verify that the result is as expected:
+Now display the contents of the new ConfigMap to check that everything looks as expected:
 
 ```shell
 kubectl get configmap my-config -o "jsonpath= {.data.key1}"
@@ -74,8 +74,8 @@ kubectl delete configmap my-config
 
 ## Exercise 2: Using a ConfigMap in a pod
 
-The file [config-pod.yaml](config-pod.yaml) contains the declarations of a ConfigMap and a pod. The pod logs the
-`env` output and then stops. We can see the result in the logs.
+The file [config-pod.yaml](config-pod.yaml) declares a ConfigMap and a pod. The pod logs the
+`env` output and then stops, so we can see the result in the logs.
 
 **`config-pod.yaml`:**
 
@@ -124,14 +124,14 @@ spec:
 kubectl apply -f config-pod.yaml
 ```
 
-Now let's check the pod logs to see whether the environment variables are really present:
+Now let's check the pod logs to see whether the environment variables are actually there:
 
 ```bash
 kubectl logs config-pod
 ```
 
-In the logs you will see all environment variables the pod knows. Among others, `key1` and `key2` should
-be included.
+The logs show every environment variable set in the pod. `key1` and `key2` should be among
+them.
 
 Cleaning up:
 
@@ -141,9 +141,9 @@ kubectl delete configmap my-config
 
 ## Exercise 3: Mapping ConfigMap values to volumes
 
-The file [volume-pod.yaml](volume-pod.yaml) contains a ConfigMap that is mounted into a pod via a volume. As in
-the exercise before last, the result is logged, but the container waits a while before stopping. So we can
-inspect it with exec.
+The file [volume-pod.yaml](volume-pod.yaml) contains a ConfigMap that gets mounted into a pod as a volume. As in
+the exercise before last, the result is logged, but this time the container sticks around for a while before
+stopping, so we can inspect it with exec.
 
 **`volume-pod.yaml`:**
 
@@ -198,7 +198,7 @@ Applying the file:
 kubectl apply -f volume-pod.yaml
 ```
 
-We now check whether the files were successfully mounted into the pod:
+Now let's check that the files actually made it into the pod:
 
 ```bash
 kubectl exec -it volume-pod -- ls /etc/config
@@ -208,12 +208,11 @@ kubectl exec -it volume-pod -- ls /etc/config
 kubectl exec -it volume-pod -- cat /etc/config/key1
 ```
 
-In the first case you see all files that were created as part of the mount. The second command uses `cat` to print
-the contents of the file `key1`, which contains the first configuration value.
+The first command lists all files created by the mount. The second uses `cat` to print
+the contents of the file `key1`, which holds the first configuration value.
 
-Now pause for a moment and consider that Kubernetes provides the pod with one file for each
-key-value combination in the ConfigMap. Each file contains the value specified in the
-ConfigMap.
+Take a moment to notice what happened here: Kubernetes gives the pod one file per
+key-value pair in the ConfigMap, and each file contains the corresponding value.
 
 Cleaning up:
 

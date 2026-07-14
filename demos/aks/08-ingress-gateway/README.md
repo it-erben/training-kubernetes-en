@@ -6,7 +6,7 @@
 - Enable and configure the Application Routing add-on
 - Implement host- and path-based routing
 - Set up an internal ingress controller
-- Outlook on the Gateway API
+- Get a first look at the Gateway API
 
 ## Prerequisites
 
@@ -185,9 +185,9 @@ kubectl get pods,svc -n ingress-demo
 
 ---
 
-## Part 3: LoadBalancer vs. Ingress – The Comparison
+## Part 3: LoadBalancer vs. Ingress
 
-### 3.1 Scenario A: Classic LoadBalancer service
+### 3.1 Scenario A: A plain LoadBalancer service
 
 ```yaml
 # File: loadbalancer-service.yaml
@@ -219,7 +219,7 @@ curl http://$LB_IP
 **🔍 Observation:**
 
 - Each LoadBalancer service creates its own Azure public IP
-- Visible in the Azure Portal under "Load Balancers"
+- You'll find it in the Azure Portal under "Load Balancers"
 - Cost: ~$0.005/hour per public IP + traffic
 
 ```bash
@@ -324,7 +324,7 @@ echo "=== /api ==="
 curl http://$INGRESS_IP/api
 ```
 
-**🔍 Exercise:** Observe in the output that each path routes to a different pod.
+**🔍 Exercise:** Look at the output – each path lands on a different pod.
 
 ---
 
@@ -394,7 +394,7 @@ kubectl apply -f internal-ingress.yaml
 kubectl get ingress internal-ingress -n ingress-demo
 ```
 
-**🔍 Observation:** The IP is a private IP from the VNet – reachable only internally.
+**🔍 Observation:** The IP is a private VNet address – you can only reach it from inside the network.
 
 ---
 
@@ -410,7 +410,7 @@ kubectl logs -n app-routing-system -l app.kubernetes.io/component=controller --t
 kubectl describe ingress -n ingress-demo
 ```
 
-### 6.2 Summarize the ingress status
+### 6.2 Ingress status at a glance
 
 ```bash
 # All ingress resources with IPs
@@ -442,9 +442,9 @@ kubectl delete nginxingresscontroller nginx-internal
 
 ---
 
-## Bonus: Outlook on the Gateway API
+## Bonus: A First Look at the Gateway API
 
-The Gateway API is the successor to the Ingress API. Here is a preview:
+The Gateway API is the successor to the Ingress API. Here's a quick preview:
 
 ```yaml
 # Example: Gateway API with Application Gateway for Containers
@@ -492,7 +492,7 @@ spec:
 - Native traffic splitting
 - Cross-namespace routing
 
-## Further Resources
+## Further Reading
 
 - [AKS Application Routing documentation](https://learn.microsoft.com/en-us/azure/aks/app-routing)
 - [Kubernetes Ingress concepts](https://kubernetes.io/docs/concepts/services-networking/ingress/)

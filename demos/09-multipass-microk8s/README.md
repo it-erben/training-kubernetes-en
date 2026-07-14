@@ -3,7 +3,7 @@
 This demo shows how to quickly set up an isolated Kubernetes cluster on your Mac without using Docker Desktop. We use
 **Canonical Multipass** (to create an Ubuntu VM) and **MicroK8s** (as a lightweight Kubernetes distribution).
 
-In addition, we set up **MetalLB** so that services of type `LoadBalancer` can receive an external IP address.
+We also set up **MetalLB** so that services of type `LoadBalancer` get an external IP address.
 
 ## Prerequisites
 
@@ -15,13 +15,13 @@ brew install --cask multipass
 
 ## Step 1: Create the VM
 
-Create an Ubuntu VM with sufficient resources (4 CPUs, 8GB RAM, 40GB disk):
+Create an Ubuntu VM with enough resources (4 CPUs, 8GB RAM, 40GB disk):
 
 ```bash
 multipass launch --name k8s-demo --cpus 4 --memory 8G --disk 40G
 ```
 
-Check that the VM is running and **note the IP address** (important for later!):
+Check that the VM is running and **note the IP address** — you'll need it later:
 
 ```bash
 multipass list
@@ -63,7 +63,7 @@ alias kubectl='microk8s kubectl'
 
 ## Step 3: Enable addons & MetalLB
 
-To be able to use `LoadBalancer` services (and not just NodePort), we need MetalLB.
+To use `LoadBalancer` services (and not just NodePort), we need MetalLB.
 
 1. Enable DNS and MetalLB:
 
@@ -80,7 +80,7 @@ To be able to use `LoadBalancer` services (and not just NodePort), we need Metal
 
 We use the prepared file `test-app.yaml` (nginx Deployment + Service).
 
-Since the file is on your Mac, we first need to transfer it into the VM or create it there. **Option A (transfer the
+The file lives on your Mac, so we first need to get it into the VM or create it there. **Option A (transfer the
 file):** On your Mac (in a new terminal):
 
 ```bash
@@ -88,7 +88,7 @@ file):** On your Mac (in a new terminal):
 multipass transfer demos/09-multipass-microk8s/test-app.yaml k8s-demo:
 ```
 
-**Option B (copy & paste):** Simply create the file in the VM with `nano test-app.yaml`.
+**Option B (copy & paste):** Create the file directly in the VM with `nano test-app.yaml`.
 
 **Apply the deployment (in the VM):**
 
@@ -98,7 +98,7 @@ microk8s kubectl apply -f test-app.yaml
 
 ## Step 5: Test
 
-Wait briefly until the pods are running, then check the service:
+Give the pods a moment to start, then check the service:
 
 ```bash
 microk8s kubectl get svc nginx-service

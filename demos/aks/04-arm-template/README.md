@@ -22,7 +22,7 @@ az account set --subscription "name-or-id"
 
 ## 1. What are ARM templates?
 
-**ARM templates** are the native Azure approach to Infrastructure as Code:
+**ARM templates** are Azure's native approach to Infrastructure as Code:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
@@ -47,16 +47,16 @@ az account set --subscription "name-or-id"
 
 **Advantages:**
 
-- Native Azure solution (no additional tool)
+- Built into Azure (no extra tool to install)
 - Full Azure feature support
-- Idempotent (can be applied repeatedly)
+- Idempotent (run it as often as you like)
 - What-if mode for previews
-- Integration with Azure DevOps and GitHub Actions
+- Integrates with Azure DevOps and GitHub Actions
 
 **Disadvantages:**
 
 - Verbose JSON syntax
-- No loops/conditionals like in Terraform
+- No loops or conditionals like Terraform has
 - Azure only (not multi-cloud)
 
 ---
@@ -294,7 +294,7 @@ az deployment operation group list \
 
 ## 7. Making changes
 
-ARM templates are **idempotent** - you can run them multiple times:
+ARM templates are **idempotent** - deploy them as often as you like:
 
 ### 7.1 Changing parameters
 
@@ -480,7 +480,7 @@ az group show --name $RESOURCE_GROUP --query "properties.provisioningState"
 | **Idempotent**         | Yes                          |
 | **Preview**            | `what-if`                    |
 
-**AKS Automatic features (enabled automatically):**
+**What AKS Automatic enables out of the box:**
 
 - Node Auto-Provisioning (Karpenter)
 - Azure CNI Overlay + Cilium

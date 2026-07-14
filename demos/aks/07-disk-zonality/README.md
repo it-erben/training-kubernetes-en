@@ -1,14 +1,14 @@
-# Demonstration: ZRS vs. LRS Disks in AKS
+# Demo: ZRS vs. LRS Disks in AKS
 
 ## Learning Objectives
 
-After this exercise, participants understand:
+After this demo, you'll understand:
 
 - The difference between zonal (LRS) and zone-redundant (ZRS) Azure disks
 - The impact on pod scheduling and high availability
-- When which storage type makes sense
+- When to use which storage type
 
-## Verify Cluster Preparation
+## Check the Cluster Setup
 
 ```bash
 # Get cluster information
@@ -173,9 +173,9 @@ kubectl get pods -w
 
 ---
 
-## Part 3: Analyze the Initial Situation
+## Part 3: Check the Starting State
 
-### 3.1 Determine pod placement
+### 3.1 Find where the pods run
 
 ```bash
 # Which nodes are the pods running on?
@@ -187,7 +187,7 @@ kubectl get pods -o wide
 # app-zrs-demo-8c5d9f7e6-y3l5n    1/1     Running   aks-nodepool1-12345678-vmss000001   
 ```
 
-### 3.2 Determine the zones of the nodes
+### 3.2 Find each node's zone
 
 ```bash
 # Detailed node information
@@ -214,9 +214,9 @@ kubectl get pv -o custom-columns=\
 'NAME:.metadata.name,CLAIM:.spec.claimRef.name,ZONE:.spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[?(@.key=="topology.kubernetes.io/zone")].values[0]'
 ```
 
-**Document your observation:**
+**Write down what you see:**
 
-| Resource  | Zone | Remark                 |
+| Resource  | Zone | Notes                  |
 |-----------|------|------------------------|
 | LRS PV    |      | Bound to one zone      |
 | ZRS PV    |      | No zone restriction    |
@@ -225,7 +225,7 @@ kubectl get pv -o custom-columns=\
 
 ## Part 4: Simulate a Zone Failover
 
-### 4.1 Identify and cordon the node of the LRS pod
+### 4.1 Find the LRS pod's zone and cordon it
 
 ```bash
 # Determine the node the LRS pod is running on
@@ -267,7 +267,7 @@ kubectl describe pod -l app=lrs-demo | grep -A 20 "Events:"
 | Workload     | Status  | Explanation                                             |
 |--------------|---------|---------------------------------------------------------|
 | app-zrs-demo | Running | The ZRS disk can be mounted in any zone                 |
-| app-lrs-demo | Pending | The LRS disk is bound to a zone, no schedulable nodes   |
+| app-lrs-demo | Pending | The LRS disk is pinned to its zone, so no node fits     |
 
 ### 4.4 Examine the scheduler events
 
@@ -282,7 +282,7 @@ kubectl get events --field-selector involvedObject.name=$(kubectl get pods -l ap
 
 ---
 
-## Part 5: Restore the Situation
+## Part 5: Recover
 
 ### 5.1 Uncordon the nodes
 
@@ -290,7 +290,7 @@ kubectl get events --field-selector involvedObject.name=$(kubectl get pods -l ap
 # Uncordon all nodes
 for node in $(kubectl get nodes -l topology.kubernetes.io/zone=$LRS_ZONE -o name); do
   kubectl uncordon $node
-  echo "Cordoned: $node"
+  echo "Uncordoned: $node"
 done
 
 # Wait until the LRS pod starts
@@ -331,13 +331,10 @@ kubectl delete -f storageclass-zrs.yaml
 
 ## Discussion Questions
 
-1. How would a StatefulSet with 3 replicas and LRS disks behave if
-   a zone fails?
+1. How would a StatefulSet with 3 replicas and LRS disks behave if a zone fails?
 
-2. What alternative to ZRS is there if the application needs ReadWriteMany?
+2. If an application needs ReadWriteMany, what's the alternative to ZRS?
 
-3. How does the `volumeBindingMode: WaitForFirstConsumer` setting interact with
-   zone placement?
+3. How does `volumeBindingMode: WaitForFirstConsumer` interact with zone placement?
 
-4. What happens to a ZRS disk when the entire AKS cluster is deleted (
-   ReclaimPolicy)?
+4. What happens to a ZRS disk when the whole AKS cluster is deleted (ReclaimPolicy)?

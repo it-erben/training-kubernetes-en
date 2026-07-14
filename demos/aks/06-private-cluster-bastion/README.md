@@ -2,12 +2,12 @@
 
 This demo shows how to create a private AKS cluster and access it without needing a jump VM.
 
-## Use Case
+## Use Cases
 
-- API server is not reachable from the internet
-- Increased security for sensitive workloads
+- The API server isn't reachable from the internet
+- Tighter security for sensitive workloads
 - Compliance requirements (e.g. no public endpoints)
-- No need for additional infrastructure (jump VMs)
+- No extra infrastructure (jump VMs) needed
 
 ---
 
@@ -174,8 +174,8 @@ kubectl get nodes
 
 ## Part 2: Access via Command Invoke (recommended)
 
-`az aks command invoke` runs commands directly in the cluster - via the Azure control plane,
-without the local machine needing network access to the API server.
+`az aks command invoke` runs commands inside the cluster through the Azure control plane -
+your local machine never needs network access to the API server.
 
 ### 2.1 Run simple commands
 
@@ -216,7 +216,7 @@ az aks command invoke \
 
 ### 2.3 Apply local manifest files
 
-With `--file`, local files can be transferred to the cluster:
+The `--file` flag lets you send local files to the cluster:
 
 ```bash
 # Create a local file
@@ -359,13 +359,13 @@ az aks command invoke \
 | Applying local files      | Streaming logs (`kubectl logs -f`)         |
 | One-off logs              | Direct API access (client-go)              |
 
-For these scenarios → see Part 3 (Bastion tunnel)
+For those, see Part 3 (Bastion tunnel).
 
 ---
 
 ## Part 3: Access via Bastion Tunnel (optional)
 
-For full kubectl functionality (interactive sessions, port forwarding), a jump VM is required.
+For full kubectl functionality (interactive sessions, port forwarding), you need a jump VM.
 
 ### 3.1 Additional variables
 
@@ -446,7 +446,7 @@ az network bastion ssh \
   --ssh-key ~/.ssh/id_rsa
 ```
 
-Run on the VM:
+On the VM, run:
 
 ```bash
 # Install Azure CLI
@@ -461,7 +461,7 @@ exit
 
 ### 3.6 Set up the tunnel
 
-Now we can set up a tunnel from the local machine through Bastion to the VM:
+Now set up a tunnel from your local machine through Bastion to the VM:
 
 #### Terminal 1: Start the Bastion tunnel
 
@@ -554,7 +554,7 @@ echo "Deletion started. Takes a few minutes."
 
 ---
 
-## Cost Note
+## Cost Estimate
 
 | Resource                     | Estimated cost/month    |
 | ---------------------------- | ----------------------- |
@@ -570,10 +570,10 @@ echo "Deletion started. Takes a few minutes."
 
 | Method | Advantages | Disadvantages |
 | --- | --- | --- |
-| **Command Invoke** | No extra infrastructure, usable immediately | No interactive sessions |
-| **Bastion tunnel** | Full kubectl functionality | Additional cost, setup effort |
+| **Command Invoke** | No extra infrastructure, works right away | No interactive sessions |
+| **Bastion tunnel** | Full kubectl functionality | Extra cost and setup work |
 
 **Recommendation:**
 
-- For most scenarios, `az aks command invoke` is sufficient
-- Bastion + VM only if interactive sessions or port forwarding are needed
+- `az aks command invoke` is enough for most scenarios
+- Set up Bastion + VM only if you need interactive sessions or port forwarding

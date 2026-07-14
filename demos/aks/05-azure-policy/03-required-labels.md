@@ -5,9 +5,9 @@ This demo shows how to use Azure Policy to enforce specific labels on all Kubern
 ## Use case
 
 - **Cost allocation**: `cost-center`, `project` labels for chargeback
-- **Ownership**: `owner`, `team` labels for responsibilities
+- **Ownership**: `owner`, `team` labels so it's clear who's responsible
 - **Environment**: `env` label for separating environments
-- **Compliance**: traceability of who deployed what
+- **Compliance**: trace who deployed what
 
 ---
 
@@ -69,8 +69,8 @@ sleep 120
 
 **Required labels:**
 
-- `app` - name of the application
-- `owner` - responsible team/person
+- `app` - the application name
+- `owner` - the team or person responsible
 - `env` - environment (dev, staging, prod)
 
 ---
@@ -246,7 +246,7 @@ kubectl get pods -n $NAMESPACE -l app=labeled-app --show-labels
 
 ## 9. Validating label values (custom policy)
 
-The built-in policy only checks whether labels exist. Validating values requires custom policies:
+The built-in policy only checks that the labels exist. To validate their values, you need a custom policy:
 
 ```bash
 # Example: custom ConstraintTemplate for label values
@@ -390,11 +390,11 @@ echo "Cleanup complete!"
 
 ## Best Practices
 
-1. **Consistent naming convention** - Define team-wide standards
-2. **Not too many mandatory labels** - 3-5 are usually enough
-3. **Automation** - CI/CD pipelines should set labels automatically
-4. **Documentation** - Document the label schema
-5. **Use namespaces** - Often better than labels for env separation
+1. **Consistent naming** - Agree on team-wide standards
+2. **Keep the mandatory list short** - 3-5 labels are usually enough
+3. **Automate it** - Let CI/CD pipelines set the labels
+4. **Document the schema** - So everyone labels things the same way
+5. **Use namespaces** - Often better than labels for separating environments
 
 ## Summary
 

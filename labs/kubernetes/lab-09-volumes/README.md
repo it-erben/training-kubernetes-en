@@ -1,8 +1,7 @@
 # Lab 09: Persistent Volumes
 
-The following exercise is meant to help you gain a basic understanding of volumes in Kubernetes (k8s). In
-this exercise you will create an application that runs in a pod and uses persistent storage in the form
-of a volume.
+This exercise gives you a first feel for volumes in Kubernetes (k8s). You'll build an application
+that runs in a pod and uses persistent storage in the form of a volume.
 
 ## Create the k8s resources
 
@@ -82,7 +81,7 @@ kubectl apply -f manifest.yaml
 ```
 
 This creates a pod with NGINX, a service of type `NodePort` that makes this pod available on port 30080 on the host,
-and a `PersistentVolumeClaim` with which the pod will request a `PersistentVolume`.
+and a `PersistentVolumeClaim` that the pod uses to request a `PersistentVolume`.
 
 Use the following commands to check the status of your Kubernetes resources:
 
@@ -106,11 +105,11 @@ NAME     READY   STATUS    RESTARTS   AGE
 my-pod    1/1     Running   0          1m
 ```
 
-If you get similar output and the pod has the status `running`, you can continue. This can take a while!
+If you get similar output and the pod has the status `running`, you're good to continue. This can take a while!
 
 ## Create an `index.html` file on your local machine
 
-You can also use the index.html file located in this directory.
+You can also just use the index.html that's already in this directory.
 
 **`index.html`:**
 
@@ -138,16 +137,16 @@ kubectl cp index.html my-pod:/usr/share/nginx/html/index.html -c my-container
 ```
 
 In this command, replace `index.html` with the path to the file on your local machine. `my-pod` is the name of the
-pod the file should be copied into, and `my-container` is the name of the container inside the pod (here it is
-the nginx container). The target folder `/usr/share/nginx/html/index.html` is the location inside the container
-defined in the `pod.yaml`.
+pod the file should be copied into, and `my-container` is the name of the container inside the pod (here,
+the nginx container). The target path `/usr/share/nginx/html/index.html` is the location inside the container
+that we defined in the `pod.yaml`.
 
 ### Verify that the `index.html` file was transferred successfully
 
 #### For Minikube
 
-When using minikube, we unfortunately cannot simply access the service via <http://localhost:30080>, even though
-we defined this port in the service as a `NodePort`. So we run:
+With minikube, we unfortunately can't just open the service at <http://localhost:30080>, even though
+we set that port as a `NodePort` in the service. So we run:
 
 ```shell
 minikube service my-service
@@ -190,8 +189,8 @@ kubectl get svc my-service -o wide
 
 ## Deleting and recreating the pod
 
-Now delete the pod my-pod and apply the manifest again so the pod is recreated. Then start the
-service tunnel again and check whether the web page still appears.
+Now delete the pod my-pod and apply the manifest again so the pod gets recreated. Then start the
+service tunnel again and check if the web page still shows up.
 
 ```shell
 kubectl delete pod my-pod
@@ -199,8 +198,8 @@ kubectl apply -f manifest.yaml
 minikube service my-service
 ```
 
-To understand why this is the case, you can take a look at the PersistentVolumes. Delete the pod once more and
-display whether the PV still exists:
+To understand why, take a look at the PersistentVolumes. Delete the pod once more and
+check whether the PV is still there:
 
 ```shell
 kubectl delete pod my-pod
@@ -209,11 +208,11 @@ kubectl get pv
 
 ## Cleaning up
 
-To completely remove the created resources, this time we take the easy route:
+To get rid of everything we created, this time we take the easy route:
 
 ```shell
 minikube delete
 minikube start
 ```
 
-This deletes the cluster entirely and sets it up again.
+This deletes the whole cluster and sets it up again from scratch.

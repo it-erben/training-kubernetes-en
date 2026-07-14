@@ -9,8 +9,8 @@ configurable via the `values.yaml`.
 
 ## Preparation: Folder Structure
 
-A Helm chart is basically just a directory structure with text files. Please create the following folder structure in
-your working directory:
+A Helm chart is basically just a directory structure with text files. Create the following folder structure
+in your working directory:
 
 ```text
 my-nginx-chart/
@@ -21,7 +21,7 @@ my-nginx-chart/
 
 ## Task 1: Metadata (Chart.yaml)
 
-Every Helm chart needs a `Chart.yaml` containing metadata about the chart. Create the file
+Every Helm chart needs a `Chart.yaml` with metadata about the chart. Create the file
 `my-nginx-chart/Chart.yaml` with the following content:
 
 ```yaml
@@ -37,7 +37,7 @@ appVersion: "1.16.0"
 
 ## Task 2: Configuration (values.yaml)
 
-In the `values.yaml` we define default values that our templates will use. Create a file
+The `values.yaml` defines the default values our templates will use. Create a file
 `my-nginx-chart/values.yaml` with the following content:
 
 ```yaml
@@ -53,22 +53,22 @@ service:
 This makes the following settings configurable:
 
 1. **Replica count:** The number of pods should be configurable (default: `2`).
-2. **Service type:** The type of the Kubernetes Service should be configurable (e.g. `ClusterIP` or `NodePort`.
-    Default: `ClusterIP`).
+2. **Service type:** The type of the Kubernetes Service should be configurable (e.g. `ClusterIP` or
+    `NodePort`; default: `ClusterIP`).
 
 ---
 
 ## Task 3: Deployment Template
 
-Now we create the template for the Deployment. Create the file `my-nginx-chart/templates/deployment.yaml`.
+Now for the Deployment template. Create the file `my-nginx-chart/templates/deployment.yaml`.
 
 **Requirements:**
 
 - Use a standard Kubernetes Deployment for `nginx`.
-- Replace the hard-coded `replicas` with the value from your `values.yaml`. The syntax for this is
+- Replace the hard-coded `replicas` with the value from your `values.yaml`. The syntax is
   `{{ .Values.replicaCount }}`.
 
-Your file could look similar to this:
+Your file could look something like this:
 
 ```yaml
 apiVersion: apps/v1
@@ -121,7 +121,7 @@ Create the file `my-nginx-chart/templates/service.yaml`.
 
 **Requirements:**
 
-- A Service should be created that points to the Deployment.
+- Create a Service that points to the Deployment.
 - The `type` of the Service (e.g. `ClusterIP` or `NodePort`) must be loaded dynamically from the values
   (`{{ .Values.service.type }}`).
 
@@ -146,14 +146,14 @@ spec:
 
 ## Task 5: Test and Install
 
-1. **Validation (dry run):** Take a look at what Helm would generate, without installing it. This helps to find
-    syntax errors.
+1. **Validation (dry run):** Look at what Helm would generate without installing anything. This helps you
+    catch syntax errors.
 
     ```bash
     helm template ./my-nginx-chart
     ```
 
-    Check in the output whether your placeholders were correctly replaced by the values from the `values.yaml`.
+    Check the output to make sure your placeholders were replaced with the values from `values.yaml`.
 
 2. **Installation:** Install the chart into your cluster.
 
@@ -161,8 +161,8 @@ spec:
     helm install my-webserver ./my-nginx-chart
     ```
 
-3. **Test the configurability:** Now try to perform an upgrade while overriding values (e.g. 3
-    replicas and NodePort), without changing the files:
+3. **Test the configurability:** Now run an upgrade that overrides values (e.g. 3 replicas and
+    NodePort) without touching the files:
 
     ```bash
     helm upgrade my-webserver ./my-nginx-chart --set replicaCount=3 --set service.type=NodePort

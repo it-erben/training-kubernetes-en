@@ -1,12 +1,12 @@
 # Lab 15: RBAC with Pods
 
-In this exercise you will learn how to use a ServiceAccount to grant a pod a permission it normally does not
-have: querying other pods via the Kubernetes API.
+In this exercise you'll use a ServiceAccount to give a pod a permission it normally doesn't have:
+querying other pods via the Kubernetes API.
 
 ## 1) Create the Pod
 
-Take a look at the [manifest for the first pod](./pod1.yaml). The pod defines a container whose image contains
-kubectl. Now apply the manifest:
+Take a look at the [manifest for the first pod](./pod1.yaml). It defines a container whose image ships
+with kubectl. Apply the manifest:
 
 **`pod1.yaml`:**
 
@@ -53,24 +53,24 @@ kubectl get pods
 # kubectl-pod   1/1     Running     0          52s
 ```
 
-Let's now check whether this pod is allowed to query the other pods via kubectl. To do that, we first
-connect to the container and open a shell session:
+Now let's find out whether this pod is allowed to query the other pods via kubectl. First, connect to
+the container and open a shell session:
 
 ```shell
 kubectl exec -it kubectl-pod -- bash
 ```
 
-Now, inside the shell session, we try to list the pods in the default namespace with kubectl:
+Inside the shell session, try listing the pods in the default namespace with kubectl:
 
 ```shell
 kubectl get pods
 # Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:default:default" cannot list resource "pods" in API group "" in the namespace "default"
 ```
 
-To understand this result, we need to remind ourselves of one thing: we just ran this command **not**
-on our training machine, but **inside** the pod. By default, kubectl inside the pod has
-no permissions at all – unlike on the training machine, where Minikube configured us as admin. Since kubectl inside
-the pod has no permissions, it cannot list any pods either.
+To make sense of this result, keep one thing in mind: we just ran this command **inside** the pod,
+**not** on our training machine. By default, kubectl inside the pod has no permissions at all – unlike
+on the training machine, where Minikube set us up as admin. And with no permissions, it can't list
+any pods either.
 
 Now disconnect with `exit` and delete the pod:
 
@@ -80,8 +80,8 @@ kubectl delete pod kubectl-pod
 
 ## 2) Create the Service Account, Role, and RoleBinding
 
-For the pod to get access, it needs a ServiceAccount. This account must be granted the permission to
-list pods by means of a role.
+To get access, the pod needs a ServiceAccount, and that account needs a role that grants it permission
+to list pods.
 
 Take a look at [the following manifest](./sa.yaml).
 
@@ -115,7 +115,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-First, a **ServiceAccount** is created there.
+The manifest starts by creating a **ServiceAccount**.
 
 ```yaml
 apiVersion: v1
@@ -124,7 +124,7 @@ metadata:
   name: my-kubectl-sa
 ```
 
-The more interesting part, however, is the **Role**.
+The more interesting part is the **Role**.
 
 ```yaml
 rules:
@@ -133,8 +133,8 @@ rules:
     verbs: ["get", "list"]
 ```
 
-It allows listing pods in the default namespace, since no other namespace is specified. The **RoleBinding**
-connects the role to the ServiceAccount.
+It allows listing pods in the default namespace – no other namespace is specified. The **RoleBinding**
+then ties the role to the ServiceAccount.
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -150,7 +150,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-Once you have understood all the parts, apply the manifest:
+Once all the parts make sense to you, apply the manifest:
 
 ```shell
 kubectl apply -f sa.yaml
@@ -158,8 +158,8 @@ kubectl apply -f sa.yaml
 
 ## 3) Start the Pod with the Service Account
 
-In [pod2.yaml](./pod2.yaml) you will find a manifest for the same pod as in step 1 -- except that this time it
-uses the ServiceAccount we created in step 2:
+[pod2.yaml](./pod2.yaml) contains the same pod as in step 1 – except that this time it uses the
+ServiceAccount we created in step 2:
 
 **`pod2.yaml`:**
 
@@ -201,7 +201,7 @@ spec:
   restartPolicy: Always
 ```
 
-An excerpt from it:
+Here is the relevant excerpt:
 
 ```yaml
 spec:
@@ -220,7 +220,7 @@ kubectl apply -f pod2.yaml
 kubectl exec -it kubectl-pod -- bash
 ```
 
-In the shell session, run kubectl again to list all pods. It should work now:
+In the shell session, run kubectl again to list all pods. This time it should work:
 
 ```shell
 kubectl get pods

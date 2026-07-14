@@ -1,13 +1,13 @@
 # Lab 21: Gateway API on Minikube
 
-This lab shows how to use the new Kubernetes Gateway API. Unlike the Ingress controller, this API is not
+This lab shows how to use the new Kubernetes Gateway API. Unlike the Ingress controller, it is not
 enabled in Minikube by default.
 
 We use **NGINX Gateway Fabric** as the implementation.
 
 ## 1. Install the CRDs and the Controller
 
-Before you apply the YAML files, we need to install the Gateway API CRDs (Custom Resource Definitions) and an
+Before applying the YAML files, we need to install the Gateway API CRDs (Custom Resource Definitions) and an
 implementation.
 
 1. **Install the Gateway API CRDs:**
@@ -135,7 +135,7 @@ spec:
       port: 80
 ```
 
-Now apply our resources:
+Now apply the resources:
 
 ```bash
 kubectl apply -f .
@@ -158,14 +158,14 @@ tunnel again.
     minikube tunnel
     ```
 
-2. **Find the Gateway's IP:** Take a look at the Gateway object to find the IP (when using the tunnel, it should be
+2. **Find the Gateway's IP:** Check the Gateway object (with the tunnel running, it should be
     127.0.0.1 or a Minikube IP):
 
     ```bash
     kubectl get gateway my-gateway
     ```
 
-3. **Send a request:** We use `curl` with the expected hostname:
+3. **Send a request** using `curl` with the expected hostname:
 
     ```bash
     curl --resolve gateway.example.com:80:127.0.0.1 http://gateway.example.com

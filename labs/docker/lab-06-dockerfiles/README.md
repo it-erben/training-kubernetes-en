@@ -1,4 +1,4 @@
-# Lab 06: Exercises on Dockerfiles
+# Lab 06: Dockerfiles
 
 ## Task 1
 
@@ -56,21 +56,21 @@ README.md
 docker build -t my_flask_app .
 ```
 
-Now start a container from it
+Start a container from it:
 
 ```shell
 docker run -d -p 8080:80 --name my_flask_container my_flask_app
 ```
 
-Now open a browser at [](http://localhost:8080) and check whether the application is running.
+Open a browser at [](http://localhost:8080) and check whether the application is running.
 
-Now take a look at the logs.
+Take a look at the logs:
 
 ```shell
 docker logs my_flask_container
 ```
 
-Now delete the container and the image.
+Finally, delete the container and the image.
 
 ## Task 2
 
@@ -78,14 +78,14 @@ In this task you create a Dockerfile yourself.
 
 Use the `nginx` image as the base and extend it as follows:
 
-- It should contain an HTML file whose content says "Hello World".
+- It should contain an HTML file that says "Hello World".
 - The HTML file should be present at `/usr/share/nginx/html/index.html` in the image.
 - Build the image and start a container from it. The running container should be reachable on port 9000 and display
   the HTML page above.
 - Check that everything works by opening <http://localhost:9000>.
 
-> - The Dockerfile directives `FROM` and `COPY` are sufficient for this task
-> - To give an image a name directly at build time, use the `-t` flag. Example:
+> - The Dockerfile directives `FROM` and `COPY` are all you need for this task
+> - To name the image right at build time, use the `-t` flag. Example:
 >   `docker build . -t my-nginx`.
-> - Inside the container, NGINX listens on port 80 by default. On the host, however, NGINX should be reachable
->   on port 9000. The `-p` argument helps you with that. Example: `docker run -p 9000:80 my-nginx`
+> - Inside the container, NGINX listens on port 80 by default; on the host it should be reachable on port 9000.
+>   That is what the `-p` flag is for. Example: `docker run -p 9000:80 my-nginx`

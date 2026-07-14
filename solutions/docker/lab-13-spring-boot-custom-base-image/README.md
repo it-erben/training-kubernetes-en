@@ -21,7 +21,7 @@ EXPOSE 8080
 CMD ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
 ```
 
-Build & Test:
+Build & test:
 
 ```bash
 docker build -t hello-docker-custom .

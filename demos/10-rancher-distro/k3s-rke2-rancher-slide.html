@@ -115,7 +115,7 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; align-
   </header>
 
   <h1>k3s, RKE2, and Rancher Manager</h1>
-  <p class="lede">The three often get lumped together. In fact, k3s and RKE2 are two Kubernetes distributions, and Rancher Manager sits above them as a control plane. Here is how it fits together:</p>
+  <p class="lede">The three often get lumped together. In fact, k3s and RKE2 are two Kubernetes distributions, and Rancher Manager sits above them as a control plane. Here's how they fit together:</p>
 
   <div class="diagram">
 
@@ -123,7 +123,7 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; align-
       <span class="badge">Control plane</span>
       <div>
         <div class="ctitle">Rancher Manager</div>
-        <div class="cdesc">Not a distribution, but an interface above the clusters. Rolls out k3s and RKE2 clusters, imports foreign k8s, and bundles access, permissions, monitoring, and GitOps (Fleet). Runs on a cluster itself.</div>
+        <div class="cdesc">Not a distribution, but a management layer on top of the clusters. Rolls out k3s and RKE2 clusters, imports external k8s, and bundles access, permissions, monitoring, and GitOps (Fleet). Runs on a cluster itself.</div>
       </div>
     </div>
 
@@ -140,7 +140,7 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; align-
           <li>A ~70 MB binary, runs as <b>one</b> systemd service</li>
           <li>State in SQLite by default, etcd works too</li>
           <li>Traefik, ServiceLB, and local-path are already included</li>
-          <li>Made for edge, IoT, CI, and laptops, also on ARM</li>
+          <li>Made for edge, IoT, CI, and laptops, ARM included</li>
         </ul>
       </div>
 
@@ -151,7 +151,7 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; align-
           <li>Ships CIS-hardened and FIPS-compliant, no rework needed</li>
           <li>Keeps its state in <b>etcd</b></li>
           <li>Uses containerd and SELinux instead of Docker</li>
-          <li>For production, government, and air gap. Rancher's default</li>
+          <li>For production, government, and air-gapped setups. Rancher's default</li>
         </ul>
       </div>
 
@@ -160,8 +160,8 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; align-
         <h2>External clusters</h2>
         <ul>
           <li>EKS, AKS, GKE, and any other CNCF k8s</li>
-          <li>Imported via agent, not built by Rancher</li>
-          <li>Then in the same dashboard as k3s and RKE2</li>
+          <li>Imported via an agent, not built by Rancher</li>
+          <li>They show up in the same dashboard as k3s and RKE2</li>
           <li>One place for all clusters, wherever they come from</li>
         </ul>
       </div>

@@ -1,6 +1,6 @@
 # Lab 04: Challenge: Services
 
-In this exercise you will create a pod and expose it through a service. You will then test access and afterwards
+In this exercise you'll create a pod and expose it through a service. Then you'll test access and
 change the service type.
 
 ---
@@ -25,15 +25,14 @@ change the service type.
 
 1. Create another pod with an identical specification but a **different name** than in step 1.
 2. Create yet another pod, this time with the image `busybox:1.37`, and attach to it directly.
-    > When you create a pod with `kubectl run -it`, you are connected directly to a shell session.
+    > When you create a pod with `kubectl run -it`, you're dropped straight into a shell session.
 3. Inside this temporary pod, run a `wget` command against the ClusterIP of the `myapp` service to confirm
-    successful internal communication.
+    that internal communication works.
 
 ---
 
 ## Step 4: Update the service type
 
 1. Delete the `myapp` service and recreate it with a different type: `NodePort`.
-2. This enables access to the application from outside the Kubernetes cluster.
-3. Use the command `minikube service myapp` to open the service. The service will automatically open in the
-    browser.
+2. This makes the application reachable from outside the Kubernetes cluster.
+3. Open the service with `minikube service myapp`. It will open in your browser automatically.

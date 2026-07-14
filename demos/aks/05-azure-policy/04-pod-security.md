@@ -1,12 +1,12 @@
-# Demo 4: Pod Security (Forbidding Privileged Containers)
+# Demo 4: Pod Security (Blocking Privileged Containers)
 
 This demo shows how to use Azure Policy to prevent insecure pod configurations - especially privileged containers.
 
 ## Use case
 
-- Privileged containers can "break out" of the container
-- Host network allows access to node traffic
-- Host PID/IPC allows access to other processes
+- Privileged containers can "break out" of container isolation
+- Host network gives a pod access to node traffic
+- Host PID/IPC exposes other processes on the node
 - Running as root inside the container is a security risk
 
 ---
@@ -60,7 +60,7 @@ echo "HostPID Policy: $HOSTPID_POLICY_ID"
 
 ## 3. Assign the policies
 
-### 3.1 Forbid privileged containers
+### 3.1 Block privileged containers
 
 ```bash
 # IMPORTANT: Azure Policy parameters require the {"value": ...} format!
@@ -75,7 +75,7 @@ az policy assignment create \
   }'
 ```
 
-### 3.2 Forbid host network
+### 3.2 Block host network
 
 ```bash
 az policy assignment create \
@@ -92,7 +92,7 @@ az policy assignment create \
   }'
 ```
 
-### 3.3 Forbid host PID/IPC
+### 3.3 Block host PID/IPC
 
 ```bash
 az policy assignment create \
@@ -312,7 +312,7 @@ kubectl get pod -n $NAMESPACE secure-pod
 
 ## 10. All security policies at once (initiative)
 
-For enterprise environments, a policy initiative is recommended:
+For enterprise environments, use a policy initiative:
 
 ```bash
 # Find the AKS baseline initiative (contains many security policies)

@@ -16,5 +16,5 @@ kubectl rollout undo deployment/deployment-demo
 kubectl delete deployment.apps/deployment-demo
 ```
 
-Expected result: the update proceeds pod by pod thanks to `maxUnavailable: 0`, `maxSurge: 1`; undo restores the
+Expected result: the update proceeds pod by pod thanks to `maxUnavailable: 0` and `maxSurge: 1`; undo restores the
 original image.

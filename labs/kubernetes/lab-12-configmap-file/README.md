@@ -1,8 +1,8 @@
 # Lab 12: Delivering Configuration Files with ConfigMaps
 
-It is quite common to store compact, static files in ConfigMaps and make them available to pods. In this
-example we use a ConfigMap to serve a start page for an NGINX pod. In the real world, this could be
-a page that the readiness check probes.
+Storing small, static files in ConfigMaps and handing them to pods is a pretty common pattern. In this
+example we use a ConfigMap to serve a start page for an NGINX pod. In the real world, this might be
+a page that a readiness probe hits.
 
 ## Creating the ConfigMap
 
@@ -39,7 +39,7 @@ volumeMounts:
 ## Test: For Minikube
 
 Finally, create a NodePort service named "nginx-service" that forwards to the pod. Use the following command
-to open a tunnel to the service and test whether the HTML page appears:
+to open a tunnel to the service and check that the HTML page shows up:
 
 ```yaml
 minikube service nginx-service
@@ -64,10 +64,10 @@ spec:
 ```
 
 **Important**: Make sure the label selector matches the pod's labels!
-Afterwards, you can query the external IP of the LoadBalancer with:
+Then you can look up the external IP of the LoadBalancer with:
 
 ```bash
 kubectl get svc nginx-service
 ```
 
-It can take a short while until the external IP is provisioned.
+It can take a little while for the external IP to be provisioned.

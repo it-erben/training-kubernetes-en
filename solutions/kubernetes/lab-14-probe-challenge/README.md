@@ -1,6 +1,6 @@
 # Solution: Probes and Lifecycle
 
-- Adjust/use the manifest: `kubectl apply -f web-server.yaml`
+- Adjust and apply the manifest: `kubectl apply -f web-server.yaml`
 - Watch the startup: `kubectl get pod web-server -w`
 - Details: `kubectl describe pod/web-server`
 - Check the events: `kubectl get events --field-selector involvedObject.name=web-server`

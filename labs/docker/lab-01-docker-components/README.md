@@ -9,7 +9,7 @@ docker run hello-world
 ```
 
 You should see a greeting message from Docker.  
-This tells you: Docker Engine and Docker Daemon are running.
+That means the Docker Engine and the Docker Daemon are up and running.
 
 ---
 
@@ -41,7 +41,7 @@ Exit the Python session with `exit()` or `CTRL+D`.
 ## Exercise 3: Docker Client
 
 Sometimes the Docker CLI does not behave the way you expect.  
-It is important to know how to display information about your installation:
+When that happens, you want to know exactly what is installed:
 
 ```shell
 docker version
@@ -52,7 +52,7 @@ Find out and write down:
 - Which version of **Docker Desktop** is installed?
 - Which version of the **Docker Engine** is installed?
 
-👉 Hint: You will find this information in the `Client` and `Server` sections.
+Hint: You will find this information in the `Client` and `Server` sections.
 
 ---
 

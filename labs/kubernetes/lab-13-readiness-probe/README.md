@@ -1,11 +1,11 @@
 # Lab 13: Readiness Probes with httpGet
 
-In this exercise I will show you how to use readiness probes to monitor your application.
+This exercise shows you how to monitor your application with readiness probes.
 
 ## Preparation: Set Up the Deployment
 
-In [manifest.yaml](./manifest.yaml) you will find a Deployment with NGINX containers. It deliberately contains an error
-in the readiness probe.
+The Deployment in [manifest.yaml](./manifest.yaml) runs NGINX containers. Its readiness probe contains a
+deliberate mistake.
 
 **`manifest.yaml`:**
 
@@ -89,15 +89,15 @@ kubectl get po --selector=app=readiness-check-demo
 #readiness-check-demo-deploy-7ff9c8f684-r4qkr   0/1     Running   0          102s
 ```
 
-The pods are running, but they are not Ready. As a result, they are not used by the Service. You can
-test this by starting a debug pod:
+The pods are running, but they never become Ready, so the Service won't send them any traffic. You can
+see this for yourself by starting a debug pod:
 
 ```shell
 kubectl run -i --tty --rm debug --image=busybox --restart=Never -- sh
 ```
 
-You are now in the terminal of a container running Busybox. Use nslookup to check whether the Service
-can be resolved via DNS at all:
+You now have a shell inside a Busybox container. Use nslookup to check whether DNS resolves the
+Service name in the first place:
 
 ```shell
 nslookup readiness-check-demo-svc.default.svc.cluster.local
@@ -109,7 +109,7 @@ nslookup readiness-check-demo-svc.default.svc.cluster.local
 # Address: 10.103.46.232
 ```
 
-Then try to reach the resolved IP address via wget:
+Next, try to reach that address with wget:
 
 ```shell
 wget -O- readiness-check-demo-svc.default.svc.cluster.local
@@ -117,9 +117,9 @@ wget -O- readiness-check-demo-svc.default.svc.cluster.local
 # wget: can't connect to remote host (10.103.46.232): Connection refused
 ```
 
-Since none of the pods is ready, no connection can be established.
+None of the pods are Ready, so the connection is refused.
 
 ## Task
 
-Fix the readiness probe in [manifest.yaml](./manifest.yaml). Then apply the manifest and use the
-Busybox test pod to check whether you can connect to the Service via wget.
+Fix the readiness probe in [manifest.yaml](./manifest.yaml), apply the manifest again, and use the
+Busybox test pod to check whether you can now reach the Service with wget.

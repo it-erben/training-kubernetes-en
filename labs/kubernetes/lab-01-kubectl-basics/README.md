@@ -1,10 +1,10 @@
 # Lab 01: Kubectl Basics – The Command Center of Kubernetes
 
-In this exercise you will get to know the most important `kubectl` commands. `kubectl` is the tool for communicating
-with the Kubernetes cluster.
+This exercise covers the `kubectl` commands you'll use all the time. `kubectl` is how you talk to the
+Kubernetes cluster.
 
-**Goal of this exercise:** By the end you should be able to confidently find your way around the cluster, locate
-resources, and understand how to pull information out of the cluster.
+**Goal of this exercise:** By the end you should be able to find your way around the cluster, locate
+resources, and pull information out of them.
 
 ---
 
@@ -33,7 +33,7 @@ kubectl get nodes
 
 ### 1.2 Inspecting node details
 
-With `describe` we get detailed information about a resource:
+`describe` gives you the details on a resource:
 
 ```bash
 kubectl describe node minikube
@@ -55,7 +55,7 @@ kubectl describe node minikube
 
 ### 2.1 Displaying all pods
 
-Pods are the smallest deployable unit in Kubernetes. Let's take a look at what is already running:
+Pods are the smallest deployable unit in Kubernetes. Let's see what's already running:
 
 ```bash
 # All pods in the current namespace (default)
@@ -74,9 +74,9 @@ kubectl get pods -A
 - `kube-system` runs system components (CoreDNS, kube-proxy, etc.)
 - Every pod has a status (Running, Pending, etc.)
 
-### 2.2 Which resources exist in the first place?
+### 2.2 What resource types are there, anyway?
 
-Kubernetes knows many different resource types. Display all of them:
+Kubernetes has a lot of resource types. List them all:
 
 ```bash
 kubectl api-resources
@@ -95,7 +95,7 @@ kubectl api-resources
    kubectl get ns           # instead of namespaces
    ```
 
-**Tip:** The short forms save you typing. It's worth memorizing them.
+**Tip:** The short forms save a lot of typing, so it's worth memorizing them.
 
 ### 2.3 Understanding the namespace system
 
@@ -127,7 +127,7 @@ By default, `kubectl get` only shows the most important columns. With `-o wide` 
 kubectl get pods -A -o wide
 ```
 
-**What do you see now in addition?**
+**What extra information do you get?**
 
 - IP addresses of the pods
 - Which node the pod is running on
@@ -180,7 +180,7 @@ With `--watch` (or `-w`) you can follow changes in real time:
 kubectl get pods -A --watch
 ```
 
-Leave this command running and open the following **in a second terminal**:
+Leave this command running and run the following **in a second terminal**:
 
 ```bash
 # Creates a test pod
@@ -200,7 +200,7 @@ Stop `--watch` with `Ctrl+C`.
 kubectl delete pod nginx-test
 ```
 
-Watch the deletion in real time as well if you run `--watch` again!
+Run `--watch` again and you can watch the pod disappear in real time, too.
 
 ---
 

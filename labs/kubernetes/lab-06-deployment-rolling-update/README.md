@@ -1,17 +1,17 @@
 # Lab 06: Deployments and Rolling Updates
 
-The [manifest](manifest.yaml) contains a deployment with a simple NGINX container, for which three replica pods
-are created. The following properties can be seen in this manifest.
+The [manifest](manifest.yaml) contains a deployment with a simple NGINX container, running as three
+replica pods. A few things to note in this manifest:
 
-- `apiVersion: apps/v1`: indicates that we are using the Deployment API of Kubernetes.
+- `apiVersion: apps/v1`: we're using the Kubernetes Deployment API.
 - Deployment with the metadata name `deployment-demo`.
-- `replicas: 3`: specifies that 3 replicas of the application should be created.
+- `replicas: 3`: 3 replicas of the application get created.
 - `strategy.type: RollingUpdate`: sets the update strategy to RollingUpdate.
-- `rollingUpdate.maxSurge: 1`: specifies how many replicas may be created in addition to the desired number of
-  replicas during the update.
-- `rollingUpdate.maxUnavailable: 0`: defines how many replicas may be unavailable during the
+- `rollingUpdate.maxSurge: 1`: how many extra replicas may be created on top of the desired count
+  during the update.
+- `rollingUpdate.maxUnavailable: 0`: how many replicas may be unavailable during the
   update.
-- `selector.matchLabels.app: rollingupdate`: for identifying the app with the label `rollingupdate`.
+- `selector.matchLabels.app: rollingupdate`: identifies the app by the label `rollingupdate`.
 - The containers use the image `nginx:1.28-alpine` and listen on port `80`.
 
 **`manifest.yaml`:**
@@ -83,8 +83,8 @@ Check the status of the deployment:
 kubectl rollout status deployment/deployment-demo
 ```
 
-The rollout should succeed shortly. Afterwards, you can list all pods with the label specified in the
-deployment's pod template spec:
+The rollout should finish quickly. Once it's done, you can list all pods carrying the label from the
+deployment's pod template:
 
 ```shell
 kubectl get pod --selector=app=deployment-demo

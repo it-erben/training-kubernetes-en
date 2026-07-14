@@ -1,7 +1,6 @@
 # Lab 04: AKS with Azure RBAC – namespace permissions
 
-For this exercise, create a cluster as in exercise 1 and set the
-environment variables as described there.
+For this lab, create a cluster as in Lab 01 and set the environment variables described there.
 
 ## Scenario
 
@@ -23,9 +22,8 @@ Use kubectl to create a namespace called `project-alpha`.
 
 ### Part 2: Create Azure role assignments
 
-We now bind the role `RBAC Reader` for the namespace `project-alpha`
-to the "Observers" group and the role `RBAC Writer` to the "Developers"
-group.
+Next, we bind the `RBAC Reader` role on the namespace `project-alpha` to the
+"Observers" group and the `RBAC Writer` role to the "Developers" group.
 
 ```bash
 OBSERVERS_ID="c3de5c6a-7948-4f72-aeca-c287721b3831"
@@ -60,5 +58,5 @@ az role assignment create \
 
 ### Part 3: Test the permissions
 
-We will test the assignments together in the training with new users
-that we assign to the groups.
+We'll test the assignments together during the training, using fresh users
+that we add to the groups.

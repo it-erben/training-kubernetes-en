@@ -4,8 +4,8 @@
 
 ### Exercise 1.1 – Inspecting Static Pods
 
-The control plane components run as **static pods** – they are started not via the API,
-but directly by the kubelet from manifest files.
+The control plane components run as **static pods** – the kubelet starts them directly from
+manifest files, not via the API.
 
 ```bash
 # SSH into the node
@@ -31,9 +31,9 @@ sudo cat /etc/kubernetes/manifests/kube-apiserver.yaml
 3. Find out which admission controllers are enabled (`--enable-admission-plugins`)
     > An admission controller is a code module in the API server that intercepts requests after authentication and
     > authorization and either validates them (reject/allow) or mutates them
-    > (add/change fields) before the object is stored in etcd. Typical examples are the
-    > automatic addition of default limits (`LimitRanger`), the enforcement of ResourceQuotas, or
-    > the injection of ServiceAccount tokens into pods.
+    > (add/change fields) before the object is stored in etcd. Typical examples: adding
+    > default limits (`LimitRanger`), enforcing ResourceQuotas, or injecting
+    > ServiceAccount tokens into pods.
 4. Document the most important startup parameters of the API server
 
 **Reflection:** What happens if you edit one of these files?
@@ -42,9 +42,9 @@ sudo cat /etc/kubernetes/manifests/kube-apiserver.yaml
 
 ### Exercise 1.2 – Analyzing the Kubelet Configuration
 
-The kubelet is the agent on every node that receives pod specifications from the API server and
-ensures that the corresponding containers are started, monitored, and restarted if necessary
-via the container runtime.
+The kubelet is the agent on every node. It receives pod specifications from the API server and
+makes sure the container runtime starts, monitors, and if necessary restarts the corresponding
+containers.
 
 Let's take a closer look at it:
 
@@ -67,8 +67,8 @@ cat /var/lib/kubelet/config.yaml
 
 2. Find the `staticPodPath` setting – how does the kubelet know where the static pods are located?
     > The `cgroupDriver` determines how Kubernetes limits and monitors container resources (CPU, memory, I/O) via
-    > Linux control groups – with `systemd` and `cgroupfs` being the two options, and both sides
-    > (kubelet and container runtime) having to use the same driver.
+    > Linux control groups. The two options are `systemd` and `cgroupfs`, and both sides
+    > (kubelet and container runtime) must use the same driver.
 
 3. Check the kubelet service:
 
@@ -81,23 +81,23 @@ cat /var/lib/kubelet/config.yaml
 
 ### Exercise 1.3 – Certificates and PKI
 
-In a Kubernetes cluster, all components communicate in encrypted form and authenticate each
-other via certificates. This is called **mTLS (mutual TLS)**: not only does the client verify the
-server certificate (as with normal HTTPS), but the server also demands a valid
-client certificate. This is how, for example, the kubelet identifies itself to the API server, and
-conversely, the kubelet verifies that it is really talking to the genuine API server.
+In a Kubernetes cluster, all components communicate over encrypted connections and authenticate
+each other with certificates. This is called **mTLS (mutual TLS)**: not only does the client verify
+the server certificate (as with normal HTTPS), the server also demands a valid client certificate.
+This is how the kubelet identifies itself to the API server, for example – and how the kubelet in
+turn verifies that it is really talking to the genuine API server.
 
-The entire chain of trust is based on a **cluster-owned Certificate Authority (CA)**.
+The entire chain of trust rests on a **cluster-owned Certificate Authority (CA)**.
 This CA signs all certificates in the cluster – for the API server, etcd, the kubelets, and also
-for users like the `minikube-user` in your kubeconfig. Whoever holds the CA certificate and trusts
-it automatically accepts all certificates signed by it.
+for users like the `minikube-user` in your kubeconfig. Anyone who trusts the CA certificate
+automatically accepts every certificate it has signed.
 
-For administrators, this knowledge is critical for several reasons: certificates expire
-(typically after 1-3 years) and must be renewed in time, otherwise the cluster grinds to a
-halt. When troubleshooting connection problems between components, an expired
-or misconfigured certificate is often the cause. And last but not least, understanding the PKI is
-essential to grasp how RBAC works – because a user's username and group membership
-are read directly from the certificate (`CN` for the name, `O` for the group).
+For administrators, this matters for several reasons. Certificates expire (typically after
+1-3 years) and must be renewed in time, otherwise the cluster grinds to a halt. When you
+troubleshoot connection problems between components, an expired or misconfigured certificate is
+often the cause. And understanding the PKI is essential for grasping how RBAC works: a user's
+username and group membership are read straight from the certificate (`CN` for the name, `O` for
+the group).
 
 First, get an overview:
 
@@ -196,8 +196,8 @@ etcdctl get / --prefix --keys-only | head -50
 
 ### Exercise 2.2 – etcd Backup and Restore
 
-Backups of etcd are important to prepare for a potential failure of the control plane.
-Fortunately, `etcdctl` takes care of part of the work for us.
+etcd backups are your insurance against a control plane failure.
+Fortunately, `etcdctl` does part of the work for us.
 
 ```bash
 minikube ssh
@@ -232,7 +232,8 @@ etcdctl snapshot status /tmp/etcd-backup.db --write-out=table
 
 ### Exercise 3.1 – containerd and crictl
 
-Kubernetes uses the **Container Runtime Interface (CRI)**. Here you will learn how to work with this low-level tool.
+Kubernetes talks to its container runtime through the **Container Runtime Interface (CRI)**. In this
+exercise you'll work with crictl, the low-level tool for it.
 
 ```bash
 minikube ssh
@@ -263,7 +264,7 @@ sudo crictl inspect <container-id>
 
    What happens? (Observe with `kubectl get pods -w`)
 
-**Insight:** The kubelet ensures that the desired state is restored.
+**Insight:** The kubelet restores the desired state.
 
 ---
 
@@ -466,9 +467,9 @@ kubectl scale deployment coredns -n kube-system --replicas=2
 
 ### Exercise 4.1 – Node Drain and Maintenance
 
-Before updating a node, it must be "evacuated": all pods are stopped and assigned to a new node by
-the scheduler. To do this, the node is first marked as "unschedulable"
-and then the pods are stopped. Below you can see the individual steps:
+Before you update a node, you have to "evacuate" it: its pods get stopped, and the scheduler
+assigns them to another node. This happens in two stages – first the node is marked as
+"unschedulable", then the pods are stopped. Here are the individual steps:
 
 ```bash
 # With Minikube and multiple nodes:
@@ -491,7 +492,7 @@ kubectl uncordon minikube
 
 **Tasks:**
 
-Perform the steps above. Observe what happens to the pods after the `cordon` and after the `drain`.
+Run through the steps above. Watch what happens to the pods after the `cordon` and after the `drain`.
 
 ---
 
@@ -523,7 +524,7 @@ kubectl get nodes
 3. Restore the API server
 4. Repeat with the scheduler – what happens to new pods?
 
-**Document:** Which component has what impact when it fails?
+**Document:** What is the impact of each component failing?
 
 | Component | Workloads running? | New pods possible? | kubectl works? |
 | ---------- | ----------------- | ------------------ | --------------------- |
@@ -593,4 +594,4 @@ After these exercises you should be able to answer these questions:
 
 ---
 
-*These exercises give you the understanding you need to not just use clusters, but to truly administer them.*
+*These exercises give you the background to administer clusters, not just use them.*

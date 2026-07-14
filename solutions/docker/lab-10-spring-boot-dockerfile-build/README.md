@@ -12,7 +12,7 @@ RUN mkdir -p /app && cp target/*SNAPSHOT.jar /app/app.jar
 CMD ["java","-jar","/app/app.jar"]
 ```
 
-Build & Test:
+Build & test:
 
 ```bash
 docker build -t hello-docker-build .

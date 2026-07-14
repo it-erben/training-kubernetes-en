@@ -1,8 +1,8 @@
 # Lab 08: NGINX StatefulSet with Headless Service
 
 The [manifest](manifest.yaml) creates a `StatefulSet` with three replicas of an `nginx` pod occupying container port 80.
-It also defines a `Service` running in so-called headless mode. This means it does not receive a
-ClusterIP (`clusterIP: None`). Let's now take a look at what exactly this means.
+It also defines a `Service` in headless mode, meaning it gets no ClusterIP (`clusterIP: None`).
+Let's dig into what that actually means.
 
 **`manifest.yaml`:**
 
@@ -76,13 +76,13 @@ spec:
 
 ## Applying the manifest
 
-First we create the required resources and check that they were created correctly.
+First we create the resources and check that everything came up correctly.
 
 ```shell
 kubectl apply -f manifest.yaml
 ```
 
-Then we check whether the service and pods were created and started successfully.
+Then we check that the service and pods were created and are running.
 
 ```shell
 kubectl get service nginx-headless
@@ -94,14 +94,15 @@ kubectl get pod --selector=app=nginx
 
 ## Investigating DNS with busybox
 
-We use `kubectl debug` to start a helper container. We inspect the first pod of the StatefulSet,
-`nginx-0`, and use [busybox](https://github.com/mirror/busybox), an image for debugging network problems.
+Once again we start a helper container with `kubectl debug`. We inspect the first pod of the StatefulSet,
+`nginx-0`, using [busybox](https://github.com/mirror/busybox), an image that's handy for debugging
+network problems.
 
 ```shell
 kubectl debug nginx-0 -it --image=busybox
 ```
 
-The DNS name of the service we created is `nginx-headless.default.svc.cluster.local`, and we will see
+The DNS name of the service we created is `nginx-headless.default.svc.cluster.local`, and we'll see
 that it points to three IP addresses: one per pod. The service itself has _no_ ClusterIP! Only the pods have
 an IP, as they always do (well, almost always...).
 
@@ -118,7 +119,7 @@ Name:   nginx-headless.default.svc.cluster.local
 Address: 10.244.0.64
 ```
 
-In addition, the headless service creates one DNS name per pod with a running index:
+The headless service also creates one DNS name per pod, numbered with a sequential index:
 
 ```text
 <STATEFULSETNAME>-<INDEX>.<SERVICENAME>.<NAMESPACE>.svc.cluster.local
@@ -130,7 +131,7 @@ so for example
 nginx-0.nginx-headless.default.svc.cluster.local
 ```
 
-And we can verify this with nslookup as well
+We can check this with nslookup too:
 
 ```shell
 nslookup nginx-0.nginx-headless.default.svc.cluster.local

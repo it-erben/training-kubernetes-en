@@ -106,7 +106,7 @@ az provider register --namespace Microsoft.KeyVault
 
 7. **"Review + create"** → **"Create"**
 
-**📌 Note:** With AKS Automatic there are NO tabs for:
+**📌 Note:** AKS Automatic has NO tabs for:
 
 - Node pools (managed automatically)
 - Networking (preconfigured with Azure CNI Overlay + Cilium)
@@ -141,7 +141,7 @@ az aks create \
 
 > ⚠️ **Error "namespace not registered"?**
 >
-> With new subscriptions, resource providers are often not registered. Solution:
+> New subscriptions often don't have the required resource providers registered yet. Fix:
 >
 > ```bash
 > # Register the required resource providers
@@ -159,8 +159,8 @@ az aks create \
 
 > ⚠️ **Error "could not find a suitable VM size" / quota problem?**
 >
-> New subscriptions often only have a quota of 10 vCPUs, but AKS Automatic needs
-> at least 16. Solution:
+> New subscriptions often come with a quota of just 10 vCPUs, but AKS Automatic
+> needs at least 16. Fix:
 >
 > ```bash
 > # Option 1: Explicitly specify a smaller VM size (possible immediately)
@@ -178,7 +178,7 @@ az aks create \
 
 #### What AKS Automatic configures automatically
 
-After creation, you can inspect the automatic configuration:
+Once the cluster is created, you can inspect what was configured for you:
 
 ```bash
 # Retrieve cluster details
@@ -197,9 +197,9 @@ az aks show --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --output yaml
 
 #### Understanding Node Auto-Provisioning (NAP)
 
-AKS Automatic does **not** use the classic cluster autoscaler, but
-**Node Auto-Provisioning (NAP)** instead, based on the open-source project
-**Karpenter**:
+AKS Automatic does **not** use the classic cluster autoscaler. It uses
+**Node Auto-Provisioning (NAP)** instead, which is based on the open-source
+project **Karpenter**:
 
 ```bash
 # System node pool has a taint - only for system components
@@ -213,10 +213,10 @@ kubectl get nodepools -A  # Karpenter NodePools
 kubectl get nodeclaims -A # Current node claims
 ```
 
-#### NAP live demo: Have nodes created automatically
+#### NAP live demo: trigger automatic node creation
 
-With this one-liner you create a deployment that is large enough to trigger NAP
-and create **two new nodes**:
+This one-liner creates a deployment big enough to make NAP spin up
+**two new nodes**:
 
 > ⚠️ **Important: Assign an Azure RBAC role!**
 >
@@ -226,8 +226,8 @@ and create **two new nodes**:
 > - `--admin` does **not** work (local accounts disabled)
 > - You need an explicit Azure RBAC role assignment
 >
-> **Without this role you will get "User does not have access to the resource"
-errors!**
+> **Without this role you'll get "User does not have access to the resource"
+> errors!**
 
 ```bash
 # 1. Set the kubeconfig
@@ -258,7 +258,7 @@ kubectl set resources deployment/nap-demo --requests=cpu=1,memory=1Gi
 kubectl get nodes -w
 ```
 
-Watch in a separate terminal how NAP provisions new nodes:
+In a separate terminal, watch NAP provision the new nodes:
 
 ```bash
 # Watch the nodes (in a separate terminal)
@@ -272,9 +272,9 @@ kubectl delete deployment nap-demo
 ```
 
 **💡 Explanation:** The system node pool has a
-`CriticalAddonsOnly=true:NoSchedule` taint, so user workloads cannot run
-there. NAP detects the pending pods and automatically creates suitable
-worker nodes.
+`CriticalAddonsOnly=true:NoSchedule` taint, so user workloads can't run
+there. NAP spots the pending pods and creates suitable worker nodes for
+them.
 
 ---
 
@@ -405,7 +405,7 @@ az aks show -g $RESOURCE_GROUP -n aks-standard-cluster \
 
 ### 3.6 Migrate from Automatic to Standard
 
-An important point for the training: **AKS Automatic can be converted to
+Worth highlighting in the training: **AKS Automatic can be converted to
 Standard** if you need more control later:
 
 ```bash
@@ -419,17 +419,17 @@ az aks update \
 # Standard → Automatic is NOT possible
 ```
 
-**💡 For the training:** This is an important argument for AKS Automatic as a
-starting point – you can always switch to Standard later if needed.
+**💡 For the training:** This is a good selling point for starting with AKS
+Automatic – you can always switch to Standard later if you need to.
 
 ---
 
-### 3.5 Managed System Node Pools (Preview) – The future of AKS
+### 3.5 Managed System Node Pools (Preview) – where AKS is heading
 
 #### The problem with traditional system node pools
 
-With **all** existing AKS clusters (Standard AND Automatic) you have to manage
-the system node pool yourself:
+On **all** existing AKS clusters (Standard AND Automatic), you manage the
+system node pool yourself:
 
 - Choose the VM size
 - Set the node count
@@ -439,8 +439,8 @@ the system node pool yourself:
 
 #### The solution: Managed System Node Pools
 
-With the new preview feature (`--enable-hosted-system`), Microsoft takes over
-the complete management as well as the costs.
+With the new preview feature (`--enable-hosted-system`), Microsoft manages the
+system node pool for you – and covers the cost.
 
 ```bash
 # AKS Automatic WITH a managed system node pool (preview)
@@ -500,7 +500,7 @@ kubectl cluster-info
 
 ### 3.7 Explore the AKS architecture in the portal
 
-After creation, show in the portal:
+Once the cluster is created, walk through these in the portal:
 
 1. **Cluster overview:**
     - Kubernetes version
@@ -515,8 +515,8 @@ After creation, show in the portal:
     - **Monitoring** → insights, metrics, logs
 
 **📌 Show the participants:** Under "Node pools" you can see the actual VMs
-and even connect via SSH (through the serial console) - this differs
-from GKE, where the nodes are more abstracted.
+and even SSH in (via the serial console) – unlike GKE, where the nodes are
+more abstracted away.
 
 ---
 
@@ -701,9 +701,9 @@ curl http://$SERVICE_IP
 
 **💡 Show during the training:**
 
-- In the portal under the cluster → "Services and ingresses" → shows the service
-  with its IP
-- Explain: Azure automatically creates an Azure Load Balancer + public IP
+- In the portal, under the cluster → "Services and ingresses" you can see the
+  service with its IP
+- Point out that Azure automatically creates an Azure Load Balancer + public IP
 
 ### 4.5 Install the ingress controller
 
@@ -745,8 +745,7 @@ EOF
 kubectl apply -f ingress.yaml
 ```
 
-Then wait until the Ingress has received an IP. You can then
-query it with `curl`.
+Wait until the Ingress gets an IP, then test it with `curl`.
 
 ---
 

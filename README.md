@@ -1,3 +1,3 @@
 # Docker and Kubernetes
 
-Content for Kubernetes trainings at GFU Cyrus.
+Content for Kubernetes training courses at GFU Cyrus.

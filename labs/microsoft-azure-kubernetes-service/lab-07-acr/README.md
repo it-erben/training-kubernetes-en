@@ -129,8 +129,8 @@ az acr repository show-tags --name $ACR_NAME --repository hello-aks -o table
 
 ## Part 4: Create the Kubernetes manifests
 
-Create the following manifests. Please remember to replace the placeholder
-`<ACR_LOGIN_SERVER>`:
+Create the following manifests. Don't forget to replace the `<ACR_LOGIN_SERVER>`
+placeholder:
 
 ### deployment.yaml
 
@@ -197,7 +197,7 @@ spec:
 
 ## Part 5: Run the deployment
 
-Perform the deployment.
+Roll everything out.
 
 ```bash
 # Deploy
@@ -217,7 +217,7 @@ kubectl get service hello-aks -w
 
 ## Part 6: Test and verify
 
-Now we test the application.
+Time to test the application.
 
 ```bash
 # Retrieve the external IP

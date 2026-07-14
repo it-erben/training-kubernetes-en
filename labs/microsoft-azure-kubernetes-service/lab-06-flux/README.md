@@ -1,7 +1,6 @@
 # Lab 06: GitOps with Flux on AKS
 
-For this exercise, create a cluster as in exercise 1 and set the
-environment variables as described there.
+For this lab, create a cluster as in Lab 01 and set the environment variables described there.
 
 ## Background: What is GitOps?
 
@@ -33,8 +32,8 @@ in the cluster and continuously watches the Git repository:
 ## Part 1: Create the repository structure
 
 Flux expects a specific structure. Create the following directories.
-For the contents of the `charts/nginx` directory, you can use the chart
-created in the Helm exercise.
+For the contents of the `charts/nginx` directory, you can reuse the chart
+you built in the Helm exercise.
 
 ```text
 /
@@ -136,7 +135,7 @@ kubectl get nodes
 ### Task 2.3: Enable the Flux extension and set up the namespace
 
 Enable Flux as an AKS extension and connect it to your Git repository.
-You will receive the URL of the Git repository and the token from your trainer.
+Your trainer will give you the repository URL and the token.
 
 ```bash
 kubectl create namespace nginx
@@ -160,7 +159,7 @@ az k8s-configuration flux create \
 
 ### Check the Flux synchronization
 
-Wait about 1-2 minutes until Flux detects the changes:
+Give Flux about 1-2 minutes to pick up the changes:
 
 ```bash
 # Show HelmReleases
@@ -198,7 +197,7 @@ kubectl get pods -n nginx -w
 
 ---
 
-## Part 5: Test drift detection
+## Part 4: Test drift detection
 
 ### Manual change in the cluster
 
@@ -211,7 +210,7 @@ kubectl scale deployment nginx-nginx-deployment -n nginx --replicas=1
 
 ### Observe the drift correction
 
-Flux detects the deviation and corrects it automatically:
+Flux notices the drift and corrects it automatically:
 
 ```bash
 # Watch Flux scale the pods back up

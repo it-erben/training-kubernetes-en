@@ -5,7 +5,7 @@
 - Apply the manifest: `kubectl apply -f emptydir-two-containers.yaml`
 - Create the file:
   `kubectl exec -it emptydir-demo -c c1 -- sh -c "mkdir -p /etc/a/data && echo 'Hello World.' > /etc/a/data/hello.txt"`
-- Cross-check: `kubectl exec -it emptydir-demo -c c2 -- cat /etc/b/data/hello.txt`
+- Verify from the second container: `kubectl exec -it emptydir-demo -c c2 -- cat /etc/b/data/hello.txt`
 - Clean up: `kubectl delete pod emptydir-demo`
 
 ## Task 2: Persistent Volumes

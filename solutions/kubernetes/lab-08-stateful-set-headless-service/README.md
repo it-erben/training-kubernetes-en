@@ -14,5 +14,5 @@ kubectl delete statefulset.apps/nginx
 kubectl delete service/nginx-headless
 ```
 
-Expected result: the headless service returns three A records (one per pod); querying individual pods returns
-pod-specific IPs.
+Expected result: the headless service returns three A records (one per pod); querying a single pod name returns
+just that pod's IP.

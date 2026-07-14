@@ -1,13 +1,13 @@
 # Lab 17: Pod Security Standards
 
-In this example we want to test the rules you got to know in the course for ourselves.
+In this exercise we'll try out the rules covered in the course for ourselves.
 
 ## 1) Create the Namespace
 
-The namespace in [ns.yaml](ns.yaml) contains configurations for warning about and blocking pods based on Pod Security
-Standards. Pods may at most claim privileges that comply with the `baseline` rule. In particular, this means they
-must not request privileged access. A warning is issued when pods request privileges that go beyond the `restricted`
-rule. The cluster administrator can view these warnings.
+The namespace in [ns.yaml](ns.yaml) is configured to warn about and block pods based on Pod Security
+Standards. Pods can claim at most the privileges that the `baseline` rule allows – in particular, they
+must not request privileged access. Pods that request privileges beyond the `restricted` rule trigger a
+warning, which the cluster administrator can see.
 
 **`ns.yaml`:**
 
@@ -29,9 +29,9 @@ kubectl apply -f ns.yaml
 
 ## 2) Create a Pod That Triggers a Warning
 
-The pod in [warn-pod.yaml](./warn-pod.yaml) does not request any privileges that would violate the `baseline` policy.
-However, one of its containers runs as the `root` user (uid 0), which puts it beyond the `restricted` policy. This
-produces a warning. When we apply this pod, the api-server acknowledges the operation with a warning but lets the pod
+The pod in [warn-pod.yaml](./warn-pod.yaml) doesn't request anything that would violate the `baseline` policy.
+One of its containers runs as the `root` user (uid 0), though, which puts it beyond the `restricted` policy
+and produces a warning. When we apply this pod, the api-server responds with a warning but lets the pod
 through:
 
 **`warn-pod.yaml`:**
@@ -81,8 +81,8 @@ kubectl apply -f warn-pod.yaml
 ## 3) Create a Pod That Gets Blocked
 
 The pod in [error-pod.yaml](./error-pod.yaml) contains a setting that violates the `baseline` policy: it
-requests privileged mode, which would give it far-reaching access to the host. The namespace we created
-above is configured to reject such pods. Let's test this:
+requests privileged mode, which would give it sweeping access to the host. The namespace we created above
+is configured to reject pods like this. Let's put that to the test:
 
 **`error-pod.yaml`:**
 

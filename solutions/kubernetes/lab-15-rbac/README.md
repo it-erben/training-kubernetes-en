@@ -13,4 +13,4 @@ kubectl delete pod kubectl-pod
 kubectl delete rolebinding/read-pods role/pod-reader serviceaccount/my-kubectl-sa
 ```
 
-The ServiceAccount `my-kubectl-sa` is granted the `get/list` permissions on pods in the default namespace via Role/RoleBinding.
+Through the Role and RoleBinding, the ServiceAccount `my-kubectl-sa` gets `get/list` on pods in the default namespace.

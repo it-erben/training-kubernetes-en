@@ -1,11 +1,11 @@
 # Demo 5: Read-Only Root Filesystem
 
-This demo shows how to use Azure Policy to enforce that containers have a read-only root filesystem.
+This demo shows how to use Azure Policy to require a read-only root filesystem for all containers.
 
 ## Use case
 
-- **Immutable infrastructure** - containers should not be modified at runtime
-- **Malware prevention** - prevents attackers from writing files
+- **Immutable infrastructure** - containers shouldn't change at runtime
+- **Malware prevention** - attackers can't write files to disk
 - **Compliance** - many security standards require immutable containers
 - **Forensics** - changes are easier to trace
 
@@ -170,7 +170,7 @@ kubectl get pod -n $NAMESPACE readonly-basic-pod
 
 ## 8. Nginx with a read-only FS (with emptyDir volumes)
 
-Nginx needs writable directories. The solution: emptyDir volumes.
+Nginx needs a few writable directories, so we mount emptyDir volumes for them.
 
 ```bash
 kubectl apply -n $NAMESPACE -f - << 'EOF'

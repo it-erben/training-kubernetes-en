@@ -260,7 +260,7 @@ terraform apply  # Performs a rolling upgrade
 
 ## 7. Remote state (recommended for teams)
 
-For team collaboration, the Terraform state should be stored in Azure Storage:
+If you're working in a team, store the Terraform state in Azure Storage:
 
 ### 7.1 Creating a storage account
 
@@ -416,7 +416,7 @@ rm -rf .terraform .terraform.lock.hcl terraform.tfstate*
 **Benefits of Terraform for AKS:**
 
 1. **Infrastructure as Code** - versioned, reviewable, reproducible
-2. **Drift detection** - `terraform plan` reveals unintended changes
+2. **Drift detection** - `terraform plan` catches unintended changes
 3. **Modularization** - reusable modules for multiple clusters
 4. **Multi-cloud** - same language for Azure, AWS, GCP
-5. **State management** - central state for team collaboration
+5. **State management** - one shared state for the whole team

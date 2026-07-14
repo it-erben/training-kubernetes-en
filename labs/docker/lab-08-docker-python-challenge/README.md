@@ -1,11 +1,10 @@
 # Lab 08: Simple Server
 
-This project shows how a minimalistic Python HTTP service is packaged as a wheel and used in a Docker
-image.
+In this lab you package a minimal Python HTTP service as a wheel and use it in a Docker image.
 
 ## Project structure
 
-The following files make up the project. Create the directory structure as follows:
+These files make up the project. Create the directory structure:
 
 ```text
 08-docker-python-challenge/
@@ -122,9 +121,9 @@ if __name__ == "__main__":
 
 ## Create a Dockerfile for this service
 
-Multi-stage builds separate the build process from the runtime environment: first, dependencies and tools are used in
-a builder stage, then only the finished artifacts are moved into a slim runtime stage. This keeps the
-final image small and secure.
+Multi-stage builds separate the build process from the runtime environment: the builder stage holds all the
+tools and dependencies, and only the finished artifacts move into a slim runtime stage. This keeps the final
+image small and secure.
 
 1. **Choose a base image**  
    Use `python:3.11-slim` for both stages to keep the image compact while still having all the tools needed to build
@@ -138,9 +137,9 @@ final image small and secure.
    ENV PIP_DISABLE_PIP_VERSION_CHECK=1
    ```
 
-   Now copy `pyproject.toml`, `README.md` and the `src` folder to `/app`. Then, in a `RUN` instruction, install the
-   `build` tool by running the command `pip install --upgrade pip build`. Afterwards, run
-   `python -m build --wheel --no-isolation` so that the wheel is created in `dist/`.
+   Copy `pyproject.toml`, `README.md` and the `src` folder to `/app`. In a `RUN` instruction, install the
+   `build` tool with `pip install --upgrade pip build`, then run
+   `python -m build --wheel --no-isolation` so that the wheel lands in `dist/`.
 
 3. **Start the runtime stage**
 
@@ -151,11 +150,10 @@ final image small and secure.
        PYTHONUNBUFFERED=1
    ```
 
-   Copy `dist/` from the builder stage (remember `COPY --from=builder`), then run `pip install /tmp/dist/*.whl`.
-   Afterwards, delete the temporary directory.
+   Copy `dist/` from the builder stage (remember `COPY --from=builder`), run `pip install /tmp/dist/*.whl`, and
+   delete the temporary directory afterwards.
 
 4. **Expose the port and set the start command**  
-   Add `EXPOSE 8080` and set `CMD ["simple-server"]` so that the container automatically runs the server on
-   startup.
+   Add `EXPOSE 8080` and set `CMD ["simple-server"]` so that the container runs the server on startup.
 
-Put these steps together in the order given to recreate the current multi-stage Dockerfile.
+Put these steps together in the given order and you have the complete multi-stage Dockerfile.

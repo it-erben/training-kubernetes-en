@@ -1,4 +1,4 @@
-# Lab 13: Exercise on custom base images with Spring
+# Lab 13: Custom base images with Spring
 
 ## Build a custom base image
 
@@ -12,4 +12,4 @@
 - Adapt your app Dockerfile from task 1 so that it uses your base image.
 - Copy your `Jar` to `/app/app.jar`, expose 8080
 
-Now build and test your image
+Now build and test your image.

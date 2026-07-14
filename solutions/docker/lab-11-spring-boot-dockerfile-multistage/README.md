@@ -22,7 +22,7 @@ target
 .git
 ```
 
-Build & Test:
+Build & test:
 
 ```bash
 docker build -t hello-docker-multistage .

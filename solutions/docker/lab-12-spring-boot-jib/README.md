@@ -14,7 +14,7 @@ Plugin snippet in `pom.xml`:
 </plugin>
 ```
 
-Build & Test:
+Build & test:
 
 ```bash
 mvn compile jib:dockerBuild    # builds hello-docker:jib locally without a Dockerfile

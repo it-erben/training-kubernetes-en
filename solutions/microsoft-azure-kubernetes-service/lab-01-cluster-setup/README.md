@@ -20,9 +20,9 @@ az aks create \
   --enable-azure-monitor-metrics
 ```
 
-> **Note:** Creation takes about 5-10 minutes. The `automatic` SKU
-> automatically enables node autoprovisioning, workload autoscaling, and
-> preconfigured best practices.
+> **Note:** Creation takes about 5-10 minutes. The `automatic` SKU enables
+> node autoprovisioning and workload autoscaling and comes with preconfigured
+> best practices.
 
 ---
 
@@ -36,7 +36,7 @@ export CLUSTER_NAME="aks-training-ab"
 # Get credentials
 az aks get-credentials \
   --resource-group $RG \
-  --name $CLUSTER
+  --name $CLUSTER_NAME
 
 # Determine the user object ID
 USER_OBJECT_ID=$(az ad signed-in-user show --query id -o tsv)
@@ -70,5 +70,5 @@ NAME                                STATUS   ROLES    AGE   VERSION
 aks-nodepool1-xxxxxxxx-vmss000000   Ready    <none>   5m    v1.29.x
 ```
 
-With AKS Automatic you initially see one node; more are provisioned
-automatically as needed.
+With AKS Automatic you start with a single node; more are provisioned as
+needed.

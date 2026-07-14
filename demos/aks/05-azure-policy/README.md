@@ -1,7 +1,7 @@
 # Azure Policy for AKS
 
-This demo shows various **Azure Policy** scenarios for AKS clusters. Azure Policy enables
-enterprise-grade governance and enforces compliance rules automatically.
+This demo walks through several **Azure Policy** scenarios for AKS clusters. Azure Policy handles
+cluster governance and enforces compliance rules automatically.
 
 ## Prerequisites
 
@@ -46,12 +46,12 @@ export LOCATION="germanywestcentral"
                     └─────────────────────────┘
 ```
 
-**How does it work?**
+**How it works**
 
-1. Azure Policy uses **Gatekeeper** (OPA - Open Policy Agent) inside the cluster
-2. Policies are synchronized as **ConstraintTemplates** and **Constraints**
+1. Azure Policy runs **Gatekeeper** (OPA - Open Policy Agent) inside the cluster
+2. Policies are synced into the cluster as **ConstraintTemplates** and **Constraints**
 3. The admission controller checks every API request against the active policies
-4. Depending on the effect: **Audit** (log only) or **Deny** (block)
+4. The effect decides what happens: **Audit** (log only) or **Deny** (block)
 
 ---
 
@@ -105,7 +105,7 @@ az policy definition list \
 
 ## Demo overview
 
-This demo contains the following scenarios:
+The demo covers these scenarios:
 
 | #   | Demo                     | File                       | Description                          |
 | --- | ------------------------ | -------------------------- | ------------------------------------ |
@@ -162,7 +162,7 @@ az policy assignment create \
 
 ## Check policy synchronization
 
-After the assignment, it takes a few minutes until the policy is active in the cluster:
+After you assign a policy, it takes a few minutes to become active in the cluster:
 
 ```bash
 # Show Gatekeeper constraints in the cluster
@@ -213,7 +213,7 @@ kubectl delete namespace policy-demo --ignore-not-found
 
 ---
 
-## Further documentation
+## Further reading
 
 - [Azure Policy for AKS](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes)
 - [Built-in policy definitions](https://learn.microsoft.com/en-us/azure/aks/policy-reference)

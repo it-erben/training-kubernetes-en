@@ -22,7 +22,7 @@
 
 1. Apply the manifest: `kubectl apply -f loop-pod.yaml`
 2. Check the status: `kubectl get pod loop -n default` and `kubectl describe pod/loop`
-3. Use the endless-loop variant: `kubectl delete pod loop && kubectl apply -f loop-pod-date.yaml`
+3. Switch to the infinite-loop variant: `kubectl delete pod loop && kubectl apply -f loop-pod-date.yaml`
 4. Events/logs: `kubectl get events --field-selector involvedObject.name=loop` and `kubectl logs loop`
 
 The matching YAML files are in this directory.
