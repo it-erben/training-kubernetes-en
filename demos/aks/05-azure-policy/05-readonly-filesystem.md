@@ -434,9 +434,9 @@ spec:
 
 ## Summary
 
-| Aspect              | Value                                                                       |
-| ------------------- | -------------------------------------------------------------------------- |
-| **Policy**          | Kubernetes cluster containers should run with a read only root file system |
-| **Effect**          | Deny                                                                       |
-| **Solution for apps** | emptyDir volumes for writable paths                                       |
-| **Best practice**   | Set size limits on emptyDir                                                |
+| Aspect | Value |
+| --- | --- |
+| **Policy** | Kubernetes cluster containers should run with a read only root file system |
+| **Effect** | Deny |
+| **Solution for apps** | emptyDir volumes for writable paths |
+| **Best practice** | Set size limits on emptyDir |

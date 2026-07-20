@@ -20,4 +20,12 @@ spec:                                # Specification: desired target state
 ---                                  # Separator: start of a second YAML document
 apiVersion: v1                       # Core API version (for Service objects)
 kind: Service                        # Object type: a Service (stable network address)
-metadata:                            #
+metadata:                            # Service metadata block
+  name: web-lb                       # Name of the Service
+spec:                                # Specification: desired networking state
+  type: LoadBalancer                 # Request an external load balancer IP
+  selector:                          # Route traffic to pods with these labels
+    app: web                         # Matches the Deployment's pod label (app=web)
+  ports:                             # Ports the Service exposes
+    - port: 80                       # Port clients connect to on the load balancer
+      targetPort: 80                 # Container port that traffic is forwarded to

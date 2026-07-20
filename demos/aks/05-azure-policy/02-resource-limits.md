@@ -358,11 +358,11 @@ echo "Cleanup complete!"
 ## Recommended limits
 
 | Workload type | CPU Request | CPU Limit | Memory Request | Memory Limit |
-| ------------ | ----------- | --------- | -------------- | ------------ |
-| Microservice | 100m        | 500m      | 128Mi          | 512Mi        |
-| Web app      | 250m        | 1         | 256Mi          | 1Gi          |
-| Batch job    | 500m        | 2         | 512Mi          | 2Gi          |
-| Database     | 1           | 4         | 2Gi            | 8Gi          |
+| --- | --- | --- | --- | --- |
+| Microservice | 100m | 500m | 128Mi | 512Mi |
+| Web app | 250m | 1 | 256Mi | 1Gi |
+| Batch job | 500m | 2 | 512Mi | 2Gi |
+| Database | 1 | 4 | 2Gi | 8Gi |
 
 ---
 
@@ -376,9 +376,9 @@ echo "Cleanup complete!"
 
 ## Summary
 
-| Aspect        | Value                                                        |
-| ------------- | ------------------------------------------------------------ |
-| **Policy**    | Kubernetes cluster containers CPU and memory resource limits |
-| **Effect**    | Deny                                                         |
-| **Parameters**| `cpuLimit`, `memoryLimit`                                    |
-| **Complement**| LimitRange for defaults, ResourceQuota for namespace limits  |
+| Aspect | Value |
+| --- | --- |
+| **Policy** | Kubernetes cluster containers CPU and memory resource limits |
+| **Effect** | Deny |
+| **Parameters** | `cpuLimit`, `memoryLimit` |
+| **Complement** | LimitRange for defaults, ResourceQuota for namespace limits |

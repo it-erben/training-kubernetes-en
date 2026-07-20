@@ -46,7 +46,7 @@ export LOCATION="germanywestcentral"
                     └─────────────────────────┘
 ```
 
-**How it works**
+### How it works
 
 1. Azure Policy runs **Gatekeeper** (OPA - Open Policy Agent) inside the cluster
 2. Policies are synced into the cluster as **ConstraintTemplates** and **Constraints**

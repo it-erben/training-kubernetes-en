@@ -13,8 +13,8 @@ The starting point is the Spring Boot service you generated earlier with the
 - Add the Jib plugin to the `<plugins>` section. Remember to use `<from>...</from>` with a base image such as
   Eclipse Temurin
 
-> You can find setup instructions for Maven
-> [here](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#quickstart).
+> You can find setup instructions in the
+> [Jib Maven plugin quickstart](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#quickstart).
 
 ---
 

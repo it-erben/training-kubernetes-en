@@ -8,11 +8,15 @@ on this laptop, no slides.
 
 "Rancher" is an umbrella term for three layers, and they're easy to mix up:
 
+<!-- markdownlint-disable MD013 -->
+
 | Layer | What it is | Competition |
-|---------|-----------|------------|
+| --- | --- | --- |
 | **Rancher Manager** | Multi-cluster management platform (UI, RBAC, app catalog, Fleet GitOps, observability) — centrally manages *external* clusters (EKS, AKS, on-prem) | Platform9, Tanzu, OpenShift Console |
 | **RKE2** | Hardened K8s distribution: CIS benchmark by default, FIPS build, embedded etcd HA, a single binary. Target audience: government/enterprise | kubeadm, OpenShift, Talos |
 | **K3s** | Lightweight distribution, < 70 MB single binary, batteries included. Edge/IoT/dev | MicroK8s, k0s |
+
+<!-- markdownlint-enable MD013 -->
 
 This demo focuses on the **distribution** level (K3s/RKE2), because you already see the
 Manager every day. The real difference sits *below* the UI.
@@ -99,7 +103,7 @@ On vanilla, none of these CRDs exist — Helm stays an external CLI tool.
 ## Summary
 
 | Topic | Vanilla (kubeadm/kind) | Rancher (K3s/RKE2) |
-|-------|------------------------|--------------------|
+| --- | --- | --- |
 | Ingress | install yourself | Traefik preinstalled |
 | LoadBalancer | MetalLB or similar needed | ServiceLB built in |
 | Storage | set up yourself | local-path default |
