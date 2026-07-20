@@ -3,6 +3,10 @@
 In this exercise, you will create an AKS cluster in **standard mode** and learn
 how to manage node pools manually.
 
+> **Shell note:** The commands below are written for **bash** (`\` line continuations, `$(…)`,
+> shell variables). Run them in **Azure Cloud Shell** (the `>_` button in the Azure Portal, with
+> `az` and `kubectl` preinstalled) or in **WSL**. In native Windows PowerShell they won't run as written.
+
 ## Part 1: Create a resource group
 
 **Task:** Create a new resource group for this exercise.
