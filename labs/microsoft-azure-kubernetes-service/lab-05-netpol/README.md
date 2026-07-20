@@ -2,6 +2,10 @@
 
 For this lab, create a cluster as in Lab 01 and set the environment variables described there.
 
+> **Shell note:** The commands below are written for **bash** (`\` line continuations, `$(…)`,
+> shell variables). Run them in **Azure Cloud Shell** (the `>_` button in the Azure Portal, with
+> `az` and `kubectl` preinstalled) or in **WSL**. In native Windows PowerShell they won't run as written.
+
 ## Part 1: Set up the test environment
 
 ### Create namespaces

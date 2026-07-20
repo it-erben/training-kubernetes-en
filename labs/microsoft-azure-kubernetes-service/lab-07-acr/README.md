@@ -1,5 +1,9 @@
 # Lab 07: Deploy a Node.js application to AKS via ACR
 
+> **Shell note:** The commands below are written for **bash** (`\` line continuations, `$(…)`,
+> shell variables). Run them in **Azure Cloud Shell** (the `>_` button in the Azure Portal, with
+> `az` and `kubectl` preinstalled) or in **WSL**. In native Windows PowerShell they won't run as written.
+
 ---
 
 ## Part 1: Create an Azure Container Registry

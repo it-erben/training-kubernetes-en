@@ -524,14 +524,14 @@ echo "Cleanup complete!"
 
 ## Summary
 
-| Component                          | Purpose                                          |
-| ---------------------------------- | ------------------------------------------------ |
-| **User-Assigned Managed Identity** | Azure identity for the workload                  |
-| **Federated Identity Credential**  | Links the K8s ServiceAccount to the Azure identity |
-| **Key Vault**                      | Stores secrets securely in Azure                 |
-| **ServiceAccount**                 | K8s identity with the Workload Identity annotation |
-| **SecretProviderClass**            | Defines which secrets are loaded                 |
-| **CSI Volume**                     | Mounts secrets as files into the pod             |
+| Component | Purpose |
+| --- | --- |
+| **User-Assigned Managed Identity** | Azure identity for the workload |
+| **Federated Identity Credential** | Links the K8s ServiceAccount to the Azure identity |
+| **Key Vault** | Stores secrets securely in Azure |
+| **ServiceAccount** | K8s identity with the Workload Identity annotation |
+| **SecretProviderClass** | Defines which secrets are loaded |
+| **CSI Volume** | Mounts secrets as files into the pod |
 
 **Best Practices:**
 

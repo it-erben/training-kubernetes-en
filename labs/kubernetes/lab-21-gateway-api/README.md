@@ -171,6 +171,13 @@ tunnel again.
     curl --resolve gateway.example.com:80:127.0.0.1 http://gateway.example.com
     ```
 
+    > **Windows (PowerShell):** `curl` is an alias for `Invoke-WebRequest` and does not know `--resolve`.
+    > Use `curl.exe` instead. On macOS/Linux, `curl` works directly.
+    >
+    > ```powershell
+    > curl.exe --resolve gateway.example.com:80:127.0.0.1 http://gateway.example.com
+    > ```
+
     _(Replace 127.0.0.1 with the IP from step 2 if it differs)_
 
     You should see "Hello from Gateway API".
