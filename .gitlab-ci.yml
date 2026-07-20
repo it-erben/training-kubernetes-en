@@ -31,6 +31,16 @@ stages:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   - if: $CI_COMMIT_BRANCH
 
+# The markdown-lint and yaml-lint components only run on merge requests by
+# default. Override their rules so they also run on branch/main pushes —
+# otherwise lint errors can land on main unnoticed (they did before). Matches
+# the *checks-rules used by the local lint jobs below.
+lint:markdown:
+  rules: *checks-rules
+
+lint:yaml:
+  rules: *checks-rules
+
 lint:helm:
   stage: lint
   rules: *checks-rules
