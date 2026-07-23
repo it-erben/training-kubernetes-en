@@ -56,9 +56,9 @@ k9s uses a command prompt, like Vim. Press **`:`**, type a resource, press `Ente
 
 1. Jump between resource types:
    - `:pods` `Enter` — all pods
-   - `:deploy` `Enter` — deployments
-   - `:svc` `Enter` — services
-   - `:ns` `Enter` — namespaces
+   - `:deployments` `Enter` — deployments
+   - `:services` `Enter` — services
+   - `:namespaces` `Enter` — namespaces
 
    > Short names work too: `:po`, `:deploy`, `:svc`, `:ns`. Aliases are the same ones `kubectl` uses.
 
@@ -240,7 +240,7 @@ The `broken` Deployment has never come up. Let's diagnose and fix it entirely fr
 | `Shift-F` | Port-forward |
 | `e` | Edit in `$K9S_EDITOR` |
 | `Ctrl-D` | Delete the highlighted resource |
-| `:q` / `Ctrl-C` | Quit k9s |
+| `:q` `Enter` / `Ctrl-C` | Quit k9s |
 
 ---
 
