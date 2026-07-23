@@ -1,0 +1,19 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: nc-07-backup-rbac
+  labels: { suite: nextcloud }
+spec:
+  steps:
+    - try:
+        - script:
+            # Schema-validate the plain manifests offline. No cluster workloads
+            # are scheduled and no namespace needs to pre-exist.
+            content: |
+              kubeconform -strict -summary -kubernetes-version 1.32.0 \
+                ../../solutions/nextcloud-casestudy/07-backup-rbac/backup-pvc.yaml \
+                ../../solutions/nextcloud-casestudy/07-backup-rbac/rbac.yaml \
+                ../../solutions/nextcloud-casestudy/07-backup-rbac/backup-cronjob.yaml \
+                ../../solutions/nextcloud-casestudy/07-backup-rbac/restore-job.yaml
+            check:
+              ($error == null): true

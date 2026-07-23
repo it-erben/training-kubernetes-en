@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nextcloud-restore
+  namespace: nextcloud
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: nextcloud-backup
+    spec:
+      serviceAccountName: nextcloud-backup
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: restore
+          image: bitnami/kubectl:1.32
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              POD=$(kubectl get pod -l app=nextcloud-db \
+                -o jsonpath='{.items[0].metadata.name}')
+              kubectl exec -i "$POD" -- sh -c \
+                'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" nextcloud' \
+                < /backup/latest.sql
+              echo "Restore complete from latest.sql"
+          env:
+            - name: HOME
+              value: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: backup
+          persistentVolumeClaim:
+            claimName: nextcloud-backup
+        - name: tmp
+          emptyDir: {}
