@@ -68,7 +68,7 @@ k9s
   ```
 
   ```bash
-  export EDITOR=nano            # set before launching k9s
+  export K9S_EDITOR=nano       # set before launching k9s
   ```
 
 - **Fix (fallback, any shell):**

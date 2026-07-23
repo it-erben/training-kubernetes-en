@@ -63,9 +63,10 @@ k9s uses a command prompt, like Vim. Press **`:`**, type a resource, press `Ente
 
 2. Press **`?`** to open the help screen with every key binding for the current view. Press `Esc` to close it.
 
-3. **Namespaces.** The header shows numbered namespaces. Press **`0`** to show *all* namespaces, then a
-   number (or `:ns` and select one) to focus a single namespace. Set it back to `default` for the rest of
-   the lab.
+3. **Namespaces.** Press **`0`** to show pods from *all* namespaces. To focus a single namespace, run
+   **`:ns`** `Enter` and select one — that always works. The header also lists namespaces with a leading
+   digit (e.g. `<1>`); pressing that digit is a shortcut for the same thing. Set it back to `default` for
+   the rest of the lab.
 
 4. **Filter.** In the pods view, press **`/`**, type `web`, and press `Enter`. The table now shows only
    matching pods. Press `Esc` to clear the filter.
@@ -124,9 +125,9 @@ Go to `:pods` and highlight a `web` pod.
 
 Let's reach the `web` app from your laptop and watch the access logs light up.
 
-1. Go to `:svc`, highlight the `web` service, and press **`Shift-F`**. In the dialog, set the local port to
-   **`8080`** and the container port to **`80`**, then confirm. k9s now forwards `localhost:8080` to the
-   Service.
+1. Go to `:svc`, highlight the `web` service, and press **`Shift-F`**. A dialog opens with the forward
+   details. Set the **local port** to **`8080`** (leave the service/container port as **`80`**), then
+   confirm. k9s now forwards `localhost:8080` to the Service.
    > You can review active forwards any time with **`:pf`** `Enter`.
 
 2. From your shell (a **second** terminal, leaving k9s running), request the app:
@@ -189,7 +190,7 @@ The `broken` Deployment has never come up. Let's diagnose and fix it entirely fr
    >
    > ```bash
    > # macOS / Linux
-   > export EDITOR=nano
+   > export K9S_EDITOR=nano
    > ```
 
 5. **Fix it, the reliable fallback.** If editing in k9s is awkward (no editor configured, or you'd rather
