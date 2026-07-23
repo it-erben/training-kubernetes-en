@@ -16,3 +16,9 @@ checks:
     - "liveness-port"
     - "latest-tag"
     - "pdb-min-available"
+    # The lab-06 Helm chart (solutions/nextcloud-casestudy/06-helm-chart) quotes
+    # its templated Service selectors (e.g. app: "{{ .Release.Name }}-db"), so
+    # kube-linter parses them as valid YAML and then rejects the literal
+    # "{{ .Release.Name }}-..." as an invalid label value. The placeholder is
+    # only resolved at `helm template` time, so exclude dangling-service here.
+    - "dangling-service"

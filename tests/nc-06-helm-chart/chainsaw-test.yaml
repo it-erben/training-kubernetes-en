@@ -1,0 +1,17 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: nc-06-helm-chart
+  labels: { suite: nextcloud }
+spec:
+  steps:
+    - try:
+        - script:
+            # Lint the chart and render it, then validate the rendered manifests
+            # against the Kubernetes schemas. No cluster workloads are scheduled.
+            content: |
+              helm lint ../../solutions/nextcloud-casestudy/06-helm-chart/nextcloud-chart
+              helm template nc ../../solutions/nextcloud-casestudy/06-helm-chart/nextcloud-chart \
+                | kubeconform -strict -summary -kubernetes-version 1.32.0
+            check:
+              ($error == null): true

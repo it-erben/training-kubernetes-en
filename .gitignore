@@ -84,3 +84,6 @@ fabric.properties
 
 # Lab test suite run logs (chainsaw)
 tests/.*.log
+
+# Superpowers workflow scratch (specs, plans) — local only
+docs/superpowers/

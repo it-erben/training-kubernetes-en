@@ -1,0 +1,47 @@
+# Database (MariaDB) configuration
+database:
+  image: mariadb:11.4.2
+  # Credentials rendered into the Secrets. Override in production.
+  rootPassword: mysecretpassword
+  user: nextcloud
+  password: nextcloudpassword
+  dbName: nextcloud
+  storage: 10Gi
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: 4Gi
+    limits:
+      cpu: "1000m"
+      memory: 4Gi
+
+# Nextcloud application configuration
+nextcloud:
+  image: nextcloud:27.1.4
+  dataStorage: 20Gi
+  configStorage: 1Gi
+  trustedDomains: "nextcloud.local localhost 127.0.0.1"
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: 2Gi
+    limits:
+      cpu: "1000m"
+      memory: 2Gi
+
+# Optional phpMyAdmin admin interface
+phpmyadmin:
+  enabled: true
+  image: phpmyadmin:5.2.1
+  resources:
+    requests:
+      cpu: "500m"
+      memory: 512Mi
+    limits:
+      cpu: "500m"
+      memory: 512Mi
+
+# Optional Ingress for Nextcloud
+ingress:
+  enabled: true
+  host: nextcloud.local
