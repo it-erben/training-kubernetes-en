@@ -1,0 +1,68 @@
+# {{- if .Values.phpmyadmin.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-phpmyadmin"
+  labels:
+    app: "{{ .Release.Name }}-phpmyadmin"
+spec:
+  type: ClusterIP
+  selector:
+    app: "{{ .Release.Name }}-phpmyadmin"
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-phpmyadmin"
+  labels:
+    app: "{{ .Release.Name }}-phpmyadmin"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-phpmyadmin"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}-phpmyadmin"
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: "{{ .Values.phpmyadmin.image }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: "{{ .Release.Name }}-db-clusterip"
+            - name: PMA_PORT
+              value: "3306"
+            - name: PMA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-db-app"
+                  key: MYSQL_USER
+            - name: PMA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-db-app"
+                  key: MYSQL_PASSWORD
+          resources:
+            requests:
+              cpu: "{{ .Values.phpmyadmin.resources.requests.cpu }}"
+              memory: "{{ .Values.phpmyadmin.resources.requests.memory }}"
+            limits:
+              cpu: "{{ .Values.phpmyadmin.resources.limits.cpu }}"
+              memory: "{{ .Values.phpmyadmin.resources.limits.memory }}"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+# {{- end }}
