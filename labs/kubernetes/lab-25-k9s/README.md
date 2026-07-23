@@ -22,13 +22,116 @@ k9s is already installed on your machine. Check it and start from a running mini
 k9s version
 ```
 
-Deploy the workloads you'll explore (a healthy app plus one that is deliberately broken):
+Deploy the workloads you'll explore (a healthy app plus one that is deliberately broken). Save the
+following manifest as `setup.yaml`:
+
+```yaml
+# Lab 25 - k9s playground workloads.
+# Two Deployments in the default namespace:
+#   * web    - a healthy nginx (2 replicas) plus a ClusterIP Service.
+#   * broken - an nginx with a non-existent image tag (ImagePullBackOff)
+#              that you diagnose and fix from inside k9s.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.29.4
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken
+  labels:
+    app: broken
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken
+  template:
+    metadata:
+      labels:
+        app: broken
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.29.4-doesnotexist
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+```
+
+Then apply it (run this from the directory where you saved the file):
 
 ```bash
 kubectl apply -f setup.yaml
 ```
-
-> In PowerShell, first `cd` into this lab's directory so `setup.yaml` is found.
 
 This creates, in the `default` namespace:
 
