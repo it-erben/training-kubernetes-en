@@ -15,9 +15,9 @@ Role, and RoleBinding in one apply.
 
 ## Watch it fail without the binding
 
-If you trigger a backup Job before applying `rbac.yaml` — or under the namespace's `default`
-ServiceAccount — the pod logs show `Error from server (Forbidden): pods is forbidden` and
-`cannot create resource "pods/exec"`. This confirms the Role is the only thing granting exec access.
+Delete the RoleBinding before applying `rbac.yaml` and trigger a Job — the pod logs show
+`Error from server (Forbidden): pods is forbidden` and `cannot create resource "pods/exec"`.
+This confirms the Role is the only thing granting exec access.
 
 ## Schedule and trigger a backup
 
