@@ -1,4 +1,4 @@
-# Solution — Lab 25: Navigating & Troubleshooting with k9s
+# Solution for Lab 25: Navigating & Troubleshooting with k9s
 
 This walkthrough gives the exact keystrokes and answers for each part. k9s keys are identical on all
 operating systems; the few shell commands show Bash and PowerShell where they differ.
@@ -25,7 +25,7 @@ k9s
 ## Part 2: Inspecting a resource
 
 - `d` describes (Events at the bottom); `y` shows full YAML; `Esc` returns.
-- From `:deploy` → `web` → `Enter` you pass **Deployment → ReplicaSet → Pod → container** — **3** hops to
+- From `:deploy` → `web` → `Enter` you pass **Deployment → ReplicaSet → Pod → container**: **3** hops to
   reach the `nginx` container.
 
 ## Part 3: Logs and shell
@@ -58,7 +58,7 @@ k9s
 
 - `:pods` shows `broken-...` in `ImagePullBackOff` / `ErrImagePull` (red).
 - `d` → Events: *"Failed to pull image \"nginx:1.29.4-doesnotexist\" ... not found"*.
-- `l` shows **no** logs — the container never started, which points you at the image/events, not the app.
+- `l` shows **no** logs. The container never started, which points you at the image/events, not the app.
 - **Root cause:** the image tag `nginx:1.29.4-doesnotexist` does not exist.
 - **Fix (k9s):** `:deploy` → `broken` → `e`, change the tag to `nginx:1.29.4`, save. Requires an editor:
 
@@ -82,19 +82,19 @@ k9s
 
 ## Part 6: Cleanup
 
-- `:deploy` → `broken` → `Ctrl-D`, confirm — deletes it from within k9s.
+- `:deploy` → `broken` → `Ctrl-D`, confirm. This deletes it from within k9s.
 - Quit (`:q`) and:
 
   ```bash
   kubectl delete -f setup.yaml
   ```
 
-  `broken` may report "not found" (already deleted in k9s) — harmless.
+  `broken` may report "not found" (already deleted in k9s), which is harmless.
 
 ## Instructor notes
 
-- The lab is **interactive (TUI)**, so it has no automated `tests/` (chainsaw) entry — unlike most labs,
+- The lab is **interactive (TUI)**, so it has no automated `tests/` (chainsaw) entry. Unlike most labs,
   its steps can't be driven headlessly. Only `setup.yaml` is lint-checked in CI.
-- If a student's `e` edit fails to open, it's almost always a missing `K9S_EDITOR`/`EDITOR` — the
+- If a student's `e` edit fails to open, it's almost always a missing `K9S_EDITOR`/`EDITOR`; the
   `kubectl set image` fallback always works.
 - Reset for the next student: `kubectl delete -f setup.yaml` then re-apply.

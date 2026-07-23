@@ -9,7 +9,7 @@ open a shell, port-forward and scale a workload, and diagnose and fix a broken d
 the TUI.
 
 > **Shells:** k9s is a terminal UI, so every keystroke in this lab is identical on Windows, macOS, and
-> Linux. Only a handful of `kubectl`/`curl` commands run in your shell — where PowerShell differs from
+> Linux. Only a handful of `kubectl`/`curl` commands run in your shell. Where PowerShell differs from
 > Bash, both variants are shown.
 
 ---
@@ -32,8 +32,8 @@ kubectl apply -f setup.yaml
 
 This creates, in the `default` namespace:
 
-- **`web`** — a healthy nginx Deployment with 2 replicas, plus a `web` Service.
-- **`broken`** — an nginx Deployment that will **not** start (you'll find out why in Part 5).
+- **`web`**: a healthy nginx Deployment with 2 replicas, plus a `web` Service.
+- **`broken`**: an nginx Deployment that will **not** start (you'll find out why in Part 5).
 
 Now launch k9s:
 
@@ -44,8 +44,8 @@ k9s
 You land on a resource table. The header (top-left) shows your context and namespace; the top-right lists
 the keys available in the current view. Two keys to remember from the start:
 
-- **`Esc`** — go back / clear a filter.
-- **`:q`** then `Enter`, or **`Ctrl-C`** — quit k9s.
+- **`Esc`**: go back / clear a filter.
+- **`:q`** then `Enter`, or **`Ctrl-C`**: quit k9s.
 
 ---
 
@@ -54,10 +54,10 @@ the keys available in the current view. Two keys to remember from the start:
 k9s uses a command prompt, like Vim. Press **`:`**, type a resource, press `Enter`.
 
 1. Jump between resource types:
-   - `:pods` `Enter` — all pods
-   - `:deployments` `Enter` — deployments
-   - `:services` `Enter` — services
-   - `:namespaces` `Enter` — namespaces
+   - `:pods` `Enter`: all pods
+   - `:deployments` `Enter`: deployments
+   - `:services` `Enter`: services
+   - `:namespaces` `Enter`: namespaces
 
    > Short names work too: `:po`, `:deploy`, `:svc`, `:ns`. Aliases are the same ones `kubectl` uses.
 
@@ -67,7 +67,7 @@ k9s uses a command prompt, like Vim. Press **`:`**, type a resource, press `Ente
    number (or `:ns` and select one) to focus a single namespace. Set it back to `default` for the rest of
    the lab.
 
-4. **Filter.** In the pods view, press **`/`**, type `web`, and press `Enter` — the table now shows only
+4. **Filter.** In the pods view, press **`/`**, type `web`, and press `Enter`. The table now shows only
    matching pods. Press `Esc` to clear the filter.
 
 5. **Sort.** In a table, use the shortcut keys shown in the header (e.g. sort by name, CPU, or age).
@@ -98,7 +98,7 @@ layers did you pass through (Deployment → ? → ? → container)?
 Go to `:pods` and highlight a `web` pod.
 
 1. **Logs.** Press **`l`** to stream the container logs live (like `kubectl logs -f`). A fresh nginx has
-   only start-up lines for now — you'll generate real traffic in Part 4. Press `Esc` to leave the log view.
+   only start-up lines for now. You'll generate real traffic in Part 4. Press `Esc` to leave the log view.
    > Useful log-view keys (shown in the header): toggle wrap, toggle timestamps, and jump to the top/bottom.
 
 2. **Shell.** With a `web` pod highlighted, press **`s`** to open a shell *inside* the container (like
@@ -143,13 +143,13 @@ Let's reach the `web` app from your laptop and watch the access logs light up.
 
    You should get the nginx welcome HTML. Run it a few times.
 
-3. Back in k9s, open the **logs** (`l`) of a `web` pod again — now you can see your `GET /` requests
+3. Back in k9s, open the **logs** (`l`) of a `web` pod again. Now you can see your `GET /` requests
    appearing live in the access log.
 
 ### 4.2 Scale
 
 1. Go to `:deploy` and highlight `web`.
-2. Press **`s`** (Scale) — in the dialog, set replicas to **`4`** and confirm.
+2. Press **`s`** (Scale). In the dialog, set replicas to **`4`** and confirm.
 3. Switch to `:pods` and watch two new `web` pods appear and go `Running` in real time.
 4. Scale back down to `2` the same way.
 
@@ -161,11 +161,11 @@ Let's reach the `web` app from your laptop and watch the access logs light up.
 
 The `broken` Deployment has never come up. Let's diagnose and fix it entirely from k9s.
 
-1. Go to `:pods`. The `broken-...` pod is **not** `Running` — it shows something like `ImagePullBackOff`
+1. Go to `:pods`. The `broken-...` pod is **not** `Running`. It shows something like `ImagePullBackOff`
    or `ErrImagePull` (k9s colours it red).
 
 2. **Read the events.** Highlight the `broken` pod and press **`d`** (describe). Scroll to **Events** at
-   the bottom. You'll see a message like *"Failed to pull image ... not found"* — the image tag does not
+   the bottom. You'll see a message like *"Failed to pull image ... not found"*. The image tag does not
    exist.
 
 3. **Check the logs.** Press **`l`**. There are **no** container logs, because the container never started.
@@ -175,7 +175,7 @@ The `broken` Deployment has never come up. Let's diagnose and fix it entirely fr
    > Diagnosis: `setup.yaml` uses the image `nginx:1.29.4-doesnotexist`, which is not a real tag. The fix
    > is to point the Deployment at a real image, `nginx:1.29.4`.
 
-4. **Fix it — the k9s way (`e`).** Go to `:deploy`, highlight `broken`, and press **`e`** to edit. k9s
+4. **Fix it, the k9s way (`e`).** Go to `:deploy`, highlight `broken`, and press **`e`** to edit. k9s
    opens the resource in your editor. Change the image tag to `nginx:1.29.4`, save, and close the editor.
 
    > k9s uses the editor from the `K9S_EDITOR` (or `EDITOR`) environment variable. Set it **before** you
@@ -191,8 +191,8 @@ The `broken` Deployment has never come up. Let's diagnose and fix it entirely fr
    > export EDITOR=nano
    > ```
 
-5. **Fix it — the reliable fallback.** If editing in k9s is awkward (no editor configured, or you'd rather
-   use the command line), run this in your shell — it works identically in Bash and PowerShell:
+5. **Fix it, the reliable fallback.** If editing in k9s is awkward (no editor configured, or you'd rather
+   use the command line), run this in your shell. It works identically in Bash and PowerShell:
 
    ```bash
    kubectl set image deployment/broken nginx=nginx:1.29.4
@@ -209,7 +209,7 @@ The `broken` Deployment has never come up. Let's diagnose and fix it entirely fr
 ## Part 6: Cleanup
 
 1. **Delete from within k9s.** Go to `:deploy`, highlight `broken`, and press **`Ctrl-D`**. Confirm the
-   deletion dialog. The Deployment (and its pod) disappears from the table — this is how you delete any
+   deletion dialog. The Deployment (and its pod) disappears from the table. This is how you delete any
    resource in k9s.
 
 2. **Remove everything else.** Quit k9s (`:q`) and run:
@@ -218,7 +218,7 @@ The `broken` Deployment has never come up. Let's diagnose and fix it entirely fr
    kubectl delete -f setup.yaml
    ```
 
-   > `broken` is already gone, so you may see a "not found" note for it — that's expected and harmless.
+   > `broken` is already gone, so you may see a "not found" note for it. That's expected and harmless.
 
 ---
 
