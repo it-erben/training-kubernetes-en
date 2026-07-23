@@ -22,7 +22,3 @@ checks:
     # "{{ .Release.Name }}-..." as an invalid label value. The placeholder is
     # only resolved at `helm template` time, so exclude dangling-service here.
     - "dangling-service"
-    # lab-07 restore-job.yaml is a one-shot restore Job intended to be run
-    # manually; ttlSecondsAfterFinished would auto-cleanup, but that is out of
-    # scope for this lab. Exclude the check to allow the Job to pass linting.
-    - "job-ttl-seconds-after-finished"
