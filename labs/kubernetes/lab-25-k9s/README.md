@@ -1,9 +1,8 @@
 # Lab 25: Navigating & Troubleshooting Kubernetes with k9s
 
-[k9s](https://k9scli.io/) is a terminal UI that turns cluster navigation into a fast, keyboard-driven
-experience. Instead of typing a `kubectl get`/`describe`/`logs` command for every question, you fly
-through resources, drill into them, read logs, open a shell, and even edit and fix workloads — all from
-one screen that refreshes itself live.
+[k9s](https://k9scli.io/) is a terminal UI for Kubernetes. It shows your cluster resources in a live
+table you navigate with the keyboard, so instead of running a separate `kubectl get`, `describe`, or
+`logs` for every question, you move between resources and read their details in one place.
 
 **Goal of this exercise:** By the end you can navigate a cluster in k9s, inspect resources, read logs and
 open a shell, port-forward and scale a workload, and diagnose and fix a broken deployment without leaving
@@ -82,9 +81,9 @@ k9s uses a command prompt, like Vim. Press **`:`**, type a resource, press `Ente
 
 Navigate to `:pods` and highlight one of the `web` pods with the arrow keys.
 
-1. Press **`d`** — this is `describe`. You get the same detail as `kubectl describe`, including the
+1. Press **`d`** to `describe` it. You get the same detail as `kubectl describe`, including the
    **Events** at the bottom. Press `Esc` to go back.
-2. Press **`y`** — the full **YAML** of the resource. Press `Esc` to go back.
+2. Press **`y`** to see the full YAML of the resource. Press `Esc` to go back.
 3. **Drill down.** Go to `:deploy`, highlight `web`, and press `Enter`. k9s drills into the Deployment's
    ReplicaSet; press `Enter` again to reach its pods; press `Enter` on a pod to see its containers. Use
    `Esc` to climb back up each level.
