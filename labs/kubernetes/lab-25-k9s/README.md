@@ -84,12 +84,13 @@ Navigate to `:pods` and highlight one of the `web` pods with the arrow keys.
 1. Press **`d`** to `describe` it. You get the same detail as `kubectl describe`, including the
    **Events** at the bottom. Press `Esc` to go back.
 2. Press **`y`** to see the full YAML of the resource. Press `Esc` to go back.
-3. **Drill down.** Go to `:deploy`, highlight `web`, and press `Enter`. k9s drills into the Deployment's
-   ReplicaSet; press `Enter` again to reach its pods; press `Enter` on a pod to see its containers. Use
+3. **Drill down.** Go to `:deploy`, highlight `web`, and press `Enter`. k9s jumps straight to the
+   Deployment's **pods** (it skips the ReplicaSet). Press `Enter` on a pod to reach its containers. Use
    `Esc` to climb back up each level.
+   > Want to see the ReplicaSet layer? Press **`z`** on the Deployment instead of `Enter`.
 
 **Task:** Starting from the `web` Deployment, drill all the way down to the `nginx` container. How many
-layers did you pass through (Deployment → ? → ? → container)?
+`Enter` presses did it take (Deployment → ? → container)?
 
 ---
 
@@ -230,7 +231,8 @@ The `broken` Deployment has never come up. Let's diagnose and fix it entirely fr
 | `?` | Help / all key bindings for the current view |
 | `/` | Filter the current table |
 | `0` | Toggle all namespaces |
-| `Enter` | Drill into the highlighted resource |
+| `Enter` | Drill into the highlighted resource (Deployment → pods, skipping the ReplicaSet) |
+| `z` | Show the ReplicaSets of the highlighted Deployment |
 | `Esc` | Go back / clear filter |
 | `d` | Describe (with Events) |
 | `y` | Show full YAML |

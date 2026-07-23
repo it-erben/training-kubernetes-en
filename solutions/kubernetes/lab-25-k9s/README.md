@@ -25,8 +25,9 @@ k9s
 ## Part 2: Inspecting a resource
 
 - `d` describes (Events at the bottom); `y` shows full YAML; `Esc` returns.
-- From `:deploy` → `web` → `Enter` you pass **Deployment → ReplicaSet → Pod → container**: **3** hops to
-  reach the `nginx` container.
+- From `:deploy` → `web` → `Enter` k9s jumps straight to the pods (it skips the ReplicaSet), then `Enter`
+  on a pod reaches its containers: **Deployment → Pod → container**, **2** `Enter` presses. (Press `z` on
+  the Deployment if you want to see the ReplicaSet layer.)
 
 ## Part 3: Logs and shell
 
