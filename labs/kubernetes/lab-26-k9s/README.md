@@ -1,4 +1,4 @@
-# Lab 25: Navigating & Troubleshooting Kubernetes with k9s
+# Lab 26: Navigating & Troubleshooting Kubernetes with k9s
 
 [k9s](https://k9scli.io/) is a terminal UI for Kubernetes. It shows your cluster resources in a live
 table you navigate with the keyboard, so instead of running a separate `kubectl get`, `describe`, or
@@ -26,7 +26,7 @@ Deploy the workloads you'll explore (a healthy app plus one that is deliberately
 following manifest as `setup.yaml`:
 
 ```yaml
-# Lab 25 - k9s playground workloads.
+# Lab 26 - k9s playground workloads.
 # Two Deployments in the default namespace:
 #   * web    - a healthy nginx (2 replicas) plus a ClusterIP Service.
 #   * broken - an nginx with a non-existent image tag (ImagePullBackOff)
