@@ -8,6 +8,18 @@ Let's add them to wrap up this case study.
 > **Docs:** [Resource Requests & Limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
 
 Every pod in a Kubernetes cluster should define resource requests and limits.
+
+> Note (Minikube): the values below are production-scale. The whole stack requests
+> roughly 2.5 CPU and 6.5Gi of memory, which does not fit a default Minikube VM.
+> Start Minikube with more headroom first, or the pods stay `Pending` with
+> `FailedScheduling`:
+>
+> ```shell
+> minikube start --cpus 4 --memory 8192
+> ```
+>
+> On a small machine, scale the requests below down instead.
+
 Set the following for MariaDB:
 
 ```yaml
@@ -63,6 +75,11 @@ readinessProbe:
   failureThreshold: 1
 ```
 
+Add a `livenessProbe` on the same `/status.php` endpoint too. Give it a higher
+`failureThreshold` than the readiness probe so a slow-but-alive pod is dropped
+from the Service before it gets restarted. Use `tcpSocket` on port 3306 for
+MariaDB and `httpGet /status.php` for Nextcloud.
+
 ## Ingress
 
 > **Docs:**
@@ -114,6 +131,9 @@ spec:
 
 During Deployment rollouts and node drains alike, neither Nextcloud nor
 MariaDB should drop below their minimum number of available pods.
+`unhealthyPodEvictionPolicy: AlwaysAllow` still lets a broken pod be evicted:
+with a single replica and `minAvailable: 1`, an unhealthy pod would otherwise
+block every node drain.
 
 ```yaml
 apiVersion: policy/v1
@@ -123,6 +143,7 @@ metadata:
   namespace: nextcloud
 spec:
   minAvailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
   selector:
     matchLabels:
       app: nextcloud
@@ -135,6 +156,7 @@ metadata:
   namespace: nextcloud
 spec:
   minAvailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
   selector:
     matchLabels:
       app: nextcloud-db

@@ -181,6 +181,12 @@ Fix any errors before installing. Try toggling a switch to see the effect:
 helm template nc ./nextcloud-chart --set phpmyadmin.enabled=false | grep -c "kind: Deployment"
 ```
 
+> **Windows (PowerShell):**
+>
+> ```powershell
+> (helm template nc ./nextcloud-chart --set phpmyadmin.enabled=false | Select-String "kind: Deployment").Count
+> ```
+
 You should see one fewer Deployment.
 
 ---

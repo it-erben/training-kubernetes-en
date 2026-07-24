@@ -103,14 +103,14 @@ spec:
               memory: "{{ .Values.nextcloud.resources.limits.memory }}"
           readinessProbe:
             httpGet:
-              path: /
+              path: /status.php
               port: http
             periodSeconds: 10
             timeoutSeconds: 2
             failureThreshold: 1
           livenessProbe:
             httpGet:
-              path: /
+              path: /status.php
               port: http
             periodSeconds: 10
             timeoutSeconds: 2

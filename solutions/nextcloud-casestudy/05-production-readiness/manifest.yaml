@@ -285,14 +285,17 @@ spec:
               memory: "2Gi"
           readinessProbe:
             httpGet:
-              path: /
+              # /status.php returns 200 regardless of Host; / is subject to
+              # Nextcloud's trusted-domain check, which the probe's Host (pod IP)
+              # would fail.
+              path: /status.php
               port: http
             periodSeconds: 10
             timeoutSeconds: 2
             failureThreshold: 1
           livenessProbe:
             httpGet:
-              path: /
+              path: /status.php
               port: http
             periodSeconds: 10
             timeoutSeconds: 2
