@@ -1,7 +1,7 @@
 # Nextcloud Stage 7: Backup, restore & least-privilege RBAC
 
-Across labs 01–05 you built a running MariaDB + Nextcloud stack: a StatefulSet, Secrets,
-persistent volumes, probes, resource limits, and an Ingress. The stack works — but it has
+Across labs 01-05 you built a running MariaDB + Nextcloud stack: a StatefulSet, Secrets,
+persistent volumes, probes, resource limits, and an Ingress. The stack works, but it has
 no backup. Lose the database and you lose everything.
 
 In this lab you add a scheduled backup that dumps the database nightly, and you wire it
@@ -31,15 +31,15 @@ kubectl get pods
 ```
 
 You should see MariaDB (`nextcloud-db-0`) and Nextcloud pods in `Running` state. If anything
-is missing, revisit labs 01–05 before continuing.
+is missing, revisit labs 01-05 before continuing.
 
 ---
 
 ## Part 1: A place to keep backups
 
 Create a PVC that the backup Job (and later the CronJob) will use to store SQL dumps.
-Name it `nextcloud-backup`, access mode `ReadWriteOnce`, 2Gi. Here is the full manifest
-— the storage layer is not the learning objective here:
+Name it `nextcloud-backup`, access mode `ReadWriteOnce`, 2Gi. Here is the full manifest,
+since the storage layer is not the learning objective here:
 
 ```yaml
 apiVersion: v1
@@ -63,20 +63,22 @@ kubectl get pvc nextcloud-backup
 
 ---
 
-## Part 2: Try to back up — and watch it fail
+## Part 2: Try to back up, and watch it fail
 
 The backup strategy avoids storing database credentials in the backup Job. Instead, the
-Job uses `kubectl exec` to reach inside the MariaDB pod and run `mysqldump` there. The
+Job uses `kubectl exec` to reach inside the MariaDB pod and run `mariadb-dump` there. The
 password already lives in the MariaDB container's environment (`MYSQL_ROOT_PASSWORD`).
 The key is the **single-quote trick**: `$MYSQL_ROOT_PASSWORD` is single-quoted in the
 inner `sh -c` string, so the shell does *not* expand it in the Job's container. The
 variable expands later, inside the MariaDB container, where it is defined.
+`--databases nextcloud` includes the database creation statement required by the restore drill.
 
 The exec command the backup script uses:
 
 ```sh
 POD=$(kubectl get pod -l app=nextcloud-db -o jsonpath='{.items[0].metadata.name}')
-kubectl exec "$POD" -- sh -c 'exec mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction nextcloud'
+kubectl exec "$POD" -- sh -c \
+  'exec mariadb-dump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction --databases nextcloud'
 ```
 
 For `kubectl exec` to work from inside a pod, that pod needs a ServiceAccount with the
@@ -117,7 +119,7 @@ Before moving on: what are the **two** permissions this Job actually needs?
 ## Part 3: Grant exactly what it needs
 
 Write a `Role` named `nextcloud-backup` in the `nextcloud` namespace. The rules section
-must be exactly this — no more, no less:
+must be exactly this, no more, no less:
 
 ```yaml
 rules:
@@ -126,11 +128,13 @@ rules:
     verbs: ["get", "list"]
   - apiGroups: [""]
     resources: ["pods/exec"]
+    resourceNames: ["nextcloud-db-0"]
     verbs: ["create"]
 ```
 
 `pods` (get, list) lets the Job find the MariaDB pod by label. `pods/exec` (create) is
-the subresource that backs `kubectl exec` — it is distinct from `pods` itself.
+the subresource that backs `kubectl exec`; it is distinct from `pods` itself. The
+`resourceNames` restriction limits exec access to the MariaDB StatefulSet pod.
 
 Then write a `RoleBinding` that binds the Role to the `nextcloud-backup` ServiceAccount.
 
@@ -184,7 +188,7 @@ Confirm a fresh dump landed on the PVC.
 
 ## Part 5: The restore drill
 
-Knowing backups exist is not enough — you need to know the restore works. Deliberately
+Knowing backups exist is not enough; you need to know the restore works. Deliberately
 break the database:
 
 ```bash
@@ -203,7 +207,7 @@ Now write a one-off `Job` named `nextcloud-restore` that:
 
   ```sh
   kubectl exec -i "$POD" -- sh -c \
-    'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" nextcloud' \
+    'exec mariadb -uroot -p"$MYSQL_ROOT_PASSWORD"' \
     < /backup/latest.sql
   ```
 
@@ -218,23 +222,23 @@ The `nextcloud-backup` identity can exec into pods. What else can it do?
 ```bash
 kubectl auth can-i get secrets --as=system:serviceaccount:nextcloud:nextcloud-backup
 kubectl auth can-i delete pods --as=system:serviceaccount:nextcloud:nextcloud-backup
-kubectl auth can-i create pods/exec --as=system:serviceaccount:nextcloud:nextcloud-backup
+kubectl --as=system:serviceaccount:nextcloud:nextcloud-backup \
+  exec nextcloud-db-0 -- sh -c true
+APP_POD=$(kubectl get pod -l app=nextcloud -o jsonpath='{.items[0].metadata.name}')
+kubectl --as=system:serviceaccount:nextcloud:nextcloud-backup \
+  exec "$APP_POD" -- sh -c true
 ```
 
-Expected output: `no`, `no`, `yes`. The Role grants exactly what the backup workflow
-needs and nothing beyond that. The identity cannot read Secrets (so it cannot escalate
-to get DB credentials through another path), cannot delete pods, cannot create new pods,
-and has no cluster-wide permissions whatsoever.
+The first two commands print `no`. The MariaDB exec succeeds; the application-pod exec is
+forbidden. The Role grants exactly what the backup workflow needs and nothing beyond that.
 
 ---
 
 ## Bonus
 
-- **Tighten with `resourceNames`:** add `resourceNames: [nextcloud-db-0]` to the `pods`
-  rule so the Role is scoped to that one pod, not any pod in the namespace.
 - **History limits:** add `successfulJobsHistoryLimit: 3` and `failedJobsHistoryLimit: 1`
   to the CronJob to keep the Job list tidy.
 - **Why `pods/exec` is a subresource:** in Kubernetes, `pods/exec` is modeled as a
   subresource rather than a verb on `pods`. This means you need `create` on `pods/exec`
-  separately from any permission on `pods` itself. It also means you can grant exec access
-  without granting the ability to create, delete, or modify pods.
+  separately from any permission on `pods` itself. A `resourceNames` rule narrows that exec
+  access to one named pod without granting the ability to create, delete, or modify pods.

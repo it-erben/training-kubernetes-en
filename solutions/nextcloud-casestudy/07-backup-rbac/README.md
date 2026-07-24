@@ -1,7 +1,7 @@
 # Solution: Backup, restore & least-privilege RBAC
 
-The backup Job execs `mysqldump` inside MariaDB under a ServiceAccount scoped to only `pods` get/list
-and `pods/exec` create, so it holds no database credentials.
+The backup Job execs `mariadb-dump` inside MariaDB under a ServiceAccount scoped to pod discovery and
+exec only in `nextcloud-db-0`, so it holds no database credentials.
 
 ## Create the backup target and identity
 
@@ -50,9 +50,10 @@ Expect `Restore complete from latest.sql`. Nextcloud recovers once the database 
 kubectl auth can-i get secrets \
   --as=system:serviceaccount:nextcloud:nextcloud-backup -n nextcloud
 # -> no
-kubectl auth can-i create pods/exec \
-  --as=system:serviceaccount:nextcloud:nextcloud-backup -n nextcloud
-# -> yes
+kubectl -n nextcloud --as=system:serviceaccount:nextcloud:nextcloud-backup \
+  exec nextcloud-db-0 -- sh -c true
+# -> succeeds
 ```
 
-The ServiceAccount can exec into pods but cannot read Secrets, ConfigMaps, or any other resource.
+The ServiceAccount can exec only in `nextcloud-db-0` and cannot read Secrets, ConfigMaps, or any other
+resource.

@@ -45,3 +45,5 @@ phpmyadmin:
 ingress:
   enabled: true
   host: nextcloud.local
+  className: ""
+  annotations: {}

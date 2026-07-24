@@ -14,9 +14,10 @@ rules:
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list"]
-  # Run a command inside it (mysqldump / mysql). Nothing else.
+  # Run a command only in the MariaDB StatefulSet pod.
   - apiGroups: [""]
     resources: ["pods/exec"]
+    resourceNames: ["nextcloud-db-0"]
     verbs: ["create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

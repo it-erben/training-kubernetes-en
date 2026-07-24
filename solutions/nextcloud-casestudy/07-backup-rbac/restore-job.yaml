@@ -28,7 +28,7 @@ spec:
               POD=$(kubectl get pod -l app=nextcloud-db \
                 -o jsonpath='{.items[0].metadata.name}')
               kubectl exec -i "$POD" -- sh -c \
-                'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" nextcloud' \
+                'exec mariadb -uroot -p"$MYSQL_ROOT_PASSWORD"' \
                 < /backup/latest.sql
               echo "Restore complete from latest.sql"
           env:

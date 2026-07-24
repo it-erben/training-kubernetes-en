@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "{{ .Release.Name }}-nextcloud-data"
+  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud-data`) }}"
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:
@@ -11,7 +11,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "{{ .Release.Name }}-nextcloud-config"
+  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud-config`) }}"
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:
@@ -21,13 +21,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ .Release.Name }}-nextcloud"
+  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
   labels:
-    app: "{{ .Release.Name }}-nextcloud"
+    app: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
 spec:
   type: ClusterIP
   selector:
-    app: "{{ .Release.Name }}-nextcloud"
+    app: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
   ports:
     - name: http
       port: 80
@@ -36,9 +36,9 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Release.Name }}-nextcloud"
+  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
   labels:
-    app: "{{ .Release.Name }}-nextcloud"
+    app: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
 spec:
   replicas: 1
   revisionHistoryLimit: 3
@@ -49,19 +49,19 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: "{{ .Release.Name }}-nextcloud"
+      app: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
   template:
     metadata:
       labels:
-        app: "{{ .Release.Name }}-nextcloud"
+        app: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
     spec:
       volumes:
         - name: nextcloud-data
           persistentVolumeClaim:
-            claimName: "{{ .Release.Name }}-nextcloud-data"
+            claimName: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud-data`) }}"
         - name: nextcloud-config
           persistentVolumeClaim:
-            claimName: "{{ .Release.Name }}-nextcloud-config"
+            claimName: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud-config`) }}"
       containers:
         - name: nextcloud
           image: "{{ .Values.nextcloud.image }}"
@@ -71,21 +71,21 @@ spec:
               containerPort: 80
           env:
             - name: MYSQL_HOST
-              value: "{{ .Release.Name }}-db-clusterip"
+              value: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `db-clusterip`) }}"
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: "{{ .Release.Name }}-db-app"
+                  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `db-app`) }}"
                   key: MYSQL_DATABASE
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: "{{ .Release.Name }}-db-app"
+                  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `db-app`) }}"
                   key: MYSQL_USER
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: "{{ .Release.Name }}-db-app"
+                  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `db-app`) }}"
                   key: MYSQL_PASSWORD
             - name: NEXTCLOUD_TRUSTED_DOMAINS
               value: "{{ .Values.nextcloud.trustedDomains }}"
@@ -103,14 +103,14 @@ spec:
               memory: "{{ .Values.nextcloud.resources.limits.memory }}"
           readinessProbe:
             httpGet:
-              path: /
+              path: /status.php
               port: http
             periodSeconds: 10
             timeoutSeconds: 2
             failureThreshold: 1
           livenessProbe:
             httpGet:
-              path: /
+              path: /status.php
               port: http
             periodSeconds: 10
             timeoutSeconds: 2

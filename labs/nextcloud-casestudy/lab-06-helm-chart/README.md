@@ -76,6 +76,10 @@ phpmyadmin:
 ingress:
   enabled: true
   host: nextcloud.local
+  # Set this only when the cluster requires a specific IngressClass.
+  className: ""
+  # Add controller-specific annotations only when required.
+  annotations: {}
 ```
 
 ---
@@ -87,19 +91,27 @@ applying two transformations to every resource:
 
 1. Delete the `namespace: nextcloud` line. You choose the namespace at install time, not in the
    chart.
-2. Replace fixed names with `{{ .Release.Name }}-<suffix>`, and update every reference to that
-   name so they still match.
+2. Define a name helper in `templates/_helpers.tpl`. It must preserve the suffix while truncating
+   long release names to 63 characters. Use it for every resource name and reference.
+
+   ```yaml
+   {{- define "nextcloud-chart.fullname" -}}
+   {{- $name := .name | trunc 63 | trimSuffix "-" -}}
+   {{- $prefixLength := sub 62 (len $name) | int -}}
+   {{- printf "%s-%s" (.root.Release.Name | trunc $prefixLength | trimSuffix "-") $name -}}
+   {{- end -}}
+   ```
 
 Suggested files and names:
 
-| File | Resources | Name pattern |
+| File | Resources | Helper suffixes |
 | --- | --- | --- |
-| `templates/secret.yaml` | app + root Secrets | `{{ .Release.Name }}-db-app` / `-db-root` |
-| `templates/mariadb.yaml` | StatefulSet + Services | `{{ .Release.Name }}-db` etc |
-| `templates/nextcloud.yaml` | Deployment + PVCs + Service | `{{ .Release.Name }}-nextcloud` etc |
-| `templates/phpmyadmin.yaml` | Deployment + Service | `{{ .Release.Name }}-phpmyadmin` |
-| `templates/ingress.yaml` | Ingress | `{{ .Release.Name }}-nextcloud` |
-| `templates/pdb.yaml` | PodDisruptionBudgets | `{{ .Release.Name }}-db-pdb` etc |
+| `templates/secret.yaml` | app + root Secrets | `db-app`, `db-root` |
+| `templates/mariadb.yaml` | StatefulSet + Services | `db`, `db-clusterip` |
+| `templates/nextcloud.yaml` | Deployment + PVCs + Service | `nextcloud`, `nextcloud-data`, `nextcloud-config` |
+| `templates/phpmyadmin.yaml` | Deployment + Service | `phpmyadmin` |
+| `templates/ingress.yaml` | Ingress | `nextcloud` |
+| `templates/pdb.yaml` | PodDisruptionBudgets | `db-pdb`, `nextcloud-pdb` |
 
 Watch the cross-references. When a name becomes templated, everything pointing at it must use
 the same template. For example the Secret reference in the MariaDB container:
@@ -109,7 +121,7 @@ env:
   - name: MYSQL_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: "{{ .Release.Name }}-db-app"
+        name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `db-app`) }}"
         key: MYSQL_PASSWORD
 ```
 
@@ -122,8 +134,8 @@ image: "{{ .Values.database.image }}"
 Do the same for these easy-to-miss references:
 
 - the StatefulSet's `serviceName` (must equal the headless Service name),
-- Nextcloud's and phpMyAdmin's `MYSQL_HOST` / `PMA_HOST` (point them at
-  `{{ .Release.Name }}-db-clusterip`),
+- Nextcloud's and phpMyAdmin's `MYSQL_HOST` / `PMA_HOST` (point them at the helper-generated
+  `db-clusterip` name),
 - each Service `selector` and the matching pod labels,
 - the Nextcloud volumes' `claimName` values,
 - the Ingress backend service name and the PDB `selector` labels.
@@ -142,7 +154,9 @@ controller. Wrap those templates so they render only when enabled. Guard the ent
 {{- end }}
 ```
 
-Do the same in `ingress.yaml` with `{{- if .Values.ingress.enabled }} ... {{- end }}`.
+Do the same in `ingress.yaml` with `{{- if .Values.ingress.enabled }} ... {{- end }}`. Render
+`spec.ingressClassName` only when `ingress.className` is non-empty.
+Render `metadata.annotations` from `ingress.annotations` only when it contains values.
 
 ---
 
@@ -166,6 +180,12 @@ Fix any errors before installing. Try toggling a switch to see the effect:
 ```bash
 helm template nc ./nextcloud-chart --set phpmyadmin.enabled=false | grep -c "kind: Deployment"
 ```
+
+> **Windows (PowerShell):**
+>
+> ```powershell
+> (helm template nc ./nextcloud-chart --set phpmyadmin.enabled=false | Select-String "kind: Deployment").Count
+> ```
 
 You should see one fewer Deployment.
 
@@ -244,5 +264,4 @@ every resource carries the release name as a prefix:
 helm install nc2 ./nextcloud-chart --namespace nextcloud-helm-2 --create-namespace
 ```
 
-Refactor with a helper. Move the repeated `{{ .Release.Name }}-...` names and common labels
-into a `templates/_helpers.tpl` named template and reference it with `{{ include ... }}`.
+Add shared labels to `templates/_helpers.tpl` and reference them with `{{ include ... }}`.

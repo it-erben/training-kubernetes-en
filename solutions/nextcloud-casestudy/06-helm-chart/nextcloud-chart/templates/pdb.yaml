@@ -1,21 +1,21 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: "{{ .Release.Name }}-db-pdb"
+  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `db-pdb`) }}"
 spec:
   minAvailable: 1
   unhealthyPodEvictionPolicy: AlwaysAllow
   selector:
     matchLabels:
-      app: "{{ .Release.Name }}-db"
+      app: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `db`) }}"
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: "{{ .Release.Name }}-nextcloud-pdb"
+  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud-pdb`) }}"
 spec:
   minAvailable: 1
   unhealthyPodEvictionPolicy: AlwaysAllow
   selector:
     matchLabels:
-      app: "{{ .Release.Name }}-nextcloud"
+      app: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
