@@ -1,8 +1,9 @@
 # Solution: Nextcloud packaged as a Helm chart
 
-The `nextcloud-chart/` directory templatizes the production-ready stack from lab 05. Every resource
-name is prefixed with `{{ .Release.Name }}` and no template hardcodes a namespace, so the chart can
-be installed into any namespace — any number of times — without collisions.
+The `nextcloud-chart/` directory templatizes the production-ready stack from lab 05. Its name helper
+keeps every resource name within Kubernetes' 63-character limit, and no template hardcodes a
+namespace. `ingress.className` and `ingress.annotations` are optional and have no cluster-specific
+defaults.
 
 ## Inspect and lint
 

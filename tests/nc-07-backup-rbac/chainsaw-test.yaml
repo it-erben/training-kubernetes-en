@@ -17,3 +17,22 @@ spec:
                 ../../solutions/nextcloud-casestudy/07-backup-rbac/restore-job.yaml
             check:
               ($error == null): true
+    - try:
+        - script:
+            content: |
+              set -euo pipefail
+              backup=../../solutions/nextcloud-casestudy/07-backup-rbac/backup-cronjob.yaml
+              restore=../../solutions/nextcloud-casestudy/07-backup-rbac/restore-job.yaml
+              rbac=../../solutions/nextcloud-casestudy/07-backup-rbac/rbac.yaml
+              lab=../../labs/nextcloud-casestudy/lab-07-backup-rbac/README.md
+              solution=../../solutions/nextcloud-casestudy/07-backup-rbac/README.md
+              grep -q 'mariadb-dump -uroot -p"$MYSQL_ROOT_PASSWORD"' "$backup"
+              grep -q -- '--databases nextcloud' "$backup"
+              ! grep -q 'MYSQL_ROOT_PASSWORD" nextcloud' "$restore"
+              awk '/resources: \["pods\/exec"\]/{execRule=1} \
+                execRule && /resourceNames: \["nextcloud-db-0"\]/{scoped=1} \
+                END{exit !scoped}' "$rbac"
+              ! grep -q -- '--resource-name' "$lab" "$solution"
+              grep -q 'exec nextcloud-db-0 -- sh -c true' "$lab" "$solution"
+            check:
+              ($error == null): true

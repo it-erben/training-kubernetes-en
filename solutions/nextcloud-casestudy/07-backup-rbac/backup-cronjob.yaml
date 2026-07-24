@@ -34,8 +34,8 @@ spec:
                     -o jsonpath='{.items[0].metadata.name}')
                   TS=$(date +%Y%m%d-%H%M%S)
                   kubectl exec "$POD" -- sh -c \
-                    'exec mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" \
-                    --single-transaction nextcloud' > "/backup/nextcloud-$TS.sql"
+                    'exec mariadb-dump -uroot -p"$MYSQL_ROOT_PASSWORD" \
+                    --single-transaction --databases nextcloud' > "/backup/nextcloud-$TS.sql"
                   cp "/backup/nextcloud-$TS.sql" /backup/latest.sql
                   echo "Backup written: nextcloud-$TS.sql"
               env:

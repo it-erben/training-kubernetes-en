@@ -2,13 +2,15 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: "{{ .Release.Name }}-nextcloud"
+  name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
+# {{- with .Values.ingress.annotations }}
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "2g"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+# {{- toYaml . | nindent 4 }}
+# {{- end }}
 spec:
-  ingressClassName: nginx
+# {{- with .Values.ingress.className }}
+  ingressClassName: {{ . | quote }}
+# {{- end }}
   rules:
     - host: "{{ .Values.ingress.host }}"
       http:
@@ -17,7 +19,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: "{{ .Release.Name }}-nextcloud"
+                name: "{{ include `nextcloud-chart.fullname` (dict `root` . `name` `nextcloud`) }}"
                 port:
                   number: 80
 # {{- end }}

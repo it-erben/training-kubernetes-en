@@ -15,3 +15,20 @@ spec:
                 | kubeconform -strict -summary -kubernetes-version 1.32.0
             check:
               ($error == null): true
+    - try:
+        - script:
+            content: |
+              set -euo pipefail
+              release=$(printf 'a%.0s' {1..53})
+              helm template "$release" ../../solutions/nextcloud-casestudy/06-helm-chart/nextcloud-chart \
+                --set phpmyadmin.enabled=false --set ingress.enabled=false \
+                | awk '/^kind:/{kind=$2} /^  name:/{gsub(/"/, "", $2); key=kind "/" $2; if (length($2) > 63 || names[key]++) exit 1}'
+              ! helm template nc ../../solutions/nextcloud-casestudy/06-helm-chart/nextcloud-chart \
+                | grep -q '^  ingressClassName:'
+              ! helm template nc ../../solutions/nextcloud-casestudy/06-helm-chart/nextcloud-chart \
+                | grep -q 'nginx.ingress.kubernetes.io'
+              helm template nc ../../solutions/nextcloud-casestudy/06-helm-chart/nextcloud-chart \
+                --set ingress.className=internal \
+                | grep -q '^  ingressClassName: "internal"$'
+            check:
+              ($error == null): true
