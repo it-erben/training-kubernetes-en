@@ -191,7 +191,7 @@ Confirm a fresh dump landed on the PVC.
 
 ---
 
-## Part 5: The restore drill
+## Part 5: Restore
 
 Knowing backups exist is not enough; you need to know the restore works. Deliberately
 break the database:
@@ -236,14 +236,3 @@ kubectl --as=system:serviceaccount:nextcloud:nextcloud-backup \
 
 The first two commands print `no`. The MariaDB exec succeeds; the application-pod exec is
 forbidden. The Role grants exactly what the backup workflow needs and nothing beyond that.
-
----
-
-## Bonus
-
-- **History limits:** add `successfulJobsHistoryLimit: 3` and `failedJobsHistoryLimit: 1`
-  to the CronJob to keep the Job list tidy.
-- **Why `pods/exec` is a subresource:** in Kubernetes, `pods/exec` is modeled as a
-  subresource rather than a verb on `pods`. This means you need `create` on `pods/exec`
-  separately from any permission on `pods` itself. A `resourceNames` rule narrows that exec
-  access to one named pod without granting the ability to create, delete, or modify pods.
