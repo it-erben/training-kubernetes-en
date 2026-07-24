@@ -65,13 +65,18 @@ kubectl get pvc nextcloud-backup
 
 ## Part 2: Try to back up, and watch it fail
 
-The backup strategy avoids storing database credentials in the backup Job. Instead, the
-Job uses `kubectl exec` to reach inside the MariaDB pod and run `mariadb-dump` there. The
-password already lives in the MariaDB container's environment (`MYSQL_ROOT_PASSWORD`).
-The key is the **single-quote trick**: `$MYSQL_ROOT_PASSWORD` is single-quoted in the
-inner `sh -c` string, so the shell does *not* expand it in the Job's container. The
-variable expands later, inside the MariaDB container, where it is defined.
-`--databases nextcloud` includes the database creation statement required by the restore drill.
+The database password should never be copied into the backup Job. So the Job never sees
+it. Instead the Job uses `kubectl exec` to step inside the MariaDB pod and run
+`mariadb-dump` from there, where the password already exists as `MYSQL_ROOT_PASSWORD`.
+
+The trick is *where* the password gets filled in. `$MYSQL_ROOT_PASSWORD` is wrapped in
+single quotes, and single quotes tell a shell "leave this text exactly as it is." So the
+Job's shell hands the literal string `$MYSQL_ROOT_PASSWORD` over to MariaDB untouched.
+Only the shell inside the MariaDB pod, where the password is actually defined, swaps in
+the real value. The secret travels as a name, never as its value.
+
+`--databases nextcloud` tells the dump to include the `CREATE DATABASE` line, which the
+restore step later needs to rebuild the database from scratch.
 
 The exec command the backup script uses:
 
