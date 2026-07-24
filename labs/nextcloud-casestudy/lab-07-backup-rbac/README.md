@@ -1,7 +1,7 @@
 # Nextcloud Stage 7: Backup, restore & least-privilege RBAC
 
-Across labs 01–05 you built a running MariaDB + Nextcloud stack: a StatefulSet, Secrets,
-persistent volumes, probes, resource limits, and an Ingress. The stack works — but it has
+Across labs 01-05 you built a running MariaDB + Nextcloud stack: a StatefulSet, Secrets,
+persistent volumes, probes, resource limits, and an Ingress. The stack works, but it has
 no backup. Lose the database and you lose everything.
 
 In this lab you add a scheduled backup that dumps the database nightly, and you wire it
@@ -31,15 +31,15 @@ kubectl get pods
 ```
 
 You should see MariaDB (`nextcloud-db-0`) and Nextcloud pods in `Running` state. If anything
-is missing, revisit labs 01–05 before continuing.
+is missing, revisit labs 01-05 before continuing.
 
 ---
 
 ## Part 1: A place to keep backups
 
 Create a PVC that the backup Job (and later the CronJob) will use to store SQL dumps.
-Name it `nextcloud-backup`, access mode `ReadWriteOnce`, 2Gi. Here is the full manifest
-— the storage layer is not the learning objective here:
+Name it `nextcloud-backup`, access mode `ReadWriteOnce`, 2Gi. Here is the full manifest,
+since the storage layer is not the learning objective here:
 
 ```yaml
 apiVersion: v1
@@ -63,7 +63,7 @@ kubectl get pvc nextcloud-backup
 
 ---
 
-## Part 2: Try to back up — and watch it fail
+## Part 2: Try to back up, and watch it fail
 
 The backup strategy avoids storing database credentials in the backup Job. Instead, the
 Job uses `kubectl exec` to reach inside the MariaDB pod and run `mariadb-dump` there. The
@@ -119,7 +119,7 @@ Before moving on: what are the **two** permissions this Job actually needs?
 ## Part 3: Grant exactly what it needs
 
 Write a `Role` named `nextcloud-backup` in the `nextcloud` namespace. The rules section
-must be exactly this — no more, no less:
+must be exactly this, no more, no less:
 
 ```yaml
 rules:
@@ -133,7 +133,7 @@ rules:
 ```
 
 `pods` (get, list) lets the Job find the MariaDB pod by label. `pods/exec` (create) is
-the subresource that backs `kubectl exec` — it is distinct from `pods` itself. The
+the subresource that backs `kubectl exec`; it is distinct from `pods` itself. The
 `resourceNames` restriction limits exec access to the MariaDB StatefulSet pod.
 
 Then write a `RoleBinding` that binds the Role to the `nextcloud-backup` ServiceAccount.
@@ -188,7 +188,7 @@ Confirm a fresh dump landed on the PVC.
 
 ## Part 5: The restore drill
 
-Knowing backups exist is not enough — you need to know the restore works. Deliberately
+Knowing backups exist is not enough; you need to know the restore works. Deliberately
 break the database:
 
 ```bash
