@@ -1,4 +1,4 @@
-# Solution for Lab 25: Navigating & Troubleshooting with k9s
+# Solution for Lab 26: Navigating & Troubleshooting with k9s
 
 This walkthrough gives the exact keystrokes and answers for each part. k9s keys are identical on all
 operating systems; the few shell commands show Bash and PowerShell where they differ.
@@ -7,7 +7,7 @@ operating systems; the few shell commands show Bash and PowerShell where they di
 
 ```bash
 k9s version
-kubectl apply -f setup.yaml   # from labs/kubernetes/lab-25-k9s/
+kubectl apply -f setup.yaml   # from labs/kubernetes/lab-26-k9s/
 k9s
 ```
 

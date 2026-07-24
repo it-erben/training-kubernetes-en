@@ -1,0 +1,32 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-24-helm-package
+  labels: { suite: solutions }
+spec:
+  steps:
+    - try:
+        - script:
+            # Render the chart and validate the output against the k8s schemas.
+            content: |
+              helm template ../../solutions/kubernetes/lab-24-helm-package/my-nginx-chart-v2 \
+                | kubeconform -strict -summary -kubernetes-version 1.32.0
+            check:
+              ($error == null): true
+        - script:
+            # Release name must prefix every resource name.
+            content: |
+              count=$(helm template web1 ../../solutions/kubernetes/lab-24-helm-package/my-nginx-chart-v2 \
+                | grep -c "name: web1-web")
+              [ "$count" = "2" ]
+            check:
+              ($error == null): true
+        - script:
+            # Service renders when enabled and vanishes when toggled off.
+            content: |
+              chart=../../solutions/kubernetes/lab-24-helm-package/my-nginx-chart-v2
+              on=$(helm template nc "$chart" | grep -c "kind: Service")
+              off=$(helm template nc "$chart" --set service.enabled=false | grep -c "kind: Service")
+              [ "${on}-${off}" = "1-0" ]
+            check:
+              ($error == null): true
