@@ -21,11 +21,12 @@ spec:
           securityContext:
             runAsNonRoot: true
             runAsUser: 1001
+            fsGroup: 1001
             seccompProfile:
               type: RuntimeDefault
           containers:
             - name: backup
-              image: bitnami/kubectl:1.32
+              image: alpine/k8s:1.32.0
               command: ["/bin/sh", "-c"]
               args:
                 - |

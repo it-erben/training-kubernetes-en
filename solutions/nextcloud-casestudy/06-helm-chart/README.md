@@ -5,6 +5,11 @@ keeps every resource name within Kubernetes' 63-character limit, and no template
 namespace. `ingress.className` and `ingress.annotations` are optional and have no cluster-specific
 defaults.
 
+`phpmyadmin.yaml` and `ingress.yaml` comment their guards as `# {{- if ... }}`. The lab teaches the
+bare `{{- if ... }}` form; the leading `#` here keeps the raw template a valid YAML document so the
+repo's yamllint and kube-linter jobs can parse the file. The engine trims the whitespace after the
+`#` and the guard fires as normal, leaving only an inert comment line in the rendered output.
+
 ## Inspect and lint
 
 ```bash

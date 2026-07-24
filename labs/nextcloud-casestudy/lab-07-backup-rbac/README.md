@@ -94,7 +94,7 @@ metadata:
 
 Now write a one-off `Job` that:
 
-- uses the `bitnami/kubectl:1.32` image,
+- uses the `alpine/k8s:1.32.0` image (ships `kubectl` and a shell),
 - references the `nextcloud-backup` ServiceAccount,
 - mounts the `nextcloud-backup` PVC at `/backup`,
 - runs the exec command above and writes the dump to `/backup/latest.sql`.
@@ -193,14 +193,14 @@ break the database:
 
 ```bash
 kubectl exec nextcloud-db-0 -- \
-  sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE nextcloud;"'
+  sh -c 'exec mariadb -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE nextcloud;"'
 ```
 
 Reload Nextcloud in your browser to confirm it is broken (Internal Server Error or similar).
 
 Now write a one-off `Job` named `nextcloud-restore` that:
 
-- uses the same `nextcloud-backup` ServiceAccount and `bitnami/kubectl:1.32` image,
+- uses the same `nextcloud-backup` ServiceAccount and `alpine/k8s:1.32.0` image,
 - mounts the `nextcloud-backup` PVC at `/backup`,
 - finds the MariaDB pod by label (same label selector as the backup),
 - pipes `/backup/latest.sql` back in with:

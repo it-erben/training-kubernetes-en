@@ -36,7 +36,7 @@ Expect a log line: `Backup written: nextcloud-<timestamp>.sql`. The dump is also
 ```bash
 # Break it: drop the database inside MariaDB
 kubectl exec -n nextcloud nextcloud-db-0 -- \
-  sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE nextcloud;"'
+  sh -c 'exec mariadb -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE nextcloud;"'
 # Restore from the latest dump
 kubectl apply -f restore-job.yaml
 kubectl logs -n nextcloud job/nextcloud-restore
