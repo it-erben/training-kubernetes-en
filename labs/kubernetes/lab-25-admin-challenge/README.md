@@ -1,4 +1,4 @@
-# Lab 24: Kubernetes Cluster Plumbing – Under the Hood
+# Lab 25: Kubernetes Cluster Plumbing – Under the Hood
 
 ## Part 1: Control Plane Anatomy
 

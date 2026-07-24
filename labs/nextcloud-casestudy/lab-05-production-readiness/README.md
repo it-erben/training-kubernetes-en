@@ -69,16 +69,23 @@ For Nextcloud, the following probe makes sense:
 readinessProbe:
   httpGet:
     path: /status.php
-    port: http
+    port: 80
+    httpHeaders:
+      - name: Host
+        value: localhost
   periodSeconds: 10
   timeoutSeconds: 2
   failureThreshold: 1
 ```
 
+Nextcloud rejects requests whose `Host` header is not a trusted domain, so the
+probe must send one it accepts; without the `Host: localhost` header the probe
+never turns ready.
+
 Add a `livenessProbe` on the same `/status.php` endpoint too. Give it a higher
 `failureThreshold` than the readiness probe so a slow-but-alive pod is dropped
 from the Service before it gets restarted. Use `tcpSocket` on port 3306 for
-MariaDB and `httpGet /status.php` for Nextcloud.
+MariaDB and `httpGet /status.php` (with the same `Host` header) for Nextcloud.
 
 ## Ingress
 

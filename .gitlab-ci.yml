@@ -40,6 +40,11 @@ lint:markdown:
 
 lint:yaml:
   rules: *checks-rules
+  # Skip Helm chart templates: their Go templating (`{{- ... }}`) is not valid
+  # YAML, so yamllint cannot parse it. kubeconform skips them the same way.
+  script: |
+    pip install --no-cache-dir yamllint
+    yamllint -d "{extends: relaxed, ignore: ['*.md', '**/templates/**'], rules: {line-length: {max: 140}}}" .
 
 lint:helm:
   stage: lint
