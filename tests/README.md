@@ -52,7 +52,7 @@ collide. The assertion style per case:
 | Nextcloud stack | `script`: `kubectl apply --dry-run=server` (full server-side validation, no heavy scheduling) |
 | Dockerfile (docker labs) | `script`: `docker buildx build --check` |
 | pinned to symptom (lab-27) | `assert` waiting reason, phase, condition, `lastState`; `script` endpoint/RBAC checks |
-| troubleshooting fix (sol-27) | `script`: apply the fix, roll out, confirm endpoints and RBAC resolve |
+| troubleshooting fix (sol-27) | `script`: apply the fix, roll out, confirm endpoints and RBAC; `assert` PVC `Bound` |
 
 `suite=labs|solutions|nextcloud|docker` labels let you slice the run.
 

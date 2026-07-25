@@ -54,7 +54,8 @@ still wrong to the Service's endpoints. Parts 2–9 are that loop run eight time
 
 - **Keystrokes:** `:pods` `Enter`, `/reports` `Enter` (`IP`/`NODE` both `n/a`), `d`.
 - **Evidence:** `Warning  FailedScheduling  7m18s  default-scheduler  0/1 nodes are available: 1
-  Insufficient memory.`, with `Requests: memory: 64Gi` above it.
+  Insufficient memory.` (a preemption clause follows, worded differently per Kubernetes version), with
+  `Requests: memory: 64Gi` above it.
 - **Root cause:** the Deployment requests 64**Gi** of memory instead of the intended 64**Mi**; the
   scheduler works from `requests`, not actual usage, and no node has 64Gi free.
 - **Fix:** `:deploy` `Enter`, `e` on `reports` — both `resources.requests.memory` and
@@ -178,8 +179,7 @@ A student stuck at `e` almost always has `$K9S_EDITOR` unset or pointing at some
 in their terminal (a GUI editor with no `-w`/wait flag, for instance). This lab has no `kubectl set
 image` fallback by design, unlike lab 26 — fixing the variable is the only way forward.
 
-Three runtime quirks surfaced during development, all specific to the cluster under the student's feet
-rather than to the lab's manifests:
+Three behaviours depend on the cluster under the student's feet rather than on the lab's manifests:
 
 `crunch` (Part 5) needs the container's entrypoint to be `sh -e -c`, not plain `sh -c`, to die reliably
 on every cluster. minikube's cgroups have `memory.oom.group = 0`, so the kernel kills only the offending
@@ -195,6 +195,7 @@ student sees two `Pending` PVCs and has to read the events to find the one that 
 lab's quoted text stops at the stable fragment, `unbound immediate PersistentVolumeClaims`, for exactly
 this reason.
 
-`reports` (Part 4) depends on the node having less than roughly 64 GiB allocatable memory; above that
-threshold the 64Gi request schedules and the scenario is void. The kind node used during development
-measured about 7.8 GiB allocatable, comfortably under the threshold.
+`reports` (Part 4) needs a node with less than roughly 64 GiB allocatable memory. Above that, the 64Gi
+request schedules and the scenario is void. A default single-node minikube or kind cluster is far under
+the threshold; check with `kubectl get nodes -o jsonpath='{.items[*].status.allocatable.memory}'` before
+running the lab on anything larger.

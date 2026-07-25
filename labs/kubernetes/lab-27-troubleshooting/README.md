@@ -234,6 +234,10 @@ Press `d` and read the Events:
 Warning  FailedScheduling  7m18s  default-scheduler  0/1 nodes are available: 1 Insufficient memory.
 ```
 
+The scheduler appends its own reasoning after that sentence — a preemption clause about whether evicting
+another pod would make room, and on newer Kubernetes a note about resource claims. None of it changes
+the diagnosis: `Insufficient memory` is the part that matters.
+
 A pod that uses nothing yet cannot be short of memory. The scheduler works purely from `requests` —
 the reservation the pod demands up front — and it could not find a node with that much free. Scroll up
 in the same output to see the number:
@@ -549,8 +553,8 @@ something k9s can do. The healthy `archive-data` claim is already there, which i
 the volume back:
 
 ```yaml
-          persistentVolumeClaim:
-            claimName: archive-data
+        persistentVolumeClaim:
+          claimName: archive-data
 ```
 
 The pod schedules immediately and goes `1/1 Running`. `archive-data-v2` stays `Pending` in the `:pvc`
