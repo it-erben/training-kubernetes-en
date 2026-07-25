@@ -1,0 +1,35 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-27-broken
+  labels: { suite: labs }
+spec:
+  # Every workload in this lab is broken by design. Asserting only "not ready"
+  # would still pass if a scenario broke for the wrong reason (a pulled tag
+  # disappearing, say), so each one is pinned to its own symptom.
+  timeouts:
+    assert: 300s
+  steps:
+    - try:
+        - script:
+            content: |
+              set -eu
+              kubectl apply -n "$NAMESPACE" \
+                -f ../../labs/kubernetes/lab-27-troubleshooting/setup.yaml
+
+        # 1. cache: secretKeyRef names a key the Secret does not have, so the
+        #    container is never created.
+        - error:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata: { name: cache }
+              status: { availableReplicas: 1 }
+
+        # 2. sessions: the container exits 1 because REDIS_HOST is unset.
+        - error:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata: { name: sessions }
+              status: { availableReplicas: 1 }

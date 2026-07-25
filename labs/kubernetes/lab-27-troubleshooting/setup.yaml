@@ -1,0 +1,85 @@
+# Lab 27 - a webshop that a colleague deployed yesterday, broken eight ways.
+# Applied into the `shop` namespace; every workload here fails for a different
+# reason, and each one is repaired from inside k9s.
+#
+# 1. cache - Deployment references a Secret key that does not exist.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cache-auth
+type: Opaque
+stringData:
+  password: s3cr3t
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache
+  labels:
+    app: cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache
+  template:
+    metadata:
+      labels:
+        app: cache
+    spec:
+      containers:
+        - name: cache
+          image: busybox:1.37
+          command: ["sh", "-c", "echo cache ready; sleep 3600"]
+          env:
+            - name: CACHE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cache-auth
+                  # The Secret above stores this under `password`.
+                  key: passwd
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "16Mi"
+            limits:
+              cpu: "50m"
+              memory: "32Mi"
+---
+# 2. sessions - the container exits when a required variable is missing.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sessions
+  labels:
+    app: sessions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sessions
+  template:
+    metadata:
+      labels:
+        app: sessions
+    spec:
+      containers:
+        - name: sessions
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - |
+              if [ -z "$REDIS_HOST" ]; then
+                echo "FATAL: REDIS_HOST not set"
+                exit 1
+              fi
+              echo "sessions connected to $REDIS_HOST"
+              sleep 3600
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "16Mi"
+            limits:
+              cpu: "50m"
+              memory: "32Mi"
