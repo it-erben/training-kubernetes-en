@@ -59,13 +59,9 @@ spec:
               status:
                 phase: Pending
 
-        # 4. crunch: writes 100Mi into a memory-backed emptyDir under a 64Mi
-        #    limit, so the kernel kills it. The first kill leaves its written
-        #    pages resident in the pod-scoped emptyDir, so every kubelet
-        #    restart after that OOMs again before the container even starts,
-        #    settling into a stable CrashLoopBackOff. Pinned to that shape,
-        #    not a bare "not ready", because a workload that merely restarts
-        #    for an unrelated reason would pass a weaker assertion.
+        # 4. crunch: allocates 100Mi under a 64Mi limit, so the kernel kills it
+        #    mid-build. Pinned to the reason, because a workload that merely
+        #    restarts would pass a weaker assertion.
         - assert:
             resource:
               apiVersion: v1
@@ -74,10 +70,6 @@ spec:
                 labels: { app: crunch }
               status:
                 containerStatuses:
-                  - state:
-                      waiting:
-                        reason: CrashLoopBackOff
-                    lastState:
+                  - lastState:
                       terminated:
-                        reason: StartError
-                        exitCode: 128
+                        reason: OOMKilled

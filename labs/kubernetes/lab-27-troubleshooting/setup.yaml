@@ -114,8 +114,9 @@ spec:
               cpu: "100m"
               memory: "64Gi"
 ---
-# 4. crunch - builds a 100Mi cache in a memory-backed emptyDir, which counts
-#    against the container's memory limit.
+# 4. crunch - builds a 100Mi report buffer in its own memory, under a limit
+#    that cannot hold it. The buffer dies with the container, so every restart
+#    repeats the same clean kill.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -140,12 +141,9 @@ spec:
             - -c
             - |
               echo "building report cache"
-              dd if=/dev/zero of=/cache/report.bin bs=1M count=100
+              dd if=/dev/zero of=/dev/null bs=100M count=1
               echo "cache built"
               sleep 3600
-          volumeMounts:
-            - name: cache
-              mountPath: /cache
           resources:
             requests:
               cpu: "10m"
@@ -153,8 +151,3 @@ spec:
             limits:
               cpu: "100m"
               memory: "64Mi"
-      volumes:
-        - name: cache
-          emptyDir:
-            medium: Memory
-            sizeLimit: 256Mi
