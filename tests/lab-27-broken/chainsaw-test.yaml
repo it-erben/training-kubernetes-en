@@ -79,3 +79,38 @@ spec:
                   - lastState:
                       terminated:
                         reason: OOMKilled
+
+        # 5. orders: the readiness probe asks nginx for /healthz, which is a 404,
+        #    so the containers start and no replica ever becomes Ready.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: orders }
+              status:
+                phase: Running
+                containerStatuses:
+                  - started: true
+                    ready: false
+        - error:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata: { name: orders }
+              status: { availableReplicas: 2 }
+
+        # 6. catalog: the pods are healthy and Ready, and the Service still has
+        #    no endpoints, because its selector matches no pod.
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" wait --for=condition=Available \
+                deployment/catalog --timeout=180s
+              addrs=$(kubectl -n "$NAMESPACE" get endpointslice \
+                -l kubernetes.io/service-name=catalog \
+                -o jsonpath='{.items[*].endpoints[*].addresses[*]}')
+              if [ -n "$addrs" ]; then
+                echo "expected no endpoints for catalog, got: $addrs"
+                exit 1
+              fi
