@@ -1,0 +1,81 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: nc-07-backup-rbac-runtime
+  labels: { suite: nextcloud }
+spec:
+  # Unlike the other nextcloud cases (server dry-run only), this one schedules a
+  # real MariaDB and runs the backup CronJob and restore Job end to end. It
+  # catches what static checks cannot: an unpullable image, a PVC the non-root
+  # pod cannot write, a mariadb client that is missing from the DB image, and an
+  # RBAC gap that blocks exec. The manifests are relocated from their hardcoded
+  # `nextcloud` namespace into chainsaw's ephemeral namespace so isolation and
+  # cleanup still apply.
+  steps:
+    - try:
+        - script:
+            content: |
+              set -eu
+              sol=../../solutions/nextcloud-casestudy/07-backup-rbac
+
+              # Minimal MariaDB fixture: StatefulSet pod nextcloud-db-0, label
+              # app=nextcloud-db, root password in env, database `nextcloud`.
+              kubectl apply -n "$NAMESPACE" -f - <<'YAML'
+              apiVersion: v1
+              kind: Service
+              metadata:
+                name: nextcloud-db
+              spec:
+                clusterIP: None
+                selector: { app: nextcloud-db }
+                ports: [{ port: 3306 }]
+              ---
+              apiVersion: apps/v1
+              kind: StatefulSet
+              metadata:
+                name: nextcloud-db
+              spec:
+                serviceName: nextcloud-db
+                replicas: 1
+                selector: { matchLabels: { app: nextcloud-db } }
+                template:
+                  metadata: { labels: { app: nextcloud-db } }
+                  spec:
+                    containers:
+                      - name: mariadb
+                        image: mariadb:11.4.2
+                        env:
+                          - { name: MYSQL_ROOT_PASSWORD, value: mysecretpassword }
+                          - { name: MYSQL_DATABASE, value: nextcloud }
+                        ports: [{ containerPort: 3306 }]
+                        readinessProbe:
+                          tcpSocket: { port: 3306 }
+                          periodSeconds: 5
+              YAML
+              kubectl -n "$NAMESPACE" rollout status statefulset/nextcloud-db --timeout=180s
+
+              # Apply the real backup manifests, relocated to this namespace.
+              for f in backup-pvc rbac backup-cronjob; do
+                sed "s/namespace: nextcloud/namespace: $NAMESPACE/" "$sol/$f.yaml" \
+                  | kubectl apply -n "$NAMESPACE" -f -
+              done
+
+              # Trigger a backup and confirm it wrote a dump (image pulls, RBAC
+              # exec works, non-root pod writes the PVC).
+              kubectl -n "$NAMESPACE" create job --from=cronjob/nextcloud-backup manual-1
+              kubectl -n "$NAMESPACE" wait --for=condition=complete job/manual-1 --timeout=180s
+              kubectl -n "$NAMESPACE" logs job/manual-1 | grep -q 'Backup written'
+
+              # Restore drill: drop with the mariadb client, restore, confirm the
+              # database is back.
+              kubectl -n "$NAMESPACE" exec nextcloud-db-0 -- \
+                sh -c 'exec mariadb -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE nextcloud;"'
+              sed "s/namespace: nextcloud/namespace: $NAMESPACE/" "$sol/restore-job.yaml" \
+                | kubectl apply -n "$NAMESPACE" -f -
+              kubectl -n "$NAMESPACE" wait --for=condition=complete job/nextcloud-restore --timeout=180s
+              kubectl -n "$NAMESPACE" logs job/nextcloud-restore | grep -q 'Restore complete'
+              kubectl -n "$NAMESPACE" exec nextcloud-db-0 -- \
+                sh -c 'mariadb -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SHOW DATABASES;"' \
+                | grep -qx nextcloud
+            check:
+              ($error == null): true

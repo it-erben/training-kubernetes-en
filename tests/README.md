@@ -50,6 +50,7 @@ collide. The assertion style per case:
 | admission must deny (lab-17 PSS) | `apply` with `expect: ($error != null)` |
 | Helm chart (lab-23) | `script`: `helm template` piped to `kubeconform` |
 | Nextcloud stack | `script`: `kubectl apply --dry-run=server` (full server-side validation, no heavy scheduling) |
+| Nextcloud backup/restore (nc-07 runtime) | `script`: schedules MariaDB, runs the CronJob and restore Job for real |
 | Dockerfile (docker labs) | `script`: `docker buildx build --check` |
 
 `suite=labs|solutions|nextcloud|docker` labels let you slice the run.
@@ -62,8 +63,12 @@ a plain "apply and become ready" lab is about a dozen lines.
 ## Scope / limitations
 
 - Nextcloud is server-dry-run-validated by default (fast, and still catches
-  schema, quantity and admission errors). To actually schedule MariaDB and
-  Nextcloud, apply the manifests by hand on a cluster with enough resources.
+  schema, quantity and admission errors). `nc-07-backup-rbac-runtime` is the
+  exception: it schedules a MariaDB fixture and runs the backup and restore Jobs
+  end to end, because an unpullable image, a PVC the non-root pod cannot write,
+  a database client missing from the image and an RBAC gap all pass a dry run
+  and only fail once the pod starts. Nextcloud itself is still never scheduled;
+  apply those manifests by hand on a cluster with enough resources.
 - Docker labs ship partial build contexts (the Spring and Python sources live
   elsewhere), so they're BuildKit-linted (`--check`) rather than built.
 - Azure (AKS) labs can't run on kind, so they stay docs-only and aren't covered
