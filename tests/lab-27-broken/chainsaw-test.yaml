@@ -18,18 +18,33 @@ spec:
                 -f ../../labs/kubernetes/lab-27-troubleshooting/setup.yaml
 
         # 1. cache: secretKeyRef names a key the Secret does not have, so the
-        #    container is never created.
-        - error:
+        #    kubelet cannot build the container's environment and it is never
+        #    created.
+        - assert:
             resource:
-              apiVersion: apps/v1
-              kind: Deployment
-              metadata: { name: cache }
-              status: { availableReplicas: 1 }
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: cache }
+              status:
+                containerStatuses:
+                  - state:
+                      waiting:
+                        reason: CreateContainerConfigError
 
-        # 2. sessions: the container exits 1 because REDIS_HOST is unset.
-        - error:
+        # 2. sessions: the container starts, finds REDIS_HOST unset, and
+        #    exits 1, so it crashloops.
+        - assert:
             resource:
-              apiVersion: apps/v1
-              kind: Deployment
-              metadata: { name: sessions }
-              status: { availableReplicas: 1 }
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: sessions }
+              status:
+                containerStatuses:
+                  - state:
+                      waiting:
+                        reason: CrashLoopBackOff
+                    lastState:
+                      terminated:
+                        exitCode: 1
