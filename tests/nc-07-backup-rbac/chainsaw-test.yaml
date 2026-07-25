@@ -34,5 +34,15 @@ spec:
                 END{exit !scoped}' "$rbac"
               ! grep -q -- '--resource-name' "$lab" "$solution"
               grep -q 'exec nextcloud-db-0 -- sh -c true' "$lab" "$solution"
+              # Docker Hub removed the versioned bitnami/kubectl tags; the Jobs
+              # must not reference an unpullable image again.
+              ! grep -q 'bitnami/kubectl' "$backup" "$restore"
+              # mariadb:11.4.2 dropped the mysql client symlink, so the restore
+              # drill must break the database with the mariadb client.
+              ! grep -q 'exec mysql ' "$lab" "$solution"
+              grep -q 'exec mariadb -uroot.*DROP DATABASE nextcloud' "$lab" "$solution"
+              # The non-root Jobs need fsGroup to write the dump to the PVC.
+              grep -q 'fsGroup: 1001' "$backup"
+              grep -q 'fsGroup: 1001' "$restore"
             check:
               ($error == null): true
