@@ -49,7 +49,8 @@ spec:
                       terminated:
                         exitCode: 1
 
-        # 3. reports: requests 64Gi of memory, so no node can take it.
+        # 3. reports: requests 64Gi of memory, so no node can take it. Pinned to
+        #    the scheduler's reason, because scenario 8 is also Pending.
         - assert:
             resource:
               apiVersion: v1
@@ -58,6 +59,11 @@ spec:
                 labels: { app: reports }
               status:
                 phase: Pending
+                conditions:
+                  - type: PodScheduled
+                    status: "False"
+                    reason: Unschedulable
+                    (contains(message, 'Insufficient memory')): true
 
         # 4. crunch: allocates 100Mi under a 64Mi limit, so the kernel kills it
         #    mid-build. Pinned to the reason, because a workload that merely
