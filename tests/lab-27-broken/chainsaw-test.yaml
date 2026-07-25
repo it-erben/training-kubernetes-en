@@ -48,3 +48,36 @@ spec:
                     lastState:
                       terminated:
                         exitCode: 1
+
+        # 3. reports: requests 64Gi of memory, so no node can take it.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: reports }
+              status:
+                phase: Pending
+
+        # 4. crunch: writes 100Mi into a memory-backed emptyDir under a 64Mi
+        #    limit, so the kernel kills it. The first kill leaves its written
+        #    pages resident in the pod-scoped emptyDir, so every kubelet
+        #    restart after that OOMs again before the container even starts,
+        #    settling into a stable CrashLoopBackOff. Pinned to that shape,
+        #    not a bare "not ready", because a workload that merely restarts
+        #    for an unrelated reason would pass a weaker assertion.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: crunch }
+              status:
+                containerStatuses:
+                  - state:
+                      waiting:
+                        reason: CrashLoopBackOff
+                    lastState:
+                      terminated:
+                        reason: StartError
+                        exitCode: 128

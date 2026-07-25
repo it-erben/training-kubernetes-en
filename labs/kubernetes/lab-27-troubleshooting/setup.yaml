@@ -83,3 +83,78 @@ spec:
             limits:
               cpu: "50m"
               memory: "32Mi"
+---
+# 3. reports - a memory request no node can satisfy (64Mi was meant).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reports
+  labels:
+    app: reports
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reports
+  template:
+    metadata:
+      labels:
+        app: reports
+    spec:
+      containers:
+        - name: reports
+          image: nginx:1.29.4
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "64Gi"
+            limits:
+              cpu: "100m"
+              memory: "64Gi"
+---
+# 4. crunch - builds a 100Mi cache in a memory-backed emptyDir, which counts
+#    against the container's memory limit.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crunch
+  labels:
+    app: crunch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crunch
+  template:
+    metadata:
+      labels:
+        app: crunch
+    spec:
+      containers:
+        - name: crunch
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - |
+              echo "building report cache"
+              dd if=/dev/zero of=/cache/report.bin bs=1M count=100
+              echo "cache built"
+              sleep 3600
+          volumeMounts:
+            - name: cache
+              mountPath: /cache
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
+      volumes:
+        - name: cache
+          emptyDir:
+            medium: Memory
+            sizeLimit: 256Mi
