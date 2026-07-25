@@ -145,3 +145,28 @@ spec:
                 echo "expected a Forbidden line in auditor logs, got: $logs"
                 exit 1
               fi
+
+        # 8. archive: the Deployment claims a PVC that can never bind, so the
+        #    pod is never scheduled.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: PersistentVolumeClaim
+              metadata: { name: archive-data-v2 }
+              status:
+                phase: Pending
+        # Pinned to the PVC in the message, because scenario 3 is also
+        # Unschedulable — for an entirely different reason.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: archive }
+              status:
+                phase: Pending
+                conditions:
+                  - type: PodScheduled
+                    status: "False"
+                    reason: Unschedulable
+                    (contains(message, 'PersistentVolumeClaim')): true

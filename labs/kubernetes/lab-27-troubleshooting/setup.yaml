@@ -318,3 +318,64 @@ spec:
             limits:
               cpu: "200m"
               memory: "256Mi"
+---
+# 8. archive - the Deployment was pointed at a migration PVC that asks for a
+#    StorageClass this cluster does not have, so it never binds.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: archive-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: archive-data-v2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: archive
+  labels:
+    app: archive
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: archive
+  template:
+    metadata:
+      labels:
+        app: archive
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.29.4
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/nginx/html/archive
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: archive-data-v2
