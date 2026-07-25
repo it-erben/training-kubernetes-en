@@ -1,9 +1,9 @@
 # Lab 27: Debugging a Broken Cluster with k9s
 
-Lab 26 handed you the navigation — `:pods`, `d`, `y`, `l`, `s`, `e` — and one broken Deployment whose
-image tag did not exist. One symptom, one cause, one fix. Real clusters never arrive that tidy. Here a
-colleague deployed a webshop yesterday and left for two weeks. Eight of its workloads are broken, each
-for a different reason, and none of them volunteers what it needs until you ask the right resource. You
+Lab 26 handed you the navigation (`:pods`, `d`, `y`, `l`, `s`, `e`) and one broken Deployment whose
+image tag did not exist: one symptom, one fix. Real clusters never arrive that tidy. Here a colleague
+deployed a webshop yesterday and left for two weeks. Eight of its workloads are broken, each for a
+different reason, and none of them volunteers what it needs until you ask the right resource. You
 repair all eight without leaving k9s, and by the end the `STATUS` column alone tells you which key to
 press next.
 
@@ -61,14 +61,14 @@ k9s -n shop
 
 Type `:pods` and press `Enter`, highlight any pod with the arrow keys, and press `e`. Your editor should
 open with that pod's YAML. Close it without saving. If no editor appears, quit k9s with `:q`, fix the
-variable in your shell, and start k9s again — every remaining part of this lab depends on that one
+variable in your shell, and start k9s again. Every remaining part of this lab depends on that one
 keystroke.
 
 ---
 
 ## Part 1: The triage loop
 
-Look at the pods table now. Ten pods, and the `STATUS` column already shows five different words — six
+Look at the pods table now. Ten pods, and the `STATUS` column already shows five different words, or six
 if you catch a crashlooping pod mid-restart.
 
 `STATUS` is not a diagnosis. It is a router. It tells you *how far the pod got* before something
@@ -83,7 +83,7 @@ reason: the **scheduler** (never placed it), the **kubelet** (placed it, could n
 | `ImagePullBackOff`, `CreateContainerConfigError` | Never started, so no logs exist | `d` → Events |
 | `CrashLoopBackOff`, restarts climbing | Started, then died | `l`, then `p` for the previous one; `d` → `Last State` |
 | `Running` but `0/1` | Alive, but the readiness probe says no | `y` → probe config; `d` → Events |
-| `Running 1/1`, still wrong | Kubernetes is happy, the app is not | `l` — and check the Service's endpoints |
+| `Running 1/1`, still wrong | Kubernetes is happy, the app is not | `l`, then the Service's endpoints |
 
 The last row is the nasty one, and two of the eight workloads sit in it.
 
@@ -93,7 +93,7 @@ That is the loop, and you will run it eight times: read the status, ask the reco
 
 ---
 
-## Part 2: `cache` — "the cache never came up"
+## Part 2: `cache` – "the cache never came up"
 
 Start with the report that sounds simplest. In the pods view, press `/`, type `cache`, and press
 `Enter`. One pod remains:
@@ -108,10 +108,10 @@ The obvious first move is to read the logs, so make it. Press `l`. k9s shows:
 Waiting for logs...
 ```
 
-and nothing ever arrives. Not an empty log — no log stream at all.
+and nothing ever arrives. There is no log stream to attach to.
 
-> **Stop and think:** The pod has no logs at all. Not empty logs — none. What has to have happened for
-> a container to produce no output whatsoever?
+> **Stop and think:** The pod produces no output at all, and there is no stream to read. What has to
+> have happened for a container to reach that state?
 
 Press `Esc` to leave the log view, then `d` to describe the pod, and `G` to jump to the bottom where
 the Events live:
@@ -142,8 +142,8 @@ password:  6 bytes
 
 `password`, not `passwd`. The Deployment asks for a key that was never there.
 
-**Fix it.** The env block lives in the pod template, so edit the Deployment, not the pod — a pod you
-edit is thrown away on the next rollout. Type `:deploy` `Enter`, filter with `/cache` `Enter`,
+**Fix it.** The env block lives in the pod template, so edit the Deployment rather than the pod: a pod
+you edit is thrown away on the next rollout. Type `:deploy` `Enter`, filter with `/cache` `Enter`,
 highlight `cache`, and press `e`. Find:
 
 ```yaml
@@ -157,7 +157,7 @@ Watch the deployments table: `READY` flips from `0/1` to `1/1` within a few seco
 
 ---
 
-## Part 3: `sessions` — "it keeps restarting"
+## Part 3: `sessions` – "it keeps restarting"
 
 Go to `:pods` and filter with `/sessions`. This pod did get further than `cache` did:
 
@@ -166,7 +166,7 @@ sessions-86cccd74dd-mbdhz   0/1   CrashLoopBackOff   5
 ```
 
 `RESTARTS` is climbing, and the status alternates between `Error` and `CrashLoopBackOff` as the kubelet
-waits longer and longer between attempts. Something started and then died, repeatedly — so this time
+waits longer and longer between attempts. Something started and then died, repeatedly, so this time
 there *is* an application to ask. Press `l`:
 
 ```text
@@ -175,9 +175,9 @@ stream closed: EOF for shop/sessions-86cccd74dd-mbdhz (sessions)
 ```
 
 > **Stop and think:** This container has run several times. When you press `l`, whose output are you
-> reading — the run that just died, or the one before it?
+> reading: the run that just died, or the one before it?
 
-`l` streams the container that is running *now* — which, for a crashlooping pod, is the most recent
+`l` streams the container that is running *now*. For a crashlooping pod that is the most recent
 attempt, or the one that just ended, as here. So plain `l` already answered the question. Press `Esc`
 to go back to the pods table and press `p` for **Logs Previous** anyway, to see what it does: the title
 bar changes to `Previous Logs(...)`, and you get either the same line from the run before the latest
@@ -188,12 +188,12 @@ unable to retrieve container logs for docker://61d85899431f1ba9050bfcc0df9bd0301
 ```
 
 The kubelet only keeps a handful of dead containers per pod before reaping them, so on a pod that has
-restarted many times the earlier run may be gone. Either way, `p` is not how you read a crashlooper —
-`l` is. `p` earns its place in the opposite situation: the current container is running fine and you
-need to know why its predecessor died.
+restarted many times the earlier run may be gone. Either way, `l` is how you read a crashlooper. `p`
+belongs to the opposite situation: the current container is running fine and you need to know why its
+predecessor died.
 
 **Fix it.** The container refuses to run without `REDIS_HOST` and never checks what is in it, so give
-it the name of the workload it is meant to reach — `cache`, the one you repaired in Part 2. Go to
+it the name of the workload it is meant to reach: `cache`, the one you repaired in Part 2. Go to
 `:deploy`, filter `/sessions`, press `e`, and add an `env` block to the container. In the live YAML the
 container's keys are sorted alphabetically, so put it directly above the `image: busybox:1.37` line, at
 the same indentation:
@@ -213,7 +213,7 @@ sessions connected to cache
 
 ---
 
-## Part 4: `reports` — "nothing happens at all"
+## Part 4: `reports` – "nothing happens at all"
 
 The colleague is right that nothing happens. Filter `:pods` for `reports`:
 
@@ -234,13 +234,13 @@ Press `d` and read the Events:
 Warning  FailedScheduling  7m18s  default-scheduler  0/1 nodes are available: 1 Insufficient memory.
 ```
 
-The scheduler appends its own reasoning after that sentence — a preemption clause about whether evicting
+The scheduler appends its own reasoning after that sentence: a preemption clause about whether evicting
 another pod would make room, and on newer Kubernetes a note about resource claims. None of it changes
-the diagnosis: `Insufficient memory` is the part that matters.
+the diagnosis. `Insufficient memory` is the part that matters.
 
-A pod that uses nothing yet cannot be short of memory. The scheduler works purely from `requests` —
-the reservation the pod demands up front — and it could not find a node with that much free. Scroll up
-in the same output to see the number:
+A pod that uses nothing yet cannot be short of memory. The scheduler works purely from `requests`, the
+reservation the pod demands up front, and no node had that much free. Scroll up in the same output to
+see the number:
 
 ```text
 Requests:
@@ -256,11 +256,11 @@ The pod lands on the node and goes `1/1 Running`.
 
 ---
 
-## Part 5: `crunch` — "it dies every few minutes"
+## Part 5: `crunch` – "it dies every few minutes"
 
 Filter `:pods` for `crunch` and watch it for half a minute. The status flips between `OOMKilled`,
 `CrashLoopBackOff` and `Running`, and `RESTARTS` climbs steadily. Unlike `sessions`, this container
-does not fail immediately — it works for a moment and then disappears.
+works for a moment before it disappears.
 
 Press `l`:
 
@@ -271,8 +271,8 @@ stream closed: EOF for shop/crunch-58cd488899-kwzhx (crunch)
 ```
 
 It never reports the cache as built. `Killed` is the shell noticing that something outside the job
-ended it — no stack trace, no error message, no exit of its own accord. The application is not
-complaining, so the complaint must be someone else's. Press `Esc`, then `d`:
+ended it, leaving no stack trace and no message of its own. The application is silent, so the
+complaint must be someone else's. Press `Esc`, then `d`:
 
 ```text
 State:          Waiting
@@ -282,12 +282,12 @@ Last State:     Terminated
   Exit Code:    137
 ```
 
-`Last State` is where a crashlooping container's cause of death is recorded — the current state only
+`Last State` is where a crashlooping container's cause of death is recorded. The current state only
 tells you the kubelet is waiting before the next attempt. `OOMKilled` with exit code `137` means the
 kernel killed the process for exceeding its memory allowance.
 
-> **Stop and think:** Nothing here is broken code — the job asks for more memory than it was allowed.
-> Two numbers govern that. Which one killed it: the request or the limit?
+> **Stop and think:** The code is fine; the job asks for more memory than it was allowed. Two numbers
+> govern that. Which one killed it, the request or the limit?
 
 Scroll up in the same output to the resources block and read both numbers before you answer:
 
@@ -312,13 +312,13 @@ enforces, and that is what was breached. In `:deploy`, press `e` on `crunch` and
             memory: 128Mi
 ```
 
-Raise the request alongside it, or the scheduler will keep placing this pod on nodes that cannot
-actually accommodate it. Back in `:pods`, the new pod reaches `1/1 Running` and `RESTARTS` stays at
-`0` — watch it for a full minute to be sure the count really has gone quiet.
+Raise the request alongside it, or the scheduler will keep placing this pod on nodes too small to hold
+it. Back in `:pods`, the new pod reaches `1/1 Running` and `RESTARTS` stays at `0`. Watch it for a full
+minute to be sure the count has gone quiet.
 
 ---
 
-## Part 6: `orders` — "checkout is down"
+## Part 6: `orders` – "checkout is down"
 
 Filter `:pods` for `orders`. Nothing here is red:
 
@@ -335,8 +335,8 @@ catalog   <none>
 orders    <none>
 ```
 
-An endpoint is the address a Service actually forwards traffic to. `orders` has none, so every request
-to the Service fails even though two nginx processes are running perfectly well.
+An endpoint is an address a Service forwards traffic to. `orders` has none, so every request to the
+Service fails even though two nginx processes are running.
 
 > **Stop and think:** The containers are running and nginx is serving. So who decided these pods are
 > not ready, and what did it ask them?
@@ -351,9 +351,9 @@ Readiness:    http-get http://:80/healthz delay=3s timeout=1s period=5s #success
 Warning  Unhealthy  4m10s (x63 over 9m12s)  kubelet  spec.containers{nginx}: Readiness probe failed: HTTP probe failed with statuscode: 404
 ```
 
-The kubelet is asking for `/healthz` every five seconds and nginx is answering `404` every time — the
-path does not exist in the image. A pod that fails its readiness probe stays `Running` but is pulled
-out of its Service, which is precisely the symptom the colleague reported.
+The kubelet is asking for `/healthz` every five seconds and nginx is answering `404` every time,
+because the path does not exist in the image. A pod that fails its readiness probe stays `Running` but
+is pulled out of its Service, which is the symptom the colleague reported.
 
 **Fix it.** Either the image needs a `/healthz` handler or the probe needs to ask for something that
 exists. You cannot rebuild the image from k9s, so change the probe: `:deploy`, `e` on `orders`, and set
@@ -367,28 +367,27 @@ orders   10.244.0.59:80,10.244.0.60:80
 
 ---
 
-## Part 7: `catalog` — "the product list is empty"
+## Part 7: `catalog` – "the product list is empty"
 
 Same complaint shape as `orders`, so check the same place first. In `:ep`, `catalog` still reads
-`<none>`. But this time the pods are not the problem — `:deploy` shows `catalog 2/2`, and `:pods`
+`<none>`. But this time the pods are not the problem: `:deploy` shows `catalog 2/2`, and `:pods`
 shows both pods `1/1 Running`. Ready pods, and still no endpoints.
 
-That is the difference between these two scenarios worth remembering: `orders` had an empty Service
-because its pods were not ready; `catalog`'s pods are ready and the Service still cannot see them. Same
-symptom, one layer apart.
+The two scenarios differ by a layer. `orders` had an empty Service because its pods were not ready;
+`catalog`'s pods are ready and the Service still cannot see them. Same symptom, one layer apart.
 
-> **Stop and think:** The pods are `1/1 Running` and the Service exists. So what actually decides which
-> pods a Service sends traffic to?
+> **Stop and think:** The pods are `1/1 Running` and the Service exists. So what decides which pods a
+> Service sends traffic to?
 
-A Service does not know about Deployments. It collects pods by **label selector** — a filter it runs
-over every pod in the namespace, continuously. If the filter matches nothing, the Service is not
-broken; it is empty, and Kubernetes has nothing to warn you about. That is why `d` on the Service shows
+A Service does not know about Deployments. It collects pods by **label selector**, a filter it runs
+continuously over every pod in the namespace. A filter that matches nothing leaves the Service empty
+rather than broken, and Kubernetes has nothing to warn you about. That is why `d` on the Service shows
 no useful events here.
 
 Compare the two sides yourself. Type `:svc` `Enter`, highlight `catalog`, press `y`, and read
 `spec.selector`. Then go to `:pods`, press `d` on a `catalog` pod, and read its `Labels`.
 
-**Fix it.** Whichever side is wrong, the one you can safely change is the Service — relabelling running
+**Fix it.** Whichever side is wrong, the Service is the side you can safely change: relabelling running
 pods would detach them from their ReplicaSet. In `:svc`, press `e` on `catalog` and correct the
 selector to match the pods' label. Back in `:ep`:
 
@@ -398,7 +397,7 @@ catalog   10.244.0.49:80,10.244.0.53:80
 
 ---
 
-## Part 8: `auditor` — "the report is empty, but the pod looks green"
+## Part 8: `auditor` – "the report is empty, but the pod looks green"
 
 Filter `:pods` for `auditor`:
 
@@ -406,9 +405,9 @@ Filter `:pods` for `auditor`:
 auditor-94bbc9c45-s4sp2   1/1   Running   0
 ```
 
-Ready, zero restarts. Press `d` and read the Events: `Scheduled`, `Pulled`, `Created`, `Started` — all
-`Normal`, not one `Warning`. Kubernetes has nothing to report because, from its point of view, nothing
-went wrong.
+Ready, zero restarts. Press `d` and read the Events: `Scheduled`, `Pulled`, `Created`, `Started`, every
+one of them `Normal`. Kubernetes has nothing to report because, from its point of view, nothing went
+wrong.
 
 > **Stop and think:** Every column is green and there are no events. Where does an application's own
 > complaint end up, if Kubernetes has nothing to complain about?
@@ -420,9 +419,9 @@ Press `Esc`, then `l`:
 Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:shop:auditor" cannot list resource "pods" in API group "" in the namespace "shop"
 ```
 
-Every 30 seconds the job asks the API server for a pod list and is refused. The refusal is a perfectly
-successful HTTP round trip, so nothing about the pod is unhealthy — the container keeps running, and
-the report it writes is simply empty.
+Every 30 seconds the job asks the API server for a pod list and is refused. The refusal is a successful
+HTTP round trip, so nothing about the pod is unhealthy. The container keeps running and the report it
+writes comes out empty.
 
 Read the message closely: it names the identity that was refused, `system:serviceaccount:shop:auditor`,
 and the exact verb and resource, `list` on `pods`. Confirm it from the inside: press `Esc`, then `s` to
@@ -452,7 +451,7 @@ rules:
   - list
 ```
 
-It grants `get` and `list` on ConfigMaps — the right verbs on the wrong resource. Add `pods` to the
+It grants `get` and `list` on ConfigMaps: the right verbs on the wrong resource. Add `pods` to the
 `resources` list:
 
 ```yaml
@@ -463,9 +462,9 @@ It grants `get` and `list` on ConfigMaps — the right verbs on the wrong resour
 
 Save and close, then press `l` on the `auditor` pod and wait for the next loop.
 
-This is the payoff of the scenario: **no pod restarts, and none is needed.** Watch the `RESTARTS`
-column — it stays at `0`, and the pod name never changes. The next `kubectl get pods` inside the
-container simply succeeds:
+Here is the payoff: **no pod restarts, and none is needed.** Watch the `RESTARTS` column. It
+stays at `0`, and the pod name never changes. The next `kubectl get pods` inside the container
+succeeds:
 
 ```text
 --- pod inventory ---
@@ -476,12 +475,12 @@ cache-847c7c5889-n8t2c      1/1     Running   0          12m
 ...
 ```
 
-Permissions are evaluated per request, not baked into the pod at startup. Widening a Role takes effect
-on the very next call, which is why an RBAC problem never shows up as a restart.
+The API server evaluates permissions on every request, so widening a Role takes effect on the very next
+call. That is why an RBAC problem never shows up as a restart.
 
 ---
 
-## Part 9 (bonus): `archive` — "it is stuck deploying"
+## Part 9 (bonus): `archive` – "it is stuck deploying"
 
 One workload left. Filter `:pods` for `archive`:
 
@@ -489,11 +488,11 @@ One workload left. Filter `:pods` for `archive`:
 archive-69bc686487-ljxqs   0/1   Pending   0
 ```
 
-`Pending` again — the same word you saw in Part 4, and the temptation is to go straight back to the
+`Pending` again, the same word you saw in Part 4, and the temptation is to go straight back to the
 resource requests.
 
 > **Stop and think:** This is the second `Pending` pod in this lab. Read the message before you reach
-> for the resource requests — what is it waiting for this time?
+> for the resource requests. What is it waiting for this time?
 
 Press `d`:
 
@@ -501,7 +500,7 @@ Press `d`:
 Warning  FailedScheduling  28s (x3 over 11m)  default-scheduler  0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims.
 ```
 
-Your cluster appends something of its own after that sentence — a dangling `not found` on newer
+Your cluster appends something of its own after that sentence: a dangling `not found` on newer
 Kubernetes, a note about preemption on older ones. Ignore it. The part that matters is `unbound
 immediate PersistentVolumeClaims`.
 
@@ -532,20 +531,20 @@ Two claims, and only one of them is a fault. Press `d` on `archive-data-v2`:
 Warning  ProvisioningFailed  18m (x62 over 33m)  persistentvolume-controller  storageclass.storage.k8s.io "fast-ssd" not found
 ```
 
-A StorageClass is the cluster's recipe for making a volume — who provisions it, on what kind of disk.
-This claim asks for one called `fast-ssd`. Type `:sc` `Enter` to see what the cluster actually offers:
+A StorageClass is the cluster's recipe for making a volume: who provisions it, on what kind of disk.
+This claim asks for one called `fast-ssd`. Type `:sc` `Enter` to see what the cluster offers:
 
 ```text
 standard (default)   k8s.io/minikube-hostpath   Delete   Immediate
 ```
 
 One class, named `standard`. Nothing will ever satisfy `archive-data-v2`, and nothing ever times out
-either — the controller retries forever, which is why the deployment looks "stuck" rather than failed.
+either. The controller retries forever, which is why the deployment looks "stuck" rather than failed.
 
 > Depending on your cluster's default StorageClass, `archive-data` may also show `Pending` rather than
 > `Bound`. Press `d` on it: if the event reads `waiting for first consumer to be created before
-> binding`, the claim is healthy and simply holding off until a pod uses it. Two `Pending` claims do not
-> mean two broken claims — the events tell them apart.
+> binding`, the claim is healthy and holding off until a pod uses it. Two `Pending` claims do not mean
+> two broken claims; the events tell them apart.
 
 **Fix it.** You cannot change a bound claim's StorageClass, and creating a replacement claim is not
 something k9s can do. The healthy `archive-data` claim is already there, which is the clue that the
@@ -558,7 +557,7 @@ the volume back:
 ```
 
 The pod schedules immediately and goes `1/1 Running`. `archive-data-v2` stays `Pending` in the `:pvc`
-list — nothing uses it now, so it does no harm.
+list. Nothing uses it now, so it does no harm.
 
 **Task:** Go to `:deploy` one last time. All eight Deployments should read `READY` at their full
 replica count, and `:ep` should show addresses for both `orders` and `catalog`.
@@ -567,9 +566,9 @@ replica count, and `:ep` should show addresses for both `orders` and `catalog`.
 
 ## Part 10: Cleanup
 
-Everything in this lab lives in one namespace, and a namespace owns the objects inside it — deleting it
+Everything in this lab lives in one namespace, and a namespace owns the objects inside it. Deleting it
 deletes the Deployments, Services, Secret, ServiceAccount, Role, RoleBinding and PersistentVolumeClaims
-in one step. So there is nothing else to clean up.
+in one step, so there is nothing else to clean up.
 
 Type `:ns` `Enter`, filter with `/shop` `Enter`, highlight `shop`, and press `Ctrl-D`. A confirmation
 dialog appears:
@@ -581,8 +580,8 @@ Force:
               Cancel     OK
 ```
 
-`Cancel` is selected by default, so pressing `Enter` straight away just closes the dialog. Press `Tab`
-to move to `OK`, then `Enter`. The namespace goes `Terminating` and disappears.
+`Cancel` is selected by default, so pressing `Enter` closes the dialog without deleting anything. Press
+`Tab` to move to `OK`, then `Enter`. The namespace goes `Terminating` and disappears.
 
 Quit k9s with `:q`.
 
