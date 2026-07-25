@@ -36,6 +36,30 @@
   nothing; either name the actual change or drop the line.
 - No checklists, "Summary" / "Test plan" sections, marketing phrasing, or emojis.
 
+## Lab READMEs
+
+Lab instructions are prose, not a spec sheet. This overrides the pronoun and
+reader-address rules above: address the learner as "you".
+
+- Open with a paragraph naming what already exists from earlier labs, what is
+  missing, and what this lab adds. State the payoff in one sentence.
+- Every part gets a reason before it gets a command: why the resource exists,
+  what breaks without it.
+- Explain unfamiliar mechanics in plain words before showing syntax. An everyday
+  comparison beats a definition (`templates/` as form letters, `values.yaml` as
+  the answers Helm pastes in).
+- Walk dense snippets through line by line and close with what they return.
+- Provide the manifests the lab is not teaching in full, and say why. Leave the
+  ones it is teaching as a bulleted requirement list for the learner to write.
+- Let a step fail on purpose where the failure is the lesson: show the real error
+  output, then fix it.
+- Pose a question at the point where the learner should stop and think.
+- Terse at sentence level still applies: no filler adjectives, no marketing, no
+  recap of the section above.
+
+Existing labs are not retrofitted. This voice applies to new labs and to labs
+being reworked.
+
 ## Before you finish
 
 - Run the project's lint, tests, and build for everything touched.
