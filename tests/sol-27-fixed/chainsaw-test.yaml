@@ -1,0 +1,56 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: sol-27-fixed
+  labels: { suite: solutions }
+spec:
+  # The mirror image of lab-27-broken: every documented fix applied at once must
+  # bring the whole stack up.
+  timeouts:
+    assert: 300s
+  steps:
+    - try:
+        - script:
+            content: |
+              set -eu
+              kubectl apply -n "$NAMESPACE" \
+                -f ../../solutions/kubernetes/lab-27-troubleshooting/fixed.yaml
+              for d in cache sessions reports crunch orders catalog auditor archive; do
+                kubectl -n "$NAMESPACE" rollout status "deployment/$d" --timeout=300s
+              done
+        - script:
+            content: |
+              set -eu
+              # An empty address list only means something if a slice was actually
+              # found; otherwise a mistyped query would "pass" on both services.
+              for svc in orders catalog; do
+                slices=$(kubectl -n "$NAMESPACE" get endpointslice \
+                  -l "kubernetes.io/service-name=$svc" \
+                  -o jsonpath='{.items[*].metadata.name}')
+                if [ -z "$slices" ]; then
+                  echo "no EndpointSlice found for $svc — query matched nothing"
+                  exit 1
+                fi
+                addrs=$(kubectl -n "$NAMESPACE" get endpointslice \
+                  -l "kubernetes.io/service-name=$svc" \
+                  -o jsonpath='{.items[*].endpoints[*].addresses[*]}')
+                if [ -z "$addrs" ]; then
+                  echo "expected endpoints for $svc, found none"
+                  exit 1
+                fi
+              done
+              # `|| true` keeps set -e from exiting before the check below runs; a
+              # command error leaves $answer empty, which the check rejects too.
+              answer=$(kubectl -n "$NAMESPACE" auth can-i list pods \
+                --as="system:serviceaccount:$NAMESPACE:auditor") || true
+              if [ "$answer" != "yes" ]; then
+                echo "expected the auditor to be allowed, got: $answer"
+                exit 1
+              fi
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: PersistentVolumeClaim
+              metadata: { name: archive-data }
+              status:
+                phase: Bound
