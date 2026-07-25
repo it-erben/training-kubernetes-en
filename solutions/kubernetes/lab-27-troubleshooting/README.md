@@ -6,6 +6,7 @@ scenarios, in the lab's own part numbering.
 ## Setup
 
 ```bash
+k9s version
 export K9S_EDITOR=nano       # PowerShell: $env:K9S_EDITOR = "notepad"
 kubectl create namespace shop
 kubectl apply -n shop -f setup.yaml   # from labs/kubernetes/lab-27-troubleshooting/
@@ -79,8 +80,8 @@ still wrong to the Service's endpoints. Parts 2–9 are that loop run eight time
 
 ## Part 6: `orders`
 
-- **Keystrokes:** `:ep` `Enter` (`orders  <none>`), `:pods` `Enter`, `/orders` `Enter` (`Running`, `0/1`),
-  `d`.
+- **Keystrokes:** `:pods` `Enter`, `/orders` `Enter` (`Running`, `0/1`), `:ep` `Enter` (`orders  <none>`),
+  `:pods` `Enter`, `d`.
 - **Evidence:** `Readiness: http-get http://:80/healthz ...` and `Warning  Unhealthy  4m10s (x63 over
   9m12s)  kubelet  spec.containers{nginx}: Readiness probe failed: HTTP probe failed with statuscode:
   404`.
@@ -113,10 +114,8 @@ still wrong to the Service's endpoints. Parts 2–9 are that loop run eight time
   "shop"`. Confirmed from inside the pod: `s`, then `kubectl auth can-i list pods` answers `no`.
 - **Root cause:** the Role grants `get`/`list` on `configmaps`, not `pods`, so every 30-second loop is
   refused by the API server — a successful HTTP round trip that Kubernetes has no reason to warn about.
-- **Fix:** `:role` `Enter`, `e` on `auditor` — add a second entry to `rules`, mirroring the existing one:
-  `apiGroups: [""]`, `resources: ["pods"]`, `verbs: ["get", "list"]`. Appending `pods` to the first
-  rule's `resources` list instead grants the identical permission and is equally correct; `fixed.yaml`
-  uses the second-rule form.
+- **Fix:** `:role` `Enter`, `e` on `auditor` — add `pods` to the rule's `resources` list, from
+  `["configmaps"]` to `["configmaps", "pods"]`, same `get`/`list` verbs.
 - **Answer:** an application's own complaint, when Kubernetes itself sees nothing wrong, ends up in the
   container's logs — `l`, not `d`.
 

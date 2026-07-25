@@ -269,10 +269,7 @@ metadata:
   name: auditor
 rules:
   - apiGroups: [""]
-    resources: ["configmaps"]
-    verbs: ["get", "list"]
-  - apiGroups: [""]
-    resources: ["pods"]
+    resources: ["configmaps", "pods"]
     verbs: ["get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
