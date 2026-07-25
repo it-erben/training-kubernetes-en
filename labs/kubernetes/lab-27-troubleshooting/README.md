@@ -497,8 +497,9 @@ Press `d`:
 Warning  FailedScheduling  28s (x3 over 11m)  default-scheduler  0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims.
 ```
 
-Your cluster appends a version-specific tail about preemption after that sentence; the part that
-matters is `unbound immediate PersistentVolumeClaims`.
+Your cluster appends something of its own after that sentence — a dangling `not found` on newer
+Kubernetes, a note about preemption on older ones. Ignore it. The part that matters is `unbound
+immediate PersistentVolumeClaims`.
 
 Same status, entirely different cause. `reports` was rejected over a number in its own spec; `archive`
 is rejected because a resource it depends on is not usable yet. The scheduler will not place a pod that
