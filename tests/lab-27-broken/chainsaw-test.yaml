@@ -107,6 +107,15 @@ spec:
               set -eu
               kubectl -n "$NAMESPACE" wait --for=condition=Available \
                 deployment/catalog --timeout=180s
+              # An empty address list only means something if a slice was
+              # actually found; otherwise a mistyped query would "pass".
+              slices=$(kubectl -n "$NAMESPACE" get endpointslice \
+                -l kubernetes.io/service-name=catalog \
+                -o jsonpath='{.items[*].metadata.name}')
+              if [ -z "$slices" ]; then
+                echo "no EndpointSlice found for catalog — query matched nothing"
+                exit 1
+              fi
               addrs=$(kubectl -n "$NAMESPACE" get endpointslice \
                 -l kubernetes.io/service-name=catalog \
                 -o jsonpath='{.items[*].endpoints[*].addresses[*]}')
