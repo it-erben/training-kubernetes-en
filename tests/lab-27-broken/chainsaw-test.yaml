@@ -123,3 +123,25 @@ spec:
                 echo "expected no endpoints for catalog, got: $addrs"
                 exit 1
               fi
+
+        # 7. auditor: the pod is healthy and its ServiceAccount still cannot do
+        #    the one thing the app does.
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" wait --for=condition=Available \
+                deployment/auditor --timeout=300s
+              answer=$(kubectl -n "$NAMESPACE" auth can-i list pods \
+                --as="system:serviceaccount:$NAMESPACE:auditor" || true)
+              if [ "$answer" != "no" ]; then
+                echo "expected the auditor to be denied, got: $answer"
+                exit 1
+              fi
+              # Capture logs separately so a failing `kubectl logs` aborts here
+              # under set -e instead of feeding grep an empty stream that
+              # would also (wrongly) report "no match".
+              logs=$(kubectl -n "$NAMESPACE" logs deployment/auditor)
+              if ! echo "$logs" | grep -q Forbidden; then
+                echo "expected a Forbidden line in auditor logs, got: $logs"
+                exit 1
+              fi

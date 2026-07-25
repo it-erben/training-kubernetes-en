@@ -251,3 +251,70 @@ spec:
   ports:
     - port: 80
       targetPort: 80
+---
+# 7. auditor - lists pods every 30s under its own identity. The Role grants it
+#    configmaps instead, so the pod stays healthy while every loop is denied.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: auditor
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: auditor
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: auditor
+subjects:
+  # A RoleBinding resolves a ServiceAccount subject in its own namespace, so
+  # this manifest stays namespace-free.
+  - kind: ServiceAccount
+    name: auditor
+roleRef:
+  kind: Role
+  name: auditor
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auditor
+  labels:
+    app: auditor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auditor
+  template:
+    metadata:
+      labels:
+        app: auditor
+    spec:
+      serviceAccountName: auditor
+      containers:
+        - name: auditor
+          image: alpine/k8s:1.32.0
+          command:
+            - sh
+            - -c
+            - |
+              while true; do
+                echo "--- pod inventory ---"
+                kubectl get pods
+                sleep 30
+              done
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
