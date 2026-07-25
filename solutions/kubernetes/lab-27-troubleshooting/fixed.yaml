@@ -137,6 +137,10 @@ spec:
         - name: crunch
           image: busybox:1.37
           command:
+            # Kept from the broken manifest: runtimes differ on whether an OOM
+            # kill takes the whole cgroup or only the offending process, and `-e`
+            # makes the shell exit with the killed child's status either way.
+            # Inert here, since the raised limit means nothing gets killed.
             - sh
             - -e
             - -c

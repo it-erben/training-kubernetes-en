@@ -31,8 +31,8 @@ kubectl create namespace shop
 kubectl apply -n shop -f setup.yaml
 ```
 
-Both commands are the same in Bash and PowerShell, and they are the **last shell commands in this lab**.
-Everything from here on happens inside k9s.
+Both commands are the same in Bash and PowerShell, and they are the **last `kubectl` commands in this
+lab**. Every change from here on is made inside k9s.
 
 > Do not open `setup.yaml`. Its comments name every fault by hand, and the whole exercise is finding
 > them in the cluster instead.
@@ -44,10 +44,12 @@ names. Lab 26 offered `kubectl set image` as a fallback; this lab has no fallbac
 unset, k9s opens nothing and you cannot fix anything. Set it **before** launching k9s:
 
 ```powershell
+# Windows (PowerShell)
 $env:K9S_EDITOR = "notepad"
 ```
 
 ```bash
+# macOS / Linux
 export K9S_EDITOR=nano
 ```
 
@@ -160,7 +162,7 @@ Watch the deployments table: `READY` flips from `0/1` to `1/1` within a few seco
 Go to `:pods` and filter with `/sessions`. This pod did get further than `cache` did:
 
 ```text
-sessions-86cccd74dd-mbdhz   0/1   CrashLoopBackOff   2 (23s ago)
+sessions-86cccd74dd-mbdhz   0/1   CrashLoopBackOff   5
 ```
 
 `RESTARTS` is climbing, and the status alternates between `Error` and `CrashLoopBackOff` as the kubelet
@@ -492,8 +494,11 @@ resource requests.
 Press `d`:
 
 ```text
-Warning  FailedScheduling  28s (x3 over 11m)  default-scheduler  0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims. not found
+Warning  FailedScheduling  28s (x3 over 11m)  default-scheduler  0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims.
 ```
+
+Your cluster appends a version-specific tail about preemption after that sentence; the part that
+matters is `unbound immediate PersistentVolumeClaims`.
 
 Same status, entirely different cause. `reports` was rejected over a number in its own spec; `archive`
 is rejected because a resource it depends on is not usable yet. The scheduler will not place a pod that
@@ -593,7 +598,7 @@ Quit k9s with `:q`.
 | `s` | Shell into a pod |
 | `e` | Edit in `$K9S_EDITOR` |
 | `Ctrl-D` | Delete the highlighted resource |
-| `?` | All key bindings for the current view |
+| `Tab` | Move between fields and buttons in a dialog |
 | `:q` `Enter` | Quit k9s |
 
 ---
