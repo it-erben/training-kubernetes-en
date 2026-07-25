@@ -138,6 +138,7 @@ spec:
           image: busybox:1.37
           command:
             - sh
+            - -e
             - -c
             - |
               echo "building report cache"

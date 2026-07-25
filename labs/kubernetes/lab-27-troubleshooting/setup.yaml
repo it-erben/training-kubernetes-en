@@ -137,7 +137,11 @@ spec:
         - name: crunch
           image: busybox:1.37
           command:
+            # Runtimes differ on whether an OOM kill takes the whole cgroup or
+            # only the offending process. `-e` makes the shell exit with the
+            # killed child's status either way, so the container really dies.
             - sh
+            - -e
             - -c
             - |
               echo "building report cache"
