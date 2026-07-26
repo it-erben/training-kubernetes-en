@@ -1,7 +1,7 @@
 # Lab 27: Debugging a Broken Cluster with k9s
 
 Lab 26 handed you the navigation (`:pods`, `d`, `y`, `l`, `s`, `e`) and one broken Deployment whose
-image tag did not exist: one symptom, one fix. Real clusters never arrive that tidy. Here a colleague
+image tag did not exist. Real clusters often have more complicated issues. Here a colleague
 deployed a webshop yesterday and left for two weeks. Eight of its workloads are broken, each for a
 different reason, and none of them volunteers what it needs until you ask the right resource. You
 repair all eight without leaving k9s, and by the end the `STATUS` column alone tells you which key to
@@ -37,44 +37,17 @@ lab**. Every change from here on is made inside k9s.
 > Do not open `setup.yaml`. Its comments name every fault by hand, and the whole exercise is finding
 > them in the cluster instead.
 
-### The editor is a hard prerequisite
-
-Every repair in this lab goes through `e`, which hands the resource to whatever editor `$K9S_EDITOR`
-names. Lab 26 offered `kubectl set image` as a fallback; this lab has no fallback. If the variable is
-unset, k9s opens nothing and you cannot fix anything. Set it **before** launching k9s:
-
-```powershell
-# Windows (PowerShell)
-$env:K9S_EDITOR = "notepad"
-```
-
-```bash
-# macOS / Linux
-export K9S_EDITOR=nano
-```
-
-Now launch k9s in the namespace and prove the editor works before you need it:
-
-```bash
-k9s -n shop
-```
-
-Type `:pods` and press `Enter`, highlight any pod with the arrow keys, and press `e`. Your editor should
-open with that pod's YAML. Close it without saving. If no editor appears, quit k9s with `:q`, fix the
-variable in your shell, and start k9s again. Every remaining part of this lab depends on that one
-keystroke.
-
 ---
 
-## Part 1: The triage loop
+## Part 1: Triage
 
-Look at the pods table now. Ten pods, and the `STATUS` column already shows five different words, or six
+Look at the pods table. You will see ten pods, and the `STATUS` column already shows five different words, or six
 if you catch a crashlooping pod mid-restart.
 
-`STATUS` is not a diagnosis. It is a router. It tells you *how far the pod got* before something
+`STATUS` is not a diagnosis, it only hints towards an issue. It tells you *how far the pod got* before something
 stopped it, and that in turn tells you which of the cluster's three record-keepers wrote down the
 reason: the **scheduler** (never placed it), the **kubelet** (placed it, could not run it), or the
-**application itself** (ran, then complained in its own logs). Ask the wrong one and you get silence.
+**application itself** (ran, then complained in its own logs).
 
 | Status | What it means | Where to look next |
 | --- | --- | --- |
@@ -85,11 +58,10 @@ reason: the **scheduler** (never placed it), the **kubelet** (placed it, could n
 | `Running` but `0/1` | Alive, but the readiness probe says no | `y` → probe config; `d` → Events |
 | `Running 1/1`, still wrong | Kubernetes is happy, the app is not | `l`, then the Service's endpoints |
 
-The last row is the nasty one, and two of the eight workloads sit in it.
 
-That is the loop, and you will run it eight times: read the status, ask the record-keeper it points at
-(`d` for events, `l` for logs), open the resource's own YAML to see the offending field, fix it with
-`e`, then watch the table until the workload recovers.
+The next exercises all follow the same pattern:
+Check the status of each workload (`d` for events, `l` for logs), open the resource's own YAML to see the offending 
+field, fix it with `e`, then watch the table until the workload recovers.
 
 ---
 
@@ -108,7 +80,7 @@ The obvious first move is to read the logs, so make it. Press `l`. k9s shows:
 Waiting for logs...
 ```
 
-and nothing ever arrives. There is no log stream to attach to.
+but nothing ever arrives. There is no log stream to attach to.
 
 > **Stop and think:** The pod produces no output at all, and there is no stream to read. What has to
 > have happened for a container to reach that state?
@@ -178,7 +150,7 @@ stream closed: EOF for shop/sessions-86cccd74dd-mbdhz (sessions)
 > reading: the run that just died, or the one before it?
 
 `l` streams the container that is running *now*. For a crashlooping pod that is the most recent
-attempt, or the one that just ended, as here. So plain `l` already answered the question. Press `Esc`
+attempt, or the one that just ended, as here. In this case, plain `l` already shows the issue. Press `Esc`
 to go back to the pods table and press `p` for **Logs Previous** anyway, to see what it does: the title
 bar changes to `Previous Logs(...)`, and you get either the same line from the run before the latest
 one, or:
@@ -188,7 +160,7 @@ unable to retrieve container logs for docker://61d85899431f1ba9050bfcc0df9bd0301
 ```
 
 The kubelet only keeps a handful of dead containers per pod before reaping them, so on a pod that has
-restarted many times the earlier run may be gone. Either way, `l` is how you read a crashlooper. `p`
+restarted many times the earlier run may be gone. Either way, `l` is how you read a crashlooping pod. `p`
 belongs to the opposite situation: the current container is running fine and you need to know why its
 predecessor died.
 
@@ -369,7 +341,7 @@ orders   10.244.0.59:80,10.244.0.60:80
 
 ## Part 7: `catalog` – "the product list is empty"
 
-Same complaint shape as `orders`, so check the same place first. In `:ep`, `catalog` still reads
+The issue sounds similar to `orders`, so check the same place first. In `:ep`, `catalog` still reads
 `<none>`. But this time the pods are not the problem: `:deploy` shows `catalog 2/2`, and `:pods`
 shows both pods `1/1 Running`. Ready pods, and still no endpoints.
 
@@ -379,7 +351,7 @@ The two scenarios differ by a layer. `orders` had an empty Service because its p
 > **Stop and think:** The pods are `1/1 Running` and the Service exists. So what decides which pods a
 > Service sends traffic to?
 
-A Service does not know about Deployments. It collects pods by **label selector**, a filter it runs
+Remember: A Service does not know about Deployments. It collects pods by **label selector**, a filter it runs
 continuously over every pod in the namespace. A filter that matches nothing leaves the Service empty
 rather than broken, and Kubernetes has nothing to warn you about. That is why `d` on the Service shows
 no useful events here.
@@ -462,7 +434,7 @@ It grants `get` and `list` on ConfigMaps: the right verbs on the wrong resource.
 
 Save and close, then press `l` on the `auditor` pod and wait for the next loop.
 
-Here is the payoff: **no pod restarts, and none is needed.** Watch the `RESTARTS` column. It
+The result should be: **no pod restarts, and none is needed.** Watch the `RESTARTS` column. It
 stays at `0`, and the pod name never changes. The next `kubectl get pods` inside the container
 succeeds:
 
