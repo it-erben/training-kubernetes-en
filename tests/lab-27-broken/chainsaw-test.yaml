@@ -1,0 +1,172 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: lab-27-broken
+  labels: { suite: labs }
+spec:
+  # Every workload in this lab is broken by design. Asserting only "not ready"
+  # would still pass if a scenario broke for the wrong reason (a pulled tag
+  # disappearing, say), so each one is pinned to its own symptom.
+  timeouts:
+    assert: 300s
+  steps:
+    - try:
+        - script:
+            content: |
+              set -eu
+              kubectl apply -n "$NAMESPACE" \
+                -f ../../labs/kubernetes/lab-27-troubleshooting/setup.yaml
+
+        # 1. cache: secretKeyRef names a key the Secret does not have, so the
+        #    kubelet cannot build the container's environment and it is never
+        #    created.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: cache }
+              status:
+                containerStatuses:
+                  - state:
+                      waiting:
+                        reason: CreateContainerConfigError
+
+        # 2. sessions: the container starts, finds REDIS_HOST unset, and
+        #    exits 1, so it crashloops.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: sessions }
+              status:
+                containerStatuses:
+                  - state:
+                      waiting:
+                        reason: CrashLoopBackOff
+                    lastState:
+                      terminated:
+                        exitCode: 1
+
+        # 3. reports: requests 64Gi of memory, so no node can take it. Pinned to
+        #    the scheduler's reason, because scenario 8 is also Pending.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: reports }
+              status:
+                phase: Pending
+                conditions:
+                  - type: PodScheduled
+                    status: "False"
+                    reason: Unschedulable
+                    (contains(message, 'Insufficient memory')): true
+
+        # 4. crunch: allocates 100Mi under a 64Mi limit, so the kernel kills it
+        #    mid-build. Pinned to the reason, because a workload that merely
+        #    restarts would pass a weaker assertion.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: crunch }
+              status:
+                containerStatuses:
+                  - lastState:
+                      terminated:
+                        reason: OOMKilled
+
+        # 5. orders: the readiness probe asks nginx for /healthz, which is a 404,
+        #    so the containers start and no replica ever becomes Ready.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: orders }
+              status:
+                phase: Running
+                containerStatuses:
+                  - started: true
+                    ready: false
+        - error:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata: { name: orders }
+              status: { availableReplicas: 2 }
+
+        # 6. catalog: the pods are healthy and Ready, and the Service still has
+        #    no endpoints, because its selector matches no pod.
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" wait --for=condition=Available \
+                deployment/catalog --timeout=180s
+              # An empty address list only means something if a slice was
+              # actually found; otherwise a mistyped query would "pass".
+              slices=$(kubectl -n "$NAMESPACE" get endpointslice \
+                -l kubernetes.io/service-name=catalog \
+                -o jsonpath='{.items[*].metadata.name}')
+              if [ -z "$slices" ]; then
+                echo "no EndpointSlice found for catalog — query matched nothing"
+                exit 1
+              fi
+              addrs=$(kubectl -n "$NAMESPACE" get endpointslice \
+                -l kubernetes.io/service-name=catalog \
+                -o jsonpath='{.items[*].endpoints[*].addresses[*]}')
+              if [ -n "$addrs" ]; then
+                echo "expected no endpoints for catalog, got: $addrs"
+                exit 1
+              fi
+
+        # 7. auditor: the pod is healthy and its ServiceAccount still cannot do
+        #    the one thing the app does.
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" wait --for=condition=Available \
+                deployment/auditor --timeout=300s
+              answer=$(kubectl -n "$NAMESPACE" auth can-i list pods \
+                --as="system:serviceaccount:$NAMESPACE:auditor" || true)
+              if [ "$answer" != "no" ]; then
+                echo "expected the auditor to be denied, got: $answer"
+                exit 1
+              fi
+              # Capture logs separately so a failing `kubectl logs` aborts here
+              # under set -e instead of feeding grep an empty stream that
+              # would also (wrongly) report "no match".
+              logs=$(kubectl -n "$NAMESPACE" logs deployment/auditor)
+              if ! echo "$logs" | grep -q Forbidden; then
+                echo "expected a Forbidden line in auditor logs, got: $logs"
+                exit 1
+              fi
+
+        # 8. archive: the Deployment claims a PVC that can never bind, so the
+        #    pod is never scheduled.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: PersistentVolumeClaim
+              metadata: { name: archive-data-v2 }
+              status:
+                phase: Pending
+        # Pinned to the PVC in the message, because scenario 3 is also
+        # Unschedulable — for an entirely different reason.
+        - assert:
+            resource:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                labels: { app: archive }
+              status:
+                phase: Pending
+                conditions:
+                  - type: PodScheduled
+                    status: "False"
+                    reason: Unschedulable
+                    (contains(message, 'PersistentVolumeClaim')): true
