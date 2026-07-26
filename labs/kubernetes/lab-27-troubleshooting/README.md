@@ -58,9 +58,8 @@ reason: the **scheduler** (never placed it), the **kubelet** (placed it, could n
 | `Running` but `0/1` | Alive, but the readiness probe says no | `y` → probe config; `d` → Events |
 | `Running 1/1`, still wrong | Kubernetes is happy, the app is not | `l`, then the Service's endpoints |
 
-
 The next exercises all follow the same pattern:
-Check the status of each workload (`d` for events, `l` for logs), open the resource's own YAML to see the offending 
+Check the status of each workload (`d` for events, `l` for logs), open the resource's own YAML to see the offending
 field, fix it with `e`, then watch the table until the workload recovers.
 
 ---
