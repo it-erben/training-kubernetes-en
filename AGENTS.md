@@ -63,6 +63,15 @@ being reworked.
 ## Before you finish
 
 - Run the project's lint, tests, and build for everything touched.
+- Run `pre-commit run --all-files` and fix everything it reports.
+- Check touched manifests the way CI does:
+  - `kube-linter lint <file>`
+  - `kubeconform -strict -kubernetes-version 1.35.0 <file>`
+  - for charts also `helm lint <chart>` and `helm template <chart>`
+- The chainsaw suite does not run in CI, only locally: `tests/bootstrap.sh`
+  then `chainsaw test tests`, or a subset with `--selector suite=labs` or
+  `--selector suite=nextcloud`. Anyone changing a manifest that has a test
+  runs it.
 - Don't claim done without running the check. Evidence before assertions.
 - Drop any TODO marker you added during your session and re-iterate, or let the
   user know to create a follow-up. Remove all markers and references to your own
@@ -70,3 +79,52 @@ being reworked.
   with their narrative. If something is truly left open, tell the user outside of
   the code, docs, markdown, comments, PR descriptions, commit messages, or anything
   else inside this repo and its connected pipeline.
+
+## How this repo is laid out
+
+Four course tracks, each with the same directory name under `labs/` and
+`solutions/`:
+
+- `docker` — thirteen labs from the Docker components to a multistage build
+  for Spring Boot.
+- `kubernetes` — 27 labs, the main track. The number is the order in the
+  course.
+- `microsoft-azure-kubernetes-service` — seven labs for the AKS course.
+- `nextcloud-casestudy` — the running case study: database, phpMyAdmin,
+  secrets, Nextcloud, production hardening, Helm chart, backup with RBAC.
+
+Alongside those:
+
+- `demos/` — what the trainer shows live, from `kubeadm` through EKS to the
+  Rancher distributions. Not written as labs.
+- `tests/` — chainsaw suite against a kind cluster, one directory per checked
+  lab or solution. `tests/README.md` covers install and invocation.
+- `docs/superpowers/` — plans and specs for larger reworks.
+
+A lab directory and its counterpart under `solutions/` carry the same name. A
+new lab needs both, plus a directory under `tests/` wherever it is
+meaningfully checkable.
+
+## Traps in this repo
+
+- **This repo and `gfu/kubernetes` are the same course in two languages.**
+  This one started as the English translation; the German repo has since
+  merged changes back from here. Anything structural — a new lab, a renamed
+  directory, a changed manifest — belongs in both. Only the prose differs.
+- **The chainsaw suite does not run in CI.** GitLab.com runners cannot start
+  kind (`kubeadm` init fails under nested Docker). A green pipeline says the
+  manifests are statically valid, not that they work.
+- **`solutions/microsoft-azure-kubernetes-service` covers exactly one lab**,
+  and under a different name: lab `lab-01-create-cluster` against solution
+  `lab-01-cluster-setup`. Six AKS labs have no solution at all.
+- **`lab-20-ingress` and `lab-21-gateway-api` have no solution**, unlike the
+  other 25 Kubernetes labs.
+- **`.markdownlint-cli2.yaml` ignores `slides/**/*.md`, and that directory no
+  longer exists.** The ignore entry and the `pdf-publisher` component in
+  `.gitlab-ci.yml` are leftovers.
+- **yamllint skips `**/templates/**`** because Go templating is not valid
+  YAML. Errors in chart templates surface at `helm template`, not at lint
+  time.
+- **`workflow.rules` prevents duplicate pipelines**, and the lint jobs are
+  deliberately overridden so they also run on a direct push to `main`. A new
+  check must hang off `*checks-rules`, or it only ever runs in merge requests.
