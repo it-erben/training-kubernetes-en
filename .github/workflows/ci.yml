@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    uses: it-erben/ci/.github/workflows/lint.yml@1.0.0
+    with:
+      # Helm chart templates are Go templating, not valid YAML, so yamllint
+      # cannot parse them. kubeconform skips them the same way.
+      yamllint-config: "{extends: relaxed, ignore: ['*.md', '**/templates/**'], rules: {line-length: {max: 140}}}"
+
+  helm:
+    runs-on: ubuntu-latest
+    env:
+      HELM_VERSION: v3.14.4
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: helm lint and template
+        run: |
+          set -euo pipefail
+          curl -sSL "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" | tar -xz -C /tmp
+          sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
+          find . -name Chart.yaml -print0 | while IFS= read -r -d '' chart; do
+            dir="$(dirname "$chart")"
+            echo "Linting ${dir}"
+            helm lint "$dir"
+            helm template "$dir" > /dev/null
+          done
+
+  kube-linter:
+    runs-on: ubuntu-latest
+    env:
+      KUBE_LINTER_VERSION: v0.6.8
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: kube-linter
+        run: |
+          set -euo pipefail
+          curl -sSL "https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/kube-linter-linux.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin kube-linter
+          find labs solutions -name '*.yaml' -print0 | xargs -0 -r kube-linter lint
+
+  kubeconform:
+    runs-on: ubuntu-latest
+    env:
+      KUBECONFORM_VERSION: v0.6.7
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: kubeconform
+        run: |
+          set -euo pipefail
+          curl -sSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin kubeconform
+          find labs solutions -name '*.yaml' \
+            -not -path '*/templates/*' \
+            -not -name 'Chart.yaml' \
+            -not -name 'values.yaml' \
+            -print0 \
+            | xargs -0 -r kubeconform -strict -summary -kubernetes-version "1.35.0" \
+              -schema-location default \
+              -schema-location 'https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/{{.NormalizedKubernetesVersion}}-standalone-strict/{{.ResourceKind}}.json' \
+              -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+
+  release:
+    needs: [lint, helm, kube-linter, kubeconform]
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    uses: it-erben/ci/.github/workflows/release.yml@1.0.0
