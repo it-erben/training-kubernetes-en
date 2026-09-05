@@ -128,3 +128,7 @@ meaningfully checkable.
 - **`workflow.rules` prevents duplicate pipelines**, and the lint jobs are
   deliberately overridden so they also run on a direct push to `main`. A new
   check must hang off `*checks-rules`, or it only ever runs in merge requests.
+- **CI runs on two platforms.** `.gitlab-ci.yml` wires up the GitLab
+  components, `.github/workflows/ci.yml` calls `lint.yml` and `release.yml`
+  from `it-erben/ci`. Helm, kube-linter and kubeconform are repo-local jobs
+  there. No Pages, no deployment.
