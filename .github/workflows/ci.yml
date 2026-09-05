@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   lint:
-    uses: it-erben/ci/.github/workflows/lint.yml@1.0.0
+    uses: it-erben/ci/.github/workflows/lint.yml@1.0.1
     with:
       # Helm chart templates are Go templating, not valid YAML, so yamllint
       # cannot parse them. kubeconform skips them the same way.
@@ -75,4 +75,4 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    uses: it-erben/ci/.github/workflows/release.yml@1.0.0
+    uses: it-erben/ci/.github/workflows/release.yml@1.0.1
